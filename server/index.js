@@ -6,12 +6,6 @@ import multer from 'multer';
 import sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
 import puppeteer from 'puppeteer';
-import fs from 'fs/promises';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
@@ -635,7 +629,6 @@ export default app;
 // Start server alleen in development
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
-    console.log(`🚀 Server draait op poort ${PORT}`);
-    console.log(`📊 API beschikbaar op http://localhost:${PORT}/api`);
+  console.log(`🚀 Server running on port ${PORT}`);
   });
 }

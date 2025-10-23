@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Dog, DogFormData, ApiResponse } from '../types';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') ? '/client/api' : '/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

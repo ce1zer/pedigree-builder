@@ -30,5 +30,8 @@
     "server/index.js": {
       "maxDuration": 30
     }
-  }
+  },
+  "buildCommand": "cd client && npm run build",
+  "outputDirectory": "client/dist",
+  "installCommand": "npm run install:all"
 }

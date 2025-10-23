@@ -58,19 +58,19 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dogs Dashboard</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-4xl font-bold text-white mb-2">Dogs Dashboard</h1>
+          <p className="text-gray-400 text-lg">
             Manage your dog profiles and pedigrees
           </p>
         </div>
         
         <Link
           href="/dogs/new"
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors space-x-2"
+          className="btn-spotify-primary inline-flex items-center space-x-2"
         >
           <Plus className="h-5 w-5" />
           <span>Add Dog</span>
@@ -79,40 +79,40 @@ const Dashboard: React.FC = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="card-spotify">
           <div className="flex items-center">
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <Users className="h-6 w-6 text-blue-600" />
+            <div className="p-3 bg-gray-800 rounded-xl">
+              <Users className="h-6 w-6 text-green-500" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Dogs</p>
-              <p className="text-2xl font-bold text-gray-900">{dogs.length}</p>
+              <p className="text-sm font-medium text-gray-400">Total Dogs</p>
+              <p className="text-2xl font-bold text-white">{dogs.length}</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="card-spotify">
           <div className="flex items-center">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <Users className="h-6 w-6 text-green-600" />
+            <div className="p-3 bg-gray-800 rounded-xl">
+              <Users className="h-6 w-6 text-blue-400" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Male</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-gray-400">Male</p>
+              <p className="text-2xl font-bold text-white">
                 {dogs.filter(dog => dog.gender === 'male').length}
               </p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+        <div className="card-spotify">
           <div className="flex items-center">
-            <div className="p-3 bg-pink-100 rounded-lg">
-              <Users className="h-6 w-6 text-pink-600" />
+            <div className="p-3 bg-gray-800 rounded-xl">
+              <Users className="h-6 w-6 text-pink-400" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Female</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium text-gray-400">Female</p>
+              <p className="text-2xl font-bold text-white">
                 {dogs.filter(dog => dog.gender === 'female').length}
               </p>
             </div>
@@ -121,42 +121,43 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Search */}
-      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+      <div className="card-spotify">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
             placeholder="Search by name or kennel..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="input-spotify w-full pl-12"
           />
         </div>
       </div>
 
       {/* Dogs Grid */}
       {filteredDogs.length === 0 ? (
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-12 text-center">
-          <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <div className="card-spotify-elevated p-12 text-center">
+          <Users className="h-16 w-16 text-gray-500 mx-auto mb-6" />
+          <h3 className="text-xl font-semibold text-white mb-3">
             {searchQuery ? 'No dogs found' : 'No dogs added yet'}
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-400 mb-8 text-lg">
             {searchQuery 
               ? 'Try a different search term' 
               : 'Start by adding your first dog'
             }
           </p>
           {!searchQuery && (
-            <Link href="/dogs/new" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-              Add First Dog
+            <Link href="/dogs/new" className="btn-spotify-primary inline-flex items-center space-x-2">
+              <Plus className="h-5 w-5" />
+              <span>Add First Dog</span>
             </Link>
           )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDogs.map((dog) => (
-            <div key={dog.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+            <div key={dog.id} className="card-spotify group cursor-pointer">
               <div className="flex items-start space-x-4">
                 {/* Photo */}
                 <div className="flex-shrink-0">
@@ -164,28 +165,28 @@ const Dashboard: React.FC = () => {
                     <img
                       src={dog.image_url}
                       alt={dog.dog_name}
-                      className="h-16 w-16 rounded-lg object-cover"
+                      className="h-16 w-16 rounded-xl object-cover"
                     />
                   ) : (
-                    <div className="h-16 w-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                      <Users className="h-8 w-8 text-gray-400" />
+                    <div className="h-16 w-16 bg-gray-800 rounded-xl flex items-center justify-center group-hover:bg-gray-700 transition-colors">
+                      <Users className="h-8 w-8 text-gray-500" />
                     </div>
                   )}
                 </div>
                 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-semibold text-gray-900 truncate">
+                  <h3 className="text-lg font-semibold text-white truncate group-hover:text-green-400 transition-colors">
                     {dog.dog_name}
                   </h3>
-                  <p className="text-sm text-gray-600">{dog.primary_kennel}</p>
+                  <p className="text-sm text-gray-400">{dog.primary_kennel}</p>
                   {dog.secondary_kennel && (
                     <p className="text-sm text-gray-500">{dog.secondary_kennel}</p>
                   )}
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-400">
                     {dog.gender === 'male' ? 'Male' : 'Female'}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-500">
                     Created: {formatDate(dog.created_at)}
                   </p>
                 </div>
@@ -195,17 +196,17 @@ const Dashboard: React.FC = () => {
               <div className="mt-4 flex space-x-2">
                 <Link
                   href={`/dogs/${dog.id}`}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors space-x-1"
+                  className="flex-1 btn-spotify-secondary text-center text-sm"
                 >
-                  <Eye className="h-4 w-4" />
-                  <span>View</span>
+                  <Eye className="h-4 w-4 inline mr-1" />
+                  View
                 </Link>
                 <Link
                   href={`/dogs/${dog.id}/edit`}
-                  className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors space-x-1"
+                  className="flex-1 btn-spotify-secondary text-center text-sm"
                 >
-                  <Edit className="h-4 w-4" />
-                  <span>Edit</span>
+                  <Edit className="h-4 w-4 inline mr-1" />
+                  Edit
                 </Link>
               </div>
             </div>

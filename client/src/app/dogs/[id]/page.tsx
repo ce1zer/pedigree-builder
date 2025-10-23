@@ -224,12 +224,12 @@ const DogCard: React.FC<DogCardProps> = ({ dog, isCurrentDog = false, relationsh
   );
 };
 
-// Pedigree Tree Component
-interface PedigreeTreeProps {
+// Pedigree Tree Horizontal Component
+interface PedigreeTreeHorizontalProps {
   generations: PedigreeGeneration[];
 }
 
-const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
+const PedigreeTreeHorizontal: React.FC<PedigreeTreeHorizontalProps> = ({ generations }) => {
   const rootDog = generations[0]?.dogs[0];
   
   if (!rootDog) {
@@ -246,122 +246,76 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
   // Extract dogs from each generation
   const parents = generations[1]?.dogs || [];
   const grandparents = generations[2]?.dogs || [];
-  const greatGrandparents = generations[3]?.dogs || [];
 
   return (
     <div className="card-spotify">
       <h2 className="text-xl font-semibold text-white mb-6">3-Generation Pedigree</h2>
       
       <div className="overflow-x-auto">
-        <div className="min-w-[800px] space-y-8">
-          {/* Generation 0: Current Dog */}
-          <div className="flex justify-center">
+        <div className="min-w-[1200px] flex items-start space-x-8 py-4">
+          {/* Generation 1: Current Dog (Left) */}
+          <div className="flex-shrink-0">
             <div className="relative">
               <DogCard dog={rootDog} isCurrentDog={true} />
               
               {/* Connection lines to parents */}
               {parents.some(p => p !== null) && (
-                <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-px h-8 bg-gray-600"></div>
+                <div className="absolute top-1/2 -right-4 w-8 h-px bg-gray-600 transform -translate-y-1/2"></div>
               )}
             </div>
           </div>
 
-          {/* Generation 1: Parents */}
+          {/* Generation 2: Parents (Center) */}
           {parents.some(p => p !== null) && (
-            <div className="flex justify-center space-x-16">
-              {/* Father */}
-              <div className="relative">
-                <DogCard dog={parents[0]} relationship="Father" />
+            <div className="flex-shrink-0">
+              <div className="flex flex-col space-y-4">
+                {/* Father */}
+                <div className="relative">
+                  <DogCard dog={parents[0]} relationship="Father" />
+                  
+                  {/* Connection lines to grandparents */}
+                  {grandparents.some((g, i) => i < 2 && g !== null) && (
+                    <div className="absolute top-1/2 -right-4 w-8 h-px bg-gray-600 transform -translate-y-1/2"></div>
+                  )}
+                </div>
                 
-                {/* Connection lines to grandparents */}
-                {grandparents.some((g, i) => i < 2 && g !== null) && (
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-px h-8 bg-gray-600"></div>
-                )}
-              </div>
-              
-              {/* Mother */}
-              <div className="relative">
-                <DogCard dog={parents[1]} relationship="Mother" />
-                
-                {/* Connection lines to grandparents */}
-                {grandparents.some((g, i) => i >= 2 && g !== null) && (
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-px h-8 bg-gray-600"></div>
-                )}
+                {/* Mother */}
+                <div className="relative">
+                  <DogCard dog={parents[1]} relationship="Mother" />
+                  
+                  {/* Connection lines to grandparents */}
+                  {grandparents.some((g, i) => i >= 2 && g !== null) && (
+                    <div className="absolute top-1/2 -right-4 w-8 h-px bg-gray-600 transform -translate-y-1/2"></div>
+                  )}
+                </div>
               </div>
             </div>
           )}
 
-          {/* Generation 2: Grandparents */}
+          {/* Generation 3: Grandparents (Right) */}
           {grandparents.some(g => g !== null) && (
-            <div className="flex justify-center space-x-8">
-              {/* Father's Father */}
-              <div className="relative">
-                <DogCard dog={grandparents[0]} relationship="Father's Father" />
+            <div className="flex-shrink-0">
+              <div className="flex flex-col space-y-2">
+                {/* Father's Father */}
+                <div className="relative">
+                  <DogCard dog={grandparents[0]} relationship="Father's Father" />
+                </div>
                 
-                {/* Connection lines to great-grandparents */}
-                {greatGrandparents.some((gg, i) => i < 2 && gg !== null) && (
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-px h-8 bg-gray-600"></div>
-                )}
-              </div>
-              
-              {/* Father's Mother */}
-              <div className="relative">
-                <DogCard dog={grandparents[1]} relationship="Father's Mother" />
+                {/* Father's Mother */}
+                <div className="relative">
+                  <DogCard dog={grandparents[1]} relationship="Father's Mother" />
+                </div>
                 
-                {/* Connection lines to great-grandparents */}
-                {greatGrandparents.some((gg, i) => i >= 2 && i < 4 && gg !== null) && (
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-px h-8 bg-gray-600"></div>
-                )}
-              </div>
-              
-              {/* Mother's Father */}
-              <div className="relative">
-                <DogCard dog={grandparents[2]} relationship="Mother's Father" />
+                {/* Mother's Father */}
+                <div className="relative">
+                  <DogCard dog={grandparents[2]} relationship="Mother's Father" />
+                </div>
                 
-                {/* Connection lines to great-grandparents */}
-                {greatGrandparents.some((gg, i) => i >= 4 && i < 6 && gg !== null) && (
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-px h-8 bg-gray-600"></div>
-                )}
+                {/* Mother's Mother */}
+                <div className="relative">
+                  <DogCard dog={grandparents[3]} relationship="Mother's Mother" />
+                </div>
               </div>
-              
-              {/* Mother's Mother */}
-              <div className="relative">
-                <DogCard dog={grandparents[3]} relationship="Mother's Mother" />
-                
-                {/* Connection lines to great-grandparents */}
-                {greatGrandparents.some((gg, i) => i >= 6 && gg !== null) && (
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-px h-8 bg-gray-600"></div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Generation 3: Great-grandparents */}
-          {greatGrandparents.some(gg => gg !== null) && (
-            <div className="flex justify-center space-x-4">
-              {/* Father's Father's Father */}
-              <DogCard dog={greatGrandparents[0]} relationship="Father's Father's Father" />
-              
-              {/* Father's Father's Mother */}
-              <DogCard dog={greatGrandparents[1]} relationship="Father's Father's Mother" />
-              
-              {/* Father's Mother's Father */}
-              <DogCard dog={greatGrandparents[2]} relationship="Father's Mother's Father" />
-              
-              {/* Father's Mother's Mother */}
-              <DogCard dog={greatGrandparents[3]} relationship="Father's Mother's Mother" />
-              
-              {/* Mother's Father's Father */}
-              <DogCard dog={greatGrandparents[4]} relationship="Mother's Father's Father" />
-              
-              {/* Mother's Father's Mother */}
-              <DogCard dog={greatGrandparents[5]} relationship="Mother's Father's Mother" />
-              
-              {/* Mother's Mother's Father */}
-              <DogCard dog={greatGrandparents[6]} relationship="Mother's Mother's Father" />
-              
-              {/* Mother's Mother's Mother */}
-              <DogCard dog={greatGrandparents[7]} relationship="Mother's Mother's Mother" />
             </div>
           )}
         </div>
@@ -670,7 +624,7 @@ const DogProfile: React.FC = () => {
           {/* Basic Information */}
           <BasicInfoCard dog={dog} />
 
-          {/* Pedigree Tree */}
+          {/* Pedigree Tree Horizontal */}
           {pedigreeLoading ? (
             <div className="card-spotify">
               <div className="flex justify-center items-center h-32">
@@ -679,7 +633,7 @@ const DogProfile: React.FC = () => {
               </div>
             </div>
           ) : (
-            <PedigreeTree generations={pedigreeGenerations} />
+            <PedigreeTreeHorizontal generations={pedigreeGenerations} />
           )}
 
           {/* Metadata */}

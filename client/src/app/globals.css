@@ -1,7 +1,12 @@
 @import "tailwindcss";
 
-/* Spotify-inspired global styles */
+/* ==========================================================================
+   Spotify-Inspired Design System
+   ========================================================================== */
+
+/* CSS Custom Properties (Design Tokens) */
 :root {
+  /* Color Palette */
   --background: #121212;
   --foreground: #ffffff;
   --spotify-green: #1DB954;
@@ -11,13 +16,34 @@
   --border-color: #2a2a2a;
   --text-secondary: #b3b3b3;
   --text-muted: #6b7280;
+  
+  /* Interactive States */
+  --button-secondary-bg: #2a2a2a;
+  --button-secondary-border: #404040;
+  --button-secondary-hover-bg: #404040;
+  --button-secondary-hover-border: #525252;
+  
+  /* Input States */
+  --input-bg: #2a2a2a;
+  --input-border: #404040;
+  --input-focus-border: var(--spotify-green);
+  --input-focus-shadow: rgba(29, 185, 84, 0.2);
+  
+  /* Shadows */
+  --shadow-elevated: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --shadow-elevated-hover: 0 25px 50px -12px rgba(29, 185, 84, 0.1);
 }
 
+/* Tailwind Theme Configuration */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
+
+/* ==========================================================================
+   Base Styles
+   ========================================================================== */
 
 body {
   background: var(--background);
@@ -25,76 +51,130 @@ body {
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-weight: 400;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Spotify-style utility classes */
+/* ==========================================================================
+   Button Components
+   ========================================================================== */
+
+/* Primary Button - Spotify Green */
 .btn-spotify-primary {
   background-color: var(--spotify-green);
   color: #000000;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
-  transition: all 0.2s ease;
-  transform: scale(1);
   border: none;
   cursor: pointer;
+  transition: all 0.2s ease;
+  transform: scale(1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
-.btn-spotify-primary:hover {
+.btn-spotify-primary:hover:not(:disabled) {
   background-color: var(--spotify-green-hover);
   transform: scale(1.05);
 }
 
+.btn-spotify-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: scale(1);
+}
+
+/* Secondary Button - Dark Theme */
 .btn-spotify-secondary {
-  background-color: #2a2a2a;
+  background-color: var(--button-secondary-bg);
   color: #ffffff;
   font-weight: 500;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
-  border: 1px solid #404040;
-  transition: all 0.2s ease;
+  border: 1px solid var(--button-secondary-border);
   cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
-.btn-spotify-secondary:hover {
-  background-color: #404040;
-  border-color: #525252;
+.btn-spotify-secondary:hover:not(:disabled) {
+  background-color: var(--button-secondary-hover-bg);
+  border-color: var(--button-secondary-hover-border);
 }
 
+.btn-spotify-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Ghost Button - Transparent */
 .btn-spotify-ghost {
   background-color: transparent;
-  color: #b3b3b3;
+  color: var(--text-secondary);
   font-weight: 500;
   padding: 0.5rem 1rem;
   border-radius: 9999px;
-  transition: all 0.2s ease;
+  border: none;
   cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
 }
 
-.btn-spotify-ghost:hover {
-  background-color: #2a2a2a;
+.btn-spotify-ghost:hover:not(:disabled) {
+  background-color: var(--button-secondary-bg);
   color: #ffffff;
 }
 
+.btn-spotify-ghost:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Form Components
+   ========================================================================== */
+
+/* Input Fields */
 .input-spotify {
-  background-color: #2a2a2a;
-  border: 1px solid #404040;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
   border-radius: 0.5rem;
   padding: 0.75rem 1rem;
   color: #ffffff;
   transition: all 0.2s ease;
+  width: 100%;
+  font-size: 0.875rem;
 }
 
 .input-spotify::placeholder {
-  color: #6b7280;
+  color: var(--text-muted);
 }
 
 .input-spotify:focus {
   outline: none;
-  border-color: var(--spotify-green);
-  box-shadow: 0 0 0 2px rgba(29, 185, 84, 0.2);
+  border-color: var(--input-focus-border);
+  box-shadow: 0 0 0 2px var(--input-focus-shadow);
 }
 
+.input-spotify:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Card Components
+   ========================================================================== */
+
+/* Standard Card */
 .card-spotify {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -107,15 +187,57 @@ body {
   background-color: var(--card-hover);
 }
 
+/* Elevated Card with Shadow */
 .card-spotify-elevated {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: 0.75rem;
   padding: 1.5rem;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-elevated);
   transition: all 0.2s ease;
 }
 
 .card-spotify-elevated:hover {
-  box-shadow: 0 25px 50px -12px rgba(29, 185, 84, 0.1);
+  box-shadow: var(--shadow-elevated-hover);
+}
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+
+/* Focus Management */
+.focus-spotify:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--input-focus-shadow);
+}
+
+/* Smooth Transitions */
+.transition-spotify {
+  transition: all 0.2s ease;
+}
+
+/* Text Colors */
+.text-spotify-primary {
+  color: var(--foreground);
+}
+
+.text-spotify-secondary {
+  color: var(--text-secondary);
+}
+
+.text-spotify-muted {
+  color: var(--text-muted);
+}
+
+/* Background Colors */
+.bg-spotify-primary {
+  background-color: var(--background);
+}
+
+.bg-spotify-card {
+  background-color: var(--card-bg);
+}
+
+.bg-spotify-card-hover {
+  background-color: var(--card-hover);
 }

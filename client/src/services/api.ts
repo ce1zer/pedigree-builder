@@ -1,84 +1,102 @@
-import axios from 'axios';
+import axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { Dog, DogFormData, ApiResponse } from '../types';
 
-const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname.includes('vercel.app') ? '/client/api' : '/api';
+// API configuration
+const API_BASE_URL = '/api';
 
-const api = axios.create({
+// Create axios instance with default configuration
+const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Dogs API
+// Helper function to handle API responses
+const handleApiResponse = <T>(response: AxiosResponse<ApiResponse<T>>): ApiResponse<T> => {
+  return response.data;
+};
+
+// Helper function to create form data for dog operations
+const createDogFormData = (dogData: DogFormData): FormData => {
+  const formData = new FormData();
+  formData.append('dogData', JSON.stringify({
+    dog_name: dogData.dog_name,
+    primary_kennel: dogData.primary_kennel,
+    secondary_kennel: dogData.secondary_kennel,
+    gender: dogData.gender,
+    father_id: dogData.father_id,
+    mother_id: dogData.mother_id,
+  }));
+  
+  if (dogData.photo) {
+    formData.append('photo', dogData.photo);
+  }
+  
+  return formData;
+};
+
+// Dogs API service
 export const dogsApi = {
-  // Get all dogs
+  /**
+   * Retrieve all dogs with their parent information
+   */
   getAll: async (): Promise<ApiResponse<Dog[]>> => {
+    console.log('Making API call to:', API_BASE_URL + '/dogs');
     const response = await api.get('/dogs');
-    return response.data;
+    console.log('Raw API response:', response);
+    return handleApiResponse(response);
   },
 
-  // Get specific dog
+  /**
+   * Retrieve a specific dog by ID with parent information
+   */
   getById: async (id: string): Promise<ApiResponse<Dog>> => {
     const response = await api.get(`/dogs/${id}`);
-    return response.data;
+    return handleApiResponse(response);
   },
 
-  // Create new dog
+  /**
+   * Create a new dog profile
+   */
   create: async (dogData: DogFormData): Promise<ApiResponse<Dog>> => {
-    const formData = new FormData();
-    formData.append('dogData', JSON.stringify({
-      dog_name: dogData.dog_name,
-      primary_kennel: dogData.primary_kennel,
-      secondary_kennel: dogData.secondary_kennel,
-      gender: dogData.gender,
-      father_id: dogData.father_id,
-      mother_id: dogData.mother_id,
-    }));
+    const formData = createDogFormData(dogData);
     
-    if (dogData.photo) {
-      formData.append('photo', dogData.photo);
-    }
-
     const response = await api.post('/dogs', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data;
+    
+    return handleApiResponse(response);
   },
 
-  // Update dog profile
+  /**
+   * Update an existing dog profile
+   */
   update: async (id: string, dogData: DogFormData): Promise<ApiResponse<Dog>> => {
-    const formData = new FormData();
-    formData.append('dogData', JSON.stringify({
-      dog_name: dogData.dog_name,
-      primary_kennel: dogData.primary_kennel,
-      secondary_kennel: dogData.secondary_kennel,
-      gender: dogData.gender,
-      father_id: dogData.father_id,
-      mother_id: dogData.mother_id,
-    }));
+    const formData = createDogFormData(dogData);
     
-    if (dogData.photo) {
-      formData.append('photo', dogData.photo);
-    }
-
     const response = await api.put(`/dogs/${id}`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data;
+    
+    return handleApiResponse(response);
   },
 
-  // Search by name or kennel
+  /**
+   * Search dogs by name or kennel
+   */
   search: async (query: string): Promise<ApiResponse<Dog[]>> => {
     const response = await api.get('/dogs/search', {
       params: { q: query },
     });
-    return response.data;
+    
+    return handleApiResponse(response);
   },
 };
 
+// Export the axios instance for direct use if needed
 export default api;

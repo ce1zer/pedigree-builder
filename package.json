@@ -10,7 +10,7 @@
     "build": "cd client && npm run build",
     "start": "cd server && npm start",
     "install:all": "npm install && cd server && npm install && cd ../client && npm install",
-    "vercel-build": "npm run install:all && npm run build"
+    "vercel-build": "npm run install:all && cd client && npm run build:force"
   },
   "keywords": ["pedigree", "dogs", "family-tree", "supabase"],
   "author": "Jordy Lissenburg",

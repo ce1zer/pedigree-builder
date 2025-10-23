@@ -20,44 +20,15 @@ export async function GET(
       .from('dogs')
       .select(`
         *,
-        father:dog_relations!dog_relations_dog_id_fkey(father_id),
-        mother:dog_relations!dog_relations_dog_id_fkey(mother_id)
+        father:father_id(id, dog_name, primary_kennel, secondary_kennel, gender, image_url),
+        mother:mother_id(id, dog_name, primary_kennel, secondary_kennel, gender, image_url)
       `)
       .eq('id', id)
       .single();
 
     if (dogError) throw dogError;
 
-    let father = null;
-    let mother = null;
-
-    // Get father details if exists
-    if (dog.father?.[0]?.father_id) {
-      const { data: fatherData } = await supabase
-        .from('dogs')
-        .select('*')
-        .eq('id', dog.father[0].father_id)
-        .single();
-      father = fatherData;
-    }
-
-    // Get mother details if exists
-    if (dog.mother?.[0]?.mother_id) {
-      const { data: motherData } = await supabase
-        .from('dogs')
-        .select('*')
-        .eq('id', dog.mother[0].mother_id)
-        .single();
-      mother = motherData;
-    }
-
-    const dogWithParents = {
-      ...dog,
-      father,
-      mother
-    };
-
-    return NextResponse.json({ success: true, data: dogWithParents });
+    return NextResponse.json({ success: true, data: dog });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
@@ -75,10 +46,17 @@ export async function PUT(
     const photo = formData.get('photo') as File;
 
     // Validate data
-    if (!dogData.name || dogData.name.trim().length < 2) {
+    if (!dogData.dog_name || dogData.dog_name.trim().length < 2) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Name must be at least 2 characters long' 
+        error: 'Dog name must be at least 2 characters long' 
+      }, { status: 400 });
+    }
+    
+    if (!dogData.primary_kennel || dogData.primary_kennel.trim().length < 2) {
+      return NextResponse.json({ 
+        success: false, 
+        error: 'Primary kennel must be at least 2 characters long' 
       }, { status: 400 });
     }
     
@@ -88,26 +66,12 @@ export async function PUT(
         error: 'Gender must be "male" or "female"' 
       }, { status: 400 });
     }
-    
-    if (!dogData.birth_date) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Birth date is required' 
-      }, { status: 400 });
-    }
-    
-    if (!dogData.breed || dogData.breed.trim().length < 2) {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Breed must be at least 2 characters long' 
-      }, { status: 400 });
-    }
 
     // Check for duplicates (excluding current dog)
     const { data: existingDog } = await supabase
       .from('dogs')
       .select('id')
-      .eq('name', dogData.name.trim())
+      .eq('dog_name', dogData.dog_name.trim())
       .neq('id', id)
       .single();
     
@@ -118,7 +82,7 @@ export async function PUT(
       }, { status: 400 });
     }
 
-    let photoUrl = null;
+    let imageUrl = null;
 
     // Handle photo upload if provided
     if (photo && photo.size > 0) {
@@ -143,19 +107,21 @@ export async function PUT(
         .from('dog-photos')
         .getPublicUrl(fileName);
       
-      photoUrl = publicUrl;
+      imageUrl = publicUrl;
     }
 
     // Update dog
     const updateData: any = {
-      name: dogData.name.trim(),
+      dog_name: dogData.dog_name.trim(),
+      primary_kennel: dogData.primary_kennel.trim(),
+      secondary_kennel: dogData.secondary_kennel?.trim() || null,
       gender: dogData.gender,
-      birth_date: dogData.birth_date,
-      breed: dogData.breed.trim(),
+      father_id: dogData.father_id || null,
+      mother_id: dogData.mother_id || null,
     };
 
-    if (photoUrl) {
-      updateData.photo_url = photoUrl;
+    if (imageUrl) {
+      updateData.image_url = imageUrl;
     }
 
     const { data, error } = await supabase

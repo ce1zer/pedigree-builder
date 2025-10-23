@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { ArrowLeft, Upload, Camera, Save } from 'lucide-react';
-import { DogFormData } from '@/types';
+import { DogFormData, Dog } from '@/types';
 import { dogsApi } from '@/services/api';
 import toast from 'react-hot-toast';
 
@@ -12,20 +12,41 @@ const AddDog: React.FC = () => {
   const router = useRouter();
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [availableDogs, setAvailableDogs] = useState<Dog[]>([]);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    watch,
   } = useForm<DogFormData>({
     defaultValues: {
-      name: '',
+      dog_name: '',
+      primary_kennel: '',
+      secondary_kennel: '',
       gender: 'male',
-      birth_date: '',
-      breed: '',
+      father_id: '',
+      mother_id: '',
     },
   });
+
+  const selectedGender = watch('gender');
+
+  useEffect(() => {
+    loadAvailableDogs();
+  }, []);
+
+  const loadAvailableDogs = async () => {
+    try {
+      const response = await dogsApi.getAll();
+      if (response.success && response.data) {
+        setAvailableDogs(response.data);
+      }
+    } catch (error) {
+      // Silent fail
+    }
+  };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -48,7 +69,7 @@ const AddDog: React.FC = () => {
       const response = await dogsApi.create(data);
       
       if (response.success && response.data) {
-        toast.success(`${data.name} has been successfully added!`);
+        toast.success(`${data.dog_name} has been successfully added!`);
         router.push(`/dogs/${response.data.id}`);
       } else {
         toast.error(response.error || 'Error creating dog');
@@ -123,23 +144,55 @@ const AddDog: React.FC = () => {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Name */}
+            {/* Dog Name */}
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Name *
+                Dog Name *
               </label>
               <input
                 type="text"
-                {...register('name', { 
-                  required: 'Name is required',
-                  minLength: { value: 2, message: 'Name must be at least 2 characters' }
+                {...register('dog_name', { 
+                  required: 'Dog name is required',
+                  minLength: { value: 2, message: 'Dog name must be at least 2 characters' }
                 })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 placeholder="e.g. Max, Luna, Buddy"
               />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+              {errors.dog_name && (
+                <p className="mt-1 text-sm text-red-600">{errors.dog_name.message}</p>
               )}
+            </div>
+
+            {/* Primary Kennel */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Primary Kennel *
+              </label>
+              <input
+                type="text"
+                {...register('primary_kennel', { 
+                  required: 'Primary kennel is required',
+                  minLength: { value: 2, message: 'Primary kennel must be at least 2 characters' }
+                })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g. Golden Kennels"
+              />
+              {errors.primary_kennel && (
+                <p className="mt-1 text-sm text-red-600">{errors.primary_kennel.message}</p>
+              )}
+            </div>
+
+            {/* Secondary Kennel */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Secondary Kennel
+              </label>
+              <input
+                type="text"
+                {...register('secondary_kennel')}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="e.g. Sunshine Farms (optional)"
+              />
             </div>
 
             {/* Gender */}
@@ -158,39 +211,52 @@ const AddDog: React.FC = () => {
                 <p className="mt-1 text-sm text-red-600">{errors.gender.message}</p>
               )}
             </div>
+          </div>
+        </div>
 
-            {/* Birth Date */}
+        {/* Parent Selection */}
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Parents</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Father */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Birth Date *
+                Father
               </label>
-              <input
-                type="date"
-                {...register('birth_date', { required: 'Birth date is required' })}
+              <select
+                {...register('father_id')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              {errors.birth_date && (
-                <p className="mt-1 text-sm text-red-600">{errors.birth_date.message}</p>
-              )}
+              >
+                <option value="">No father selected</option>
+                {availableDogs
+                  .filter(d => d.gender === 'male')
+                  .map(d => (
+                    <option key={d.id} value={d.id}>
+                      {d.dog_name} ({d.primary_kennel})
+                    </option>
+                  ))}
+              </select>
             </div>
 
-            {/* Breed */}
-            <div className="md:col-span-2">
+            {/* Mother */}
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Breed *
+                Mother
               </label>
-              <input
-                type="text"
-                {...register('breed', { 
-                  required: 'Breed is required',
-                  minLength: { value: 2, message: 'Breed must be at least 2 characters' }
-                })}
+              <select
+                {...register('mother_id')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="e.g. Golden Retriever, German Shepherd"
-              />
-              {errors.breed && (
-                <p className="mt-1 text-sm text-red-600">{errors.breed.message}</p>
-              )}
+              >
+                <option value="">No mother selected</option>
+                {availableDogs
+                  .filter(d => d.gender === 'female')
+                  .map(d => (
+                    <option key={d.id} value={d.id}>
+                      {d.dog_name} ({d.primary_kennel})
+                    </option>
+                  ))}
+              </select>
             </div>
           </div>
         </div>

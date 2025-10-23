@@ -3,10 +3,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
 import { ArrowLeft, Edit, Users, TreePine } from 'lucide-react';
-import { Dog, ParentData } from '@/types';
+import { Dog, DogFormData } from '@/types';
 import { dogsApi } from '@/services/api';
-import { formatDate, getAge } from '@/utils/helpers';
+import { formatDate } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 const DogProfile: React.FC = () => {
@@ -14,12 +15,18 @@ const DogProfile: React.FC = () => {
   const router = useRouter();
   const [dog, setDog] = useState<Dog | null>(null);
   const [loading, setLoading] = useState(true);
-  const [linkingParents, setLinkingParents] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [availableDogs, setAvailableDogs] = useState<Dog[]>([]);
-  const [parentData, setParentData] = useState<ParentData>({
-    father_id: '',
-    mother_id: '',
-  });
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setValue,
+    watch,
+  } = useForm<DogFormData>();
+
+  const selectedGender = watch('gender');
 
   useEffect(() => {
     if (id) {
@@ -35,10 +42,12 @@ const DogProfile: React.FC = () => {
       
       if (response.success && response.data) {
         setDog(response.data);
-        setParentData({
-          father_id: response.data.father?.id || '',
-          mother_id: response.data.mother?.id || '',
-        });
+        setValue('dog_name', response.data.dog_name);
+        setValue('primary_kennel', response.data.primary_kennel);
+        setValue('secondary_kennel', response.data.secondary_kennel || '');
+        setValue('gender', response.data.gender);
+        setValue('father_id', response.data.father_id || '');
+        setValue('mother_id', response.data.mother_id || '');
       } else {
         toast.error(response.error || 'Dog not found');
         router.push('/');
@@ -54,33 +63,27 @@ const DogProfile: React.FC = () => {
     try {
       const response = await dogsApi.getAll();
       if (response.success && response.data) {
-        const filtered = response.data.filter(d => 
-          d.id !== id && 
-          d.gender !== dog?.gender
-        );
+        const filtered = response.data.filter(d => d.id !== id);
         setAvailableDogs(filtered);
       }
     } catch (error) {
-      // Silent fail for available dogs
+      // Silent fail
     }
   };
 
-  const handleLinkParents = async () => {
+  const handleUpdate = async (data: DogFormData) => {
     try {
-      setLinkingParents(true);
-      
-      const response = await dogsApi.linkParents(id!, parentData);
+      const response = await dogsApi.update(id!, data);
       
       if (response.success) {
-        toast.success('Parents successfully linked!');
-        loadDog();
+        toast.success('Dog profile updated successfully!');
+        setIsEditing(false);
+        loadDog(); // Reload dog data
       } else {
-        toast.error(response.error || 'Error linking parents');
+        toast.error(response.error || 'Error updating dog profile');
       }
     } catch (error) {
-      toast.error('Error linking parents');
-    } finally {
-      setLinkingParents(false);
+      toast.error('Error updating dog profile');
     }
   };
 
@@ -119,8 +122,8 @@ const DogProfile: React.FC = () => {
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">{dog.name}</h1>
-            <p className="text-gray-600 mt-1">{dog.breed}</p>
+            <h1 className="text-3xl font-bold text-gray-900">{dog.dog_name}</h1>
+            <p className="text-gray-600 mt-1">{dog.primary_kennel}</p>
           </div>
         </div>
         
@@ -132,70 +135,95 @@ const DogProfile: React.FC = () => {
             <TreePine className="h-4 w-4" />
             <span>Pedigree</span>
           </button>
-          <Link
-            href={`/dogs/${dog.id}/edit`}
+          <button
+            onClick={() => setIsEditing(!isEditing)}
             className="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors space-x-2"
           >
             <Edit className="h-4 w-4" />
-            <span>Edit</span>
-          </Link>
+            <span>{isEditing ? 'Cancel' : 'Edit'}</span>
+          </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Info */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Photo and Basic Info */}
+      {isEditing ? (
+        /* Edit Form */
+        <form onSubmit={handleSubmit(handleUpdate)} className="space-y-6">
           <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            <div className="flex items-start space-x-6">
-              {dog.photo_url ? (
-                <img
-                  src={dog.photo_url}
-                  alt={dog.name}
-                  className="h-32 w-32 rounded-lg object-cover"
-                />
-              ) : (
-                <div className="h-32 w-32 bg-gray-200 rounded-lg flex items-center justify-center">
-                  <Users className="h-16 w-16 text-gray-400" />
-                </div>
-              )}
-              
-              <div className="flex-1 space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Gender</label>
-                    <p className="text-lg text-gray-900">
-                      {dog.gender === 'male' ? 'Male' : 'Female'}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Age</label>
-                    <p className="text-lg text-gray-900">{getAge(dog.birth_date)} years old</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Birth Date</label>
-                    <p className="text-lg text-gray-900">{formatDate(dog.birth_date)}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-600">Breed</label>
-                    <p className="text-lg text-gray-900">{dog.breed}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Parents */}
-          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Parents</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Edit Dog Information</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Dog Name */}
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Dog Name *
+                </label>
+                <input
+                  type="text"
+                  {...register('dog_name', { 
+                    required: 'Dog name is required',
+                    minLength: { value: 2, message: 'Dog name must be at least 2 characters' }
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                {errors.dog_name && (
+                  <p className="mt-1 text-sm text-red-600">{errors.dog_name.message}</p>
+                )}
+              </div>
+
+              {/* Primary Kennel */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Primary Kennel *
+                </label>
+                <input
+                  type="text"
+                  {...register('primary_kennel', { 
+                    required: 'Primary kennel is required',
+                    minLength: { value: 2, message: 'Primary kennel must be at least 2 characters' }
+                  })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                {errors.primary_kennel && (
+                  <p className="mt-1 text-sm text-red-600">{errors.primary_kennel.message}</p>
+                )}
+              </div>
+
+              {/* Secondary Kennel */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Secondary Kennel
+                </label>
+                <input
+                  type="text"
+                  {...register('secondary_kennel')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              {/* Gender */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Gender *
+                </label>
+                <select
+                  {...register('gender', { required: 'Gender is required' })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+                {errors.gender && (
+                  <p className="mt-1 text-sm text-red-600">{errors.gender.message}</p>
+                )}
+              </div>
+
               {/* Father */}
               <div>
-                <label className="text-sm font-medium text-gray-600 mb-2 block">Father</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Father
+                </label>
                 <select
-                  value={parentData.father_id}
-                  onChange={(e) => setParentData(prev => ({ ...prev, father_id: e.target.value }))}
+                  {...register('father_id')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">No father selected</option>
@@ -203,24 +231,19 @@ const DogProfile: React.FC = () => {
                     .filter(d => d.gender === 'male')
                     .map(d => (
                       <option key={d.id} value={d.id}>
-                        {d.name} ({d.breed})
+                        {d.dog_name} ({d.primary_kennel})
                       </option>
                     ))}
                 </select>
-                {dog.father && (
-                  <div className="mt-2 p-3 bg-blue-50 rounded-lg">
-                    <p className="font-medium text-blue-900">{dog.father.name}</p>
-                    <p className="text-sm text-blue-700">{dog.father.breed}</p>
-                  </div>
-                )}
               </div>
 
               {/* Mother */}
               <div>
-                <label className="text-sm font-medium text-gray-600 mb-2 block">Mother</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mother
+                </label>
                 <select
-                  value={parentData.mother_id}
-                  onChange={(e) => setParentData(prev => ({ ...prev, mother_id: e.target.value }))}
+                  {...register('mother_id')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">No mother selected</option>
@@ -228,70 +251,151 @@ const DogProfile: React.FC = () => {
                     .filter(d => d.gender === 'female')
                     .map(d => (
                       <option key={d.id} value={d.id}>
-                        {d.name} ({d.breed})
+                        {d.dog_name} ({d.primary_kennel})
                       </option>
                     ))}
                 </select>
-                {dog.mother && (
-                  <div className="mt-2 p-3 bg-pink-50 rounded-lg">
-                    <p className="font-medium text-pink-900">{dog.mother.name}</p>
-                    <p className="text-sm text-pink-700">{dog.mother.breed}</p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                type="button"
+                onClick={() => setIsEditing(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </form>
+      ) : (
+        /* View Mode */
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Info */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Photo and Basic Info */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+              <div className="flex items-start space-x-6">
+                {dog.image_url ? (
+                  <img
+                    src={dog.image_url}
+                    alt={dog.dog_name}
+                    className="h-32 w-32 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="h-32 w-32 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <Users className="h-16 w-16 text-gray-400" />
                   </div>
                 )}
+                
+                <div className="flex-1 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Gender</label>
+                      <p className="text-lg text-gray-900">
+                        {dog.gender === 'male' ? 'Male' : 'Female'}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium text-gray-600">Primary Kennel</label>
+                      <p className="text-lg text-gray-900">{dog.primary_kennel}</p>
+                    </div>
+                    {dog.secondary_kennel && (
+                      <div className="md:col-span-2">
+                        <label className="text-sm font-medium text-gray-600">Secondary Kennel</label>
+                        <p className="text-lg text-gray-900">{dog.secondary_kennel}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="mt-4">
-              <button
-                onClick={handleLinkParents}
-                disabled={linkingParents}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-              >
-                {linkingParents ? 'Linking...' : 'Link Parents'}
-              </button>
+            {/* Parents */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Parents</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Father */}
+                <div>
+                  <label className="text-sm font-medium text-gray-600 mb-2 block">Father</label>
+                  {dog.father ? (
+                    <div className="p-3 bg-blue-50 rounded-lg">
+                      <p className="font-medium text-blue-900">{dog.father.dog_name}</p>
+                      <p className="text-sm text-blue-700">{dog.father.primary_kennel}</p>
+                      <Link href={`/dogs/${dog.father.id}`} className="text-blue-600 hover:underline text-sm">
+                        View Father's Profile
+                      </Link>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 italic">No father assigned</p>
+                  )}
+                </div>
+
+                {/* Mother */}
+                <div>
+                  <label className="text-sm font-medium text-gray-600 mb-2 block">Mother</label>
+                  {dog.mother ? (
+                    <div className="p-3 bg-pink-50 rounded-lg">
+                      <p className="font-medium text-pink-900">{dog.mother.dog_name}</p>
+                      <p className="text-sm text-pink-700">{dog.mother.primary_kennel}</p>
+                      <Link href={`/dogs/${dog.mother.id}`} className="text-pink-600 hover:underline text-sm">
+                        View Mother's Profile
+                      </Link>
+                    </div>
+                  ) : (
+                    <p className="text-gray-500 italic">No mother assigned</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Quick Actions */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+              <div className="space-y-3">
+                <button
+                  onClick={handleGeneratePedigree}
+                  className="w-full inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors space-x-2"
+                >
+                  <TreePine className="h-4 w-4" />
+                  <span>View Pedigree</span>
+                </button>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors space-x-2"
+                >
+                  <Edit className="h-4 w-4" />
+                  <span>Edit Profile</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Metadata */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Metadata</h3>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <span className="text-gray-600">Created:</span>
+                  <span className="ml-2 text-gray-900">{formatDate(dog.created_at)}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Quick Actions */}
-          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <button
-                onClick={handleGeneratePedigree}
-                className="w-full inline-flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors space-x-2"
-              >
-                <TreePine className="h-4 w-4" />
-                <span>View Pedigree</span>
-              </button>
-              <Link
-                href={`/dogs/${dog.id}/edit`}
-                className="w-full inline-flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors space-x-2"
-              >
-                <Edit className="h-4 w-4" />
-                <span>Edit Profile</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Metadata */}
-          <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Metadata</h3>
-            <div className="space-y-3 text-sm">
-              <div>
-                <span className="text-gray-600">Created:</span>
-                <span className="ml-2 text-gray-900">{formatDate(dog.created_at)}</span>
-              </div>
-              <div>
-                <span className="text-gray-600">Last updated:</span>
-                <span className="ml-2 text-gray-900">{formatDate(dog.updated_at)}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 };

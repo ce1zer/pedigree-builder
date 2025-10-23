@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase
       .from('dogs')
       .select('*')
-      .or(`name.ilike.${searchTerm},breed.ilike.${searchTerm}`)
-      .order('name');
+      .or(`dog_name.ilike.${searchTerm},primary_kennel.ilike.${searchTerm},secondary_kennel.ilike.${searchTerm}`)
+      .order('dog_name');
 
     if (error) throw error;
 

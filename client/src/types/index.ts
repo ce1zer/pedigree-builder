@@ -1,27 +1,25 @@
 export interface Dog {
   id: string;
-  name: string;
+  dog_name: string;
+  primary_kennel: string;
+  secondary_kennel?: string;
   gender: 'male' | 'female';
-  birth_date: string;
-  breed: string;
-  photo_url?: string;
+  image_url?: string;
+  father_id?: string;
+  mother_id?: string;
   created_at: string;
-  updated_at: string;
   father?: Dog | null;
   mother?: Dog | null;
 }
 
 export interface DogFormData {
-  name: string;
+  dog_name: string;
+  primary_kennel: string;
+  secondary_kennel?: string;
   gender: 'male' | 'female';
-  birth_date: string;
-  breed: string;
-  photo?: File;
-}
-
-export interface ParentData {
   father_id?: string;
   mother_id?: string;
+  photo?: File;
 }
 
 export interface ApiResponse<T> {

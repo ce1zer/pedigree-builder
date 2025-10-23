@@ -21,8 +21,9 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     if (searchQuery.trim()) {
       const filtered = dogs.filter(dog =>
-        dog.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        dog.breed.toLowerCase().includes(searchQuery.toLowerCase())
+        dog.dog_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        dog.primary_kennel.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (dog.secondary_kennel && dog.secondary_kennel.toLowerCase().includes(searchQuery.toLowerCase()))
       );
       setFilteredDogs(filtered);
     } else {
@@ -125,7 +126,7 @@ const Dashboard: React.FC = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Search by name or breed..."
+            placeholder="Search by name or kennel..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -159,10 +160,10 @@ const Dashboard: React.FC = () => {
               <div className="flex items-start space-x-4">
                 {/* Photo */}
                 <div className="flex-shrink-0">
-                  {dog.photo_url ? (
+                  {dog.image_url ? (
                     <img
-                      src={dog.photo_url}
-                      alt={dog.name}
+                      src={dog.image_url}
+                      alt={dog.dog_name}
                       className="h-16 w-16 rounded-lg object-cover"
                     />
                   ) : (
@@ -175,14 +176,17 @@ const Dashboard: React.FC = () => {
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-semibold text-gray-900 truncate">
-                    {dog.name}
+                    {dog.dog_name}
                   </h3>
-                  <p className="text-sm text-gray-600">{dog.breed}</p>
+                  <p className="text-sm text-gray-600">{dog.primary_kennel}</p>
+                  {dog.secondary_kennel && (
+                    <p className="text-sm text-gray-500">{dog.secondary_kennel}</p>
+                  )}
                   <p className="text-sm text-gray-500">
-                    {dog.gender === 'male' ? 'Male' : 'Female'} • {getAge(dog.birth_date)} years old
+                    {dog.gender === 'male' ? 'Male' : 'Female'}
                   </p>
                   <p className="text-xs text-gray-400">
-                    Born: {formatDate(dog.birth_date)}
+                    Created: {formatDate(dog.created_at)}
                   </p>
                 </div>
               </div>

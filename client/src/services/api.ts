@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Dog, DogFormData, ParentData, ApiResponse } from '../types';
+import { Dog, DogFormData, ApiResponse } from '../types';
 
 const API_BASE_URL = '/api';
 
@@ -28,10 +28,12 @@ export const dogsApi = {
   create: async (dogData: DogFormData): Promise<ApiResponse<Dog>> => {
     const formData = new FormData();
     formData.append('dogData', JSON.stringify({
-      name: dogData.name,
+      dog_name: dogData.dog_name,
+      primary_kennel: dogData.primary_kennel,
+      secondary_kennel: dogData.secondary_kennel,
       gender: dogData.gender,
-      birth_date: dogData.birth_date,
-      breed: dogData.breed,
+      father_id: dogData.father_id,
+      mother_id: dogData.mother_id,
     }));
     
     if (dogData.photo) {
@@ -50,10 +52,12 @@ export const dogsApi = {
   update: async (id: string, dogData: DogFormData): Promise<ApiResponse<Dog>> => {
     const formData = new FormData();
     formData.append('dogData', JSON.stringify({
-      name: dogData.name,
+      dog_name: dogData.dog_name,
+      primary_kennel: dogData.primary_kennel,
+      secondary_kennel: dogData.secondary_kennel,
       gender: dogData.gender,
-      birth_date: dogData.birth_date,
-      breed: dogData.breed,
+      father_id: dogData.father_id,
+      mother_id: dogData.mother_id,
     }));
     
     if (dogData.photo) {
@@ -68,13 +72,7 @@ export const dogsApi = {
     return response.data;
   },
 
-  // Link parents
-  linkParents: async (id: string, parentData: ParentData): Promise<ApiResponse<any>> => {
-    const response = await api.post(`/dogs/${id}/parents`, parentData);
-    return response.data;
-  },
-
-  // Search by name
+  // Search by name or kennel
   search: async (query: string): Promise<ApiResponse<Dog[]>> => {
     const response = await api.get('/dogs/search', {
       params: { q: query },

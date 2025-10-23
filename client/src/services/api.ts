@@ -12,19 +12,19 @@ const api = axios.create({
 
 // Dogs API
 export const dogsApi = {
-  // Alle honden ophalen
+  // Get all dogs
   getAll: async (): Promise<ApiResponse<Dog[]>> => {
     const response = await api.get('/dogs');
     return response.data;
   },
 
-  // Specifieke hond ophalen
+  // Get specific dog
   getById: async (id: string): Promise<ApiResponse<Dog>> => {
     const response = await api.get(`/dogs/${id}`);
     return response.data;
   },
 
-  // Nieuwe hond aanmaken
+  // Create new dog
   create: async (dogData: DogFormData): Promise<ApiResponse<Dog>> => {
     const formData = new FormData();
     formData.append('dogData', JSON.stringify({
@@ -46,7 +46,7 @@ export const dogsApi = {
     return response.data;
   },
 
-  // Hondenprofiel bijwerken
+  // Update dog profile
   update: async (id: string, dogData: DogFormData): Promise<ApiResponse<Dog>> => {
     const formData = new FormData();
     formData.append('dogData', JSON.stringify({
@@ -68,13 +68,13 @@ export const dogsApi = {
     return response.data;
   },
 
-  // Ouders koppelen
+  // Link parents
   linkParents: async (id: string, parentData: ParentData): Promise<ApiResponse<any>> => {
     const response = await api.post(`/dogs/${id}/parents`, parentData);
     return response.data;
   },
 
-  // Zoeken op naam
+  // Search by name
   search: async (query: string): Promise<ApiResponse<Dog[]>> => {
     const response = await api.get('/dogs/search', {
       params: { q: query },
@@ -85,7 +85,7 @@ export const dogsApi = {
 
 // Pedigree API
 export const pedigreeApi = {
-  // Stamboom genereren
+  // Generate pedigree
   generate: async (rootDogId: string, maxGenerations: number = 5): Promise<ApiResponse<PedigreeNode>> => {
     const response = await api.post('/pedigree/generate', {
       rootDogId,
@@ -94,7 +94,7 @@ export const pedigreeApi = {
     return response.data;
   },
 
-  // Stamboom exporteren als PNG
+  // Export pedigree as PNG
   exportAsPng: async (pedigreeData: PedigreeNode): Promise<Blob> => {
     const response = await api.post('/pedigree/export', {
       pedigreeData,

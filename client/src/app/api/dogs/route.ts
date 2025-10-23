@@ -7,7 +7,7 @@ const supabase = createClient(
   process.env.SUPABASE_ANON_KEY || 'placeholder-key'
 );
 
-// GET /api/dogs - Alle honden ophalen
+// GET /api/dogs - Get all dogs
 export async function GET() {
   try {
     const { data, error } = await supabase
@@ -23,7 +23,7 @@ export async function GET() {
   }
 }
 
-// POST /api/dogs - Nieuwe hond aanmaken
+// POST /api/dogs - Create new dog
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
     
-    // Check voor duplicaten
+    // Check for duplicates
     const { data: existingDog } = await supabase
       .from('dogs')
       .select('id')
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
     
-    // Maak hond aan
+    // Create dog
     const { data, error } = await supabase
       .from('dogs')
       .insert([{
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
         gender: dogData.gender,
         birth_date: dogData.birth_date,
         breed: dogData.breed.trim(),
-        photo_url: null // Voor nu geen foto upload
+        photo_url: null // No photo upload for now
       }])
       .select()
       .single();

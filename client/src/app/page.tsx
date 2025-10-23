@@ -38,18 +38,18 @@ const Dashboard: React.FC = () => {
         setDogs(response.data);
         setFilteredDogs(response.data);
       } else {
-        toast.error(response.error || 'Fout bij het laden van honden');
+        toast.error(response.error || 'Error loading dogs');
       }
     } catch (error) {
       console.error('Error loading dogs:', error);
-      toast.error('Fout bij het laden van honden');
+      toast.error('Error loading dogs');
     } finally {
       setLoading(false);
     }
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('nl-NL');
+    return new Date(dateString).toLocaleDateString('en-US');
   };
 
   const getAge = (birthDate: string) => {

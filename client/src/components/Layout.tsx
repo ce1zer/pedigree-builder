@@ -51,7 +51,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 }`}
               >
                 <Plus className="h-4 w-4" />
-                <span>Nieuwe Hond</span>
+                <span>Add Dog</span>
               </Link>
             </nav>
           </div>
@@ -67,7 +67,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <footer className="bg-white border-t border-gray-200 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="text-center text-gray-600">
-            <p>&copy; 2024 PedigreeBuilder. Gebouwd voor hondenliefhebbers.</p>
+            <p>&copy; 2024 PedigreeBuilder. Built for dog lovers.</p>
           </div>
         </div>
       </footer>

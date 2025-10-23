@@ -33,28 +33,28 @@ export async function POST(request: NextRequest) {
     if (!dogData.name || dogData.name.trim().length < 2) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Naam moet minimaal 2 karakters bevatten' 
+        error: 'Name must be at least 2 characters long' 
       }, { status: 400 });
     }
     
     if (!dogData.gender || !['male', 'female'].includes(dogData.gender)) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Geslacht moet "male" of "female" zijn' 
+        error: 'Gender must be "male" or "female"' 
       }, { status: 400 });
     }
     
     if (!dogData.birth_date) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Geboortedatum is verplicht' 
+        error: 'Birth date is required' 
       }, { status: 400 });
     }
     
     if (!dogData.breed || dogData.breed.trim().length < 2) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Ras moet minimaal 2 karakters bevatten' 
+        error: 'Breed must be at least 2 characters long' 
       }, { status: 400 });
     }
     
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     if (existingDog) {
       return NextResponse.json({ 
         success: false, 
-        error: 'Een hond met deze naam bestaat al' 
+        error: 'A dog with this name already exists' 
       }, { status: 400 });
     }
     

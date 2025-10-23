@@ -78,9 +78,9 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Honden Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Dogs Dashboard</h1>
           <p className="text-gray-600 mt-1">
-            Beheer je hondenprofielen en stambomen
+            Manage your dog profiles and pedigrees
           </p>
         </div>
         
@@ -89,7 +89,7 @@ const Dashboard: React.FC = () => {
           className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors space-x-2"
         >
           <Plus className="h-5 w-5" />
-          <span>Nieuwe Hond</span>
+          <span>Add Dog</span>
         </Link>
       </div>
 
@@ -101,7 +101,7 @@ const Dashboard: React.FC = () => {
               <Users className="h-6 w-6 text-blue-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Totaal Honden</p>
+              <p className="text-sm font-medium text-gray-600">Total Dogs</p>
               <p className="text-2xl font-bold text-gray-900">{dogs.length}</p>
             </div>
           </div>
@@ -113,7 +113,7 @@ const Dashboard: React.FC = () => {
               <Users className="h-6 w-6 text-green-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Mannelijk</p>
+              <p className="text-sm font-medium text-gray-600">Male</p>
               <p className="text-2xl font-bold text-gray-900">
                 {dogs.filter(dog => dog.gender === 'male').length}
               </p>
@@ -127,7 +127,7 @@ const Dashboard: React.FC = () => {
               <Users className="h-6 w-6 text-pink-600" />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Vrouwelijk</p>
+              <p className="text-sm font-medium text-gray-600">Female</p>
               <p className="text-2xl font-bold text-gray-900">
                 {dogs.filter(dog => dog.gender === 'female').length}
               </p>
@@ -142,7 +142,7 @@ const Dashboard: React.FC = () => {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
             type="text"
-            placeholder="Zoek op naam of ras..."
+            placeholder="Search by name or breed..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -155,17 +155,17 @@ const Dashboard: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md border border-gray-200 p-12 text-center">
           <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {searchQuery ? 'Geen honden gevonden' : 'Nog geen honden toegevoegd'}
+            {searchQuery ? 'No dogs found' : 'No dogs added yet'}
           </h3>
           <p className="text-gray-600 mb-6">
             {searchQuery 
-              ? 'Probeer een andere zoekterm' 
-              : 'Begin met het toevoegen van je eerste hond'
+              ? 'Try a different search term' 
+              : 'Start by adding your first dog'
             }
           </p>
           {!searchQuery && (
             <Link href="/dogs/new" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-              Eerste hond toevoegen
+              Add First Dog
             </Link>
           )}
         </div>
@@ -196,10 +196,10 @@ const Dashboard: React.FC = () => {
                   </h3>
                   <p className="text-sm text-gray-600">{dog.breed}</p>
                   <p className="text-sm text-gray-500">
-                    {dog.gender === 'male' ? 'Mannetje' : 'Vrouwtje'} • {getAge(dog.birth_date)} jaar
+                    {dog.gender === 'male' ? 'Male' : 'Female'} • {getAge(dog.birth_date)} years old
                   </p>
                   <p className="text-xs text-gray-400">
-                    Geboren: {formatDate(dog.birth_date)}
+                    Born: {formatDate(dog.birth_date)}
                   </p>
                 </div>
               </div>
@@ -211,14 +211,14 @@ const Dashboard: React.FC = () => {
                   className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors space-x-1"
                 >
                   <Eye className="h-4 w-4" />
-                  <span>Bekijk</span>
+                  <span>View</span>
                 </Link>
                 <Link
                   href={`/dogs/${dog.id}/edit`}
                   className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors space-x-1"
                 >
                   <Edit className="h-4 w-4" />
-                  <span>Bewerk</span>
+                  <span>Edit</span>
                 </Link>
               </div>
             </div>

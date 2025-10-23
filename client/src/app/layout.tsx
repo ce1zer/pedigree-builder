@@ -7,8 +7,8 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PedigreeBuilder - Hondenstambomen",
-  description: "Een webtool voor het bouwen en beheren van hondenstambomen",
+  title: "PedigreeBuilder - Dog Pedigrees",
+  description: "A web tool for building and managing dog pedigrees",
 };
 
 export default function RootLayout({

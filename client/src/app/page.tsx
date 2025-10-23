@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Plus, Search, Eye, Edit, Users } from 'lucide-react';
 import { Dog } from '../types';
 import { dogsApi } from '../services/api';
@@ -83,8 +85,8 @@ const Dashboard: React.FC = () => {
         </div>
         
         <Link
-          to="/dogs/new"
-          className="btn btn-primary flex items-center space-x-2"
+          href="/dogs/new"
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors space-x-2"
         >
           <Plus className="h-5 w-5" />
           <span>Nieuwe Hond</span>
@@ -93,7 +95,7 @@ const Dashboard: React.FC = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card p-6">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="p-3 bg-blue-100 rounded-lg">
               <Users className="h-6 w-6 text-blue-600" />
@@ -105,7 +107,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         
-        <div className="card p-6">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="p-3 bg-green-100 rounded-lg">
               <Users className="h-6 w-6 text-green-600" />
@@ -119,7 +121,7 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
         
-        <div className="card p-6">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
           <div className="flex items-center">
             <div className="p-3 bg-pink-100 rounded-lg">
               <Users className="h-6 w-6 text-pink-600" />
@@ -135,7 +137,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Search */}
-      <div className="card p-6">
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
           <input
@@ -143,14 +145,14 @@ const Dashboard: React.FC = () => {
             placeholder="Zoek op naam of ras..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="input pl-10"
+            className="w-full px-3 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>
       </div>
 
       {/* Dogs Grid */}
       {filteredDogs.length === 0 ? (
-        <div className="card p-12 text-center">
+        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-12 text-center">
           <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             {searchQuery ? 'Geen honden gevonden' : 'Nog geen honden toegevoegd'}
@@ -162,7 +164,7 @@ const Dashboard: React.FC = () => {
             }
           </p>
           {!searchQuery && (
-            <Link to="/dogs/new" className="btn btn-primary">
+            <Link href="/dogs/new" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
               Eerste hond toevoegen
             </Link>
           )}
@@ -170,7 +172,7 @@ const Dashboard: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDogs.map((dog) => (
-            <div key={dog.id} className="card p-6 hover:shadow-lg transition-shadow">
+            <div key={dog.id} className="bg-white rounded-lg shadow-md border border-gray-200 p-6 hover:shadow-lg transition-shadow">
               <div className="flex items-start space-x-4">
                 {/* Photo */}
                 <div className="flex-shrink-0">
@@ -205,15 +207,15 @@ const Dashboard: React.FC = () => {
               {/* Actions */}
               <div className="mt-4 flex space-x-2">
                 <Link
-                  to={`/dogs/${dog.id}`}
-                  className="btn btn-secondary flex-1 flex items-center justify-center space-x-1"
+                  href={`/dogs/${dog.id}`}
+                  className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors space-x-1"
                 >
                   <Eye className="h-4 w-4" />
                   <span>Bekijk</span>
                 </Link>
                 <Link
-                  to={`/dogs/${dog.id}/edit`}
-                  className="btn btn-secondary flex-1 flex items-center justify-center space-x-1"
+                  href={`/dogs/${dog.id}/edit`}
+                  className="flex-1 inline-flex items-center justify-center px-3 py-2 bg-gray-200 text-gray-900 rounded-lg font-medium hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors space-x-1"
                 >
                   <Edit className="h-4 w-4" />
                   <span>Bewerk</span>

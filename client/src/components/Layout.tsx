@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Dog, Plus, Home } from 'lucide-react';
 
 interface LayoutProps {
@@ -7,10 +10,10 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const location = useLocation();
+  const pathname = usePathname();
 
   const isActive = (path: string) => {
-    return location.pathname === path;
+    return pathname === path;
   };
 
   return (
@@ -20,7 +23,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/" className="flex items-center space-x-2">
+            <Link href="/" className="flex items-center space-x-2">
               <Dog className="h-8 w-8 text-blue-600" />
               <span className="text-xl font-bold text-gray-900">PedigreeBuilder</span>
             </Link>
@@ -28,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             {/* Navigation */}
             <nav className="flex space-x-8">
               <Link
-                to="/"
+                href="/"
                 className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive('/') 
                     ? 'bg-blue-100 text-blue-700' 
@@ -40,7 +43,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               </Link>
               
               <Link
-                to="/dogs/new"
+                href="/dogs/new"
                 className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                   isActive('/dogs/new') 
                     ? 'bg-blue-100 text-blue-700' 

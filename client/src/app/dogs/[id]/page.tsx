@@ -88,7 +88,31 @@ const DogProfile: React.FC = () => {
   };
 
   const handleGeneratePedigree = async () => {
-    toast.error('Pedigree generation not yet implemented');
+    try {
+      const response = await fetch('/api/pedigree/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          rootDogId: id,
+          maxGenerations: 5
+        }),
+      });
+      
+      const result = await response.json();
+      
+      if (result.success && result.data) {
+        // For now, just show the pedigree data in console
+        // In a real implementation, you'd navigate to a pedigree viewer page
+        console.log('Generated pedigree:', result.data);
+        toast.success('Pedigree generated successfully! Check console for data.');
+      } else {
+        toast.error(result.error || 'Error generating pedigree');
+      }
+    } catch (error) {
+      toast.error('Error generating pedigree');
+    }
   };
 
   if (loading) {

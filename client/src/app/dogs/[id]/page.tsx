@@ -5,7 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Edit, Users, TreePine } from 'lucide-react';
 import { Dog, ParentData } from '@/types';
-import { dogsApi, pedigreeApi } from '@/services/api';
+import { dogsApi } from '@/services/api';
+import { formatDate, getAge } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 const DogProfile: React.FC = () => {
@@ -43,7 +44,6 @@ const DogProfile: React.FC = () => {
         router.push('/');
       }
     } catch (error) {
-      console.error('Error loading dog:', error);
       toast.error('Error loading dog profile');
     } finally {
       setLoading(false);
@@ -54,15 +54,14 @@ const DogProfile: React.FC = () => {
     try {
       const response = await dogsApi.getAll();
       if (response.success && response.data) {
-        // Filter out current dog and dogs that would create circular references
         const filtered = response.data.filter(d => 
           d.id !== id && 
-          d.gender !== dog?.gender // Can't be same gender as current dog
+          d.gender !== dog?.gender
         );
         setAvailableDogs(filtered);
       }
     } catch (error) {
-      console.error('Error loading available dogs:', error);
+      // Silent fail for available dogs
     }
   };
 
@@ -74,12 +73,11 @@ const DogProfile: React.FC = () => {
       
       if (response.success) {
         toast.success('Parents successfully linked!');
-        loadDog(); // Reload dog data
+        loadDog();
       } else {
         toast.error(response.error || 'Error linking parents');
       }
     } catch (error) {
-      console.error('Error linking parents:', error);
       toast.error('Error linking parents');
     } finally {
       setLinkingParents(false);
@@ -87,35 +85,7 @@ const DogProfile: React.FC = () => {
   };
 
   const handleGeneratePedigree = async () => {
-    try {
-      const response = await pedigreeApi.generate(id!);
-      
-      if (response.success && response.data) {
-        router.push(`/pedigree/${id}`);
-      } else {
-        toast.error(response.error || 'Error generating pedigree');
-      }
-    } catch (error) {
-      console.error('Error generating pedigree:', error);
-      toast.error('Error generating pedigree');
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US');
-  };
-
-  const getAge = (birthDate: string) => {
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
-    }
-    
-    return age;
+    toast.error('Pedigree generation not yet implemented');
   };
 
   if (loading) {

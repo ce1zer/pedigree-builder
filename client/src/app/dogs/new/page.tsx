@@ -54,7 +54,6 @@ const AddDog: React.FC = () => {
         toast.error(response.error || 'Error creating dog');
       }
     } catch (error) {
-      console.error('Error creating dog:', error);
       toast.error('Error creating dog');
     } finally {
       setIsSubmitting(false);

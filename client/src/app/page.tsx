@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Plus, Search, Eye, Edit, Users } from 'lucide-react';
-import { Dog } from '../types';
-import { dogsApi } from '../services/api';
+import { Dog } from '@/types';
+import { dogsApi } from '@/services/api';
+import { formatDate, getAge } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
@@ -41,28 +42,10 @@ const Dashboard: React.FC = () => {
         toast.error(response.error || 'Error loading dogs');
       }
     } catch (error) {
-      console.error('Error loading dogs:', error);
       toast.error('Error loading dogs');
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US');
-  };
-
-  const getAge = (birthDate: string) => {
-    const today = new Date();
-    const birth = new Date(birthDate);
-    let age = today.getFullYear() - birth.getFullYear();
-    const monthDiff = today.getMonth() - birth.getMonth();
-    
-    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-      age--;
-    }
-    
-    return age;
   };
 
   if (loading) {

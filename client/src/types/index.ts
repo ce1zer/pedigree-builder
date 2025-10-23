@@ -24,18 +24,6 @@ export interface ParentData {
   mother_id?: string;
 }
 
-export interface PedigreeNode {
-  id: string;
-  name: string;
-  gender: 'male' | 'female';
-  breed: string;
-  birth_date: string;
-  photo_url?: string;
-  generation: number;
-  father?: PedigreeNode | null;
-  mother?: PedigreeNode | null;
-}
-
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Dog, DogFormData, ParentData, PedigreeNode, ApiResponse } from '../types';
+import { Dog, DogFormData, ParentData, ApiResponse } from '../types';
 
 const API_BASE_URL = '/api';
 
@@ -78,29 +78,6 @@ export const dogsApi = {
   search: async (query: string): Promise<ApiResponse<Dog[]>> => {
     const response = await api.get('/dogs/search', {
       params: { q: query },
-    });
-    return response.data;
-  },
-};
-
-// Pedigree API
-export const pedigreeApi = {
-  // Generate pedigree
-  generate: async (rootDogId: string, maxGenerations: number = 5): Promise<ApiResponse<PedigreeNode>> => {
-    const response = await api.post('/pedigree/generate', {
-      rootDogId,
-      maxGenerations,
-    });
-    return response.data;
-  },
-
-  // Export pedigree as PNG
-  exportAsPng: async (pedigreeData: PedigreeNode): Promise<Blob> => {
-    const response = await api.post('/pedigree/export', {
-      pedigreeData,
-      format: 'png',
-    }, {
-      responseType: 'blob',
     });
     return response.data;
   },

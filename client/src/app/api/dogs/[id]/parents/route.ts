@@ -87,7 +87,6 @@ export async function POST(
 
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
-    console.error('Error linking parents:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

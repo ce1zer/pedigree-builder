@@ -55,7 +55,6 @@ export async function GET() {
     
     return NextResponse.json({ success: true, data: dogsWithParents });
   } catch (error: any) {
-    console.error('Error fetching dogs:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
@@ -125,7 +124,6 @@ export async function POST(request: NextRequest) {
         });
       
       if (uploadError) {
-        console.error('Upload error:', uploadError);
         return NextResponse.json({ 
           success: false, 
           error: 'Failed to upload photo' 
@@ -156,7 +154,6 @@ export async function POST(request: NextRequest) {
     
     return NextResponse.json({ success: true, data });
   } catch (error: any) {
-    console.error('Error creating dog:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }

@@ -1,41 +1,274 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Edit, Users, TreePine } from 'lucide-react';
+import { ArrowLeft, Edit, Users, TreePine, User } from 'lucide-react';
 import { Dog, DogFormData } from '@/types';
 import { dogsApi } from '@/services/api';
 import { formatDate } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
+// Constants
+const ICON_SIZE = 'h-5 w-5';
+const SMALL_ICON_SIZE = 'h-4 w-4';
+const PHOTO_SIZE = 'h-32 w-32';
+const USER_ICON_SIZE = 'h-16 w-16';
+
+// Pedigree generation interface
+interface PedigreeGeneration {
+  generation: number;
+  dogs: (Dog | null)[];
+}
+
+// Helper function to fetch a dog by ID
+const fetchDogById = async (dogId: string): Promise<Dog | null> => {
+  try {
+    const response = await dogsApi.getById(dogId);
+    return response.success && response.data ? response.data : null;
+  } catch (error) {
+    console.warn(`Failed to fetch dog with ID ${dogId}:`, error);
+    return null;
+  }
+};
+
+// Helper function to build pedigree generations recursively
+const buildPedigreeGenerations = async (rootDog: Dog): Promise<PedigreeGeneration[]> => {
+  const generations: PedigreeGeneration[] = [
+    {
+      generation: 0,
+      dogs: [rootDog]
+    }
+  ];
+
+  // Generation 1: Parents
+  const parents: (Dog | null)[] = [];
+  if (rootDog.father_id) {
+    parents.push(await fetchDogById(rootDog.father_id));
+  } else {
+    parents.push(null);
+  }
+  if (rootDog.mother_id) {
+    parents.push(await fetchDogById(rootDog.mother_id));
+  } else {
+    parents.push(null);
+  }
+  generations.push({
+    generation: 1,
+    dogs: parents
+  });
+
+  // Generation 2: Grandparents
+  const grandparents: (Dog | null)[] = [];
+  for (const parent of parents) {
+    if (parent?.father_id) {
+      grandparents.push(await fetchDogById(parent.father_id));
+    } else {
+      grandparents.push(null);
+    }
+    if (parent?.mother_id) {
+      grandparents.push(await fetchDogById(parent.mother_id));
+    } else {
+      grandparents.push(null);
+    }
+  }
+  generations.push({
+    generation: 2,
+    dogs: grandparents
+  });
+
+  // Generation 3: Great-grandparents
+  const greatGrandparents: (Dog | null)[] = [];
+  for (const grandparent of grandparents) {
+    if (grandparent?.father_id) {
+      greatGrandparents.push(await fetchDogById(grandparent.father_id));
+    } else {
+      greatGrandparents.push(null);
+    }
+    if (grandparent?.mother_id) {
+      greatGrandparents.push(await fetchDogById(grandparent.mother_id));
+    } else {
+      greatGrandparents.push(null);
+    }
+  }
+  generations.push({
+    generation: 3,
+    dogs: greatGrandparents
+  });
+
+  return generations;
+};
+
+// Basic Info Card Component
+interface BasicInfoCardProps {
+  dog: Dog;
+}
+
+const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog }) => (
+  <div className="card-spotify">
+    <h2 className="text-xl font-semibold text-white mb-6">Basic Information</h2>
+    
+    <div className="flex items-start space-x-6">
+      {/* Profile Image */}
+      <div className="flex-shrink-0">
+        {dog.image_url ? (
+          <img
+            src={dog.image_url}
+            alt={dog.dog_name}
+            className={`${PHOTO_SIZE} rounded-xl object-cover`}
+          />
+        ) : (
+          <div className={`${PHOTO_SIZE} bg-gray-800 rounded-xl flex items-center justify-center`}>
+            <User className={`${USER_ICON_SIZE} text-gray-500`} />
+          </div>
+        )}
+      </div>
+      
+      {/* Dog Information */}
+      <div className="flex-1 space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="text-sm font-semibold text-gray-400">Dog Name</label>
+            <p className="text-lg text-white font-medium">{dog.dog_name}</p>
+          </div>
+          
+          <div>
+            <label className="text-sm font-semibold text-gray-400">Gender</label>
+            <p className="text-lg text-white">
+              {dog.gender === 'male' ? 'Male' : 'Female'}
+            </p>
+          </div>
+          
+          <div>
+            <label className="text-sm font-semibold text-gray-400">Primary Kennel</label>
+            <p className="text-lg text-white">{dog.primary_kennel}</p>
+          </div>
+          
+          {dog.secondary_kennel && (
+            <div>
+              <label className="text-sm font-semibold text-gray-400">Secondary Kennel</label>
+              <p className="text-lg text-white">{dog.secondary_kennel}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Pedigree Table Component
+interface PedigreeTableProps {
+  generations: PedigreeGeneration[];
+}
+
+const PedigreeTable: React.FC<PedigreeTableProps> = ({ generations }) => {
+  const getGenerationLabel = (generation: number): string => {
+    switch (generation) {
+      case 0: return 'Dog';
+      case 1: return 'Parents';
+      case 2: return 'Grandparents';
+      case 3: return 'Great-grandparents';
+      default: return `Generation ${generation}`;
+    }
+  };
+
+  const getRelationshipLabel = (generation: number, index: number): string => {
+    if (generation === 0) return 'Dog';
+    if (generation === 1) return index === 0 ? 'Father' : 'Mother';
+    if (generation === 2) {
+      const parentIndex = Math.floor(index / 2);
+      const isFather = index % 2 === 0;
+      return `${isFather ? 'Father' : 'Mother'} of ${parentIndex === 0 ? 'Father' : 'Mother'}`;
+    }
+    if (generation === 3) {
+      const grandparentIndex = Math.floor(index / 2);
+      const isFather = index % 2 === 0;
+      const grandparentLabels = ['Father of Father', 'Mother of Father', 'Father of Mother', 'Mother of Mother'];
+      return `${isFather ? 'Father' : 'Mother'} of ${grandparentLabels[grandparentIndex]}`;
+    }
+    return 'Unknown';
+  };
+
+  return (
+    <div className="card-spotify">
+      <h2 className="text-xl font-semibold text-white mb-6">3-Generation Pedigree</h2>
+      
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-gray-700">
+              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">Generation</th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">Relationship</th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">Name</th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">Gender</th>
+              <th className="text-left py-3 px-4 text-sm font-semibold text-gray-300">Kennel</th>
+            </tr>
+          </thead>
+          <tbody>
+            {generations.map((gen) => (
+              <React.Fragment key={gen.generation}>
+                {gen.dogs.map((dog, index) => (
+                  <tr key={`${gen.generation}-${index}`} className="border-b border-gray-800 hover:bg-gray-800/50">
+                    <td className="py-3 px-4 text-sm text-gray-300">
+                      {index === 0 && getGenerationLabel(gen.generation)}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-400">
+                      {getRelationshipLabel(gen.generation, index)}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-white">
+                      {dog ? (
+                        <Link 
+                          href={`/dogs/${dog.id}`}
+                          className="text-green-400 hover:text-green-300 font-medium"
+                        >
+                          {dog.dog_name}
+                        </Link>
+                      ) : (
+                        <span className="text-gray-500 italic">Unknown</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-300">
+                      {dog ? (dog.gender === 'male' ? 'Male' : 'Female') : '—'}
+                    </td>
+                    <td className="py-3 px-4 text-sm text-gray-300">
+                      {dog ? dog.primary_kennel : '—'}
+                    </td>
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// Main DogProfile component
 const DogProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [dog, setDog] = useState<Dog | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableDogs, setAvailableDogs] = useState<Dog[]>([]);
+  const [pedigreeGenerations, setPedigreeGenerations] = useState<PedigreeGeneration[]>([]);
+  const [pedigreeLoading, setPedigreeLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
     setValue,
     watch,
   } = useForm<DogFormData>();
 
   const selectedGender = watch('gender');
 
-  useEffect(() => {
-    if (id) {
-      loadDog();
-      loadAvailableDogs();
-    }
-  }, [id]);
-
-  const loadDog = async () => {
+  // Load dog data
+  const loadDog = useCallback(async () => {
     try {
       setLoading(true);
       const response = await dogsApi.getById(id!);
@@ -57,9 +290,10 @@ const DogProfile: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, router, setValue]);
 
-  const loadAvailableDogs = async () => {
+  // Load available dogs for parent selection
+  const loadAvailableDogs = useCallback(async () => {
     try {
       const response = await dogsApi.getAll();
       if (response.success && response.data) {
@@ -69,73 +303,84 @@ const DogProfile: React.FC = () => {
     } catch (error) {
       // Silent fail
     }
-  };
+  }, [id]);
 
-  const handleUpdate = async (data: DogFormData) => {
+  // Load pedigree generations
+  const loadPedigreeGenerations = useCallback(async () => {
+    if (!dog) return;
+    
     try {
+      setPedigreeLoading(true);
+      const generations = await buildPedigreeGenerations(dog);
+      setPedigreeGenerations(generations);
+    } catch (error) {
+      console.error('Error loading pedigree generations:', error);
+      toast.error('Error loading pedigree data');
+    } finally {
+      setPedigreeLoading(false);
+    }
+  }, [dog]);
+
+  // Handle form update
+  const handleUpdate = useCallback(async (data: DogFormData) => {
+    try {
+      setIsSubmitting(true);
       const response = await dogsApi.update(id!, data);
       
       if (response.success) {
         toast.success('Dog profile updated successfully!');
         setIsEditing(false);
-        loadDog(); // Reload dog data
+        await loadDog(); // Reload dog data
+        await loadPedigreeGenerations(); // Reload pedigree data
       } else {
         toast.error(response.error || 'Error updating dog profile');
       }
     } catch (error) {
       toast.error('Error updating dog profile');
+    } finally {
+      setIsSubmitting(false);
     }
-  };
+  }, [id, loadDog, loadPedigreeGenerations]);
 
-  const handleGeneratePedigree = async () => {
-    try {
-      const response = await fetch('/api/pedigree/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          rootDogId: id,
-          maxGenerations: 5
-        }),
-      });
-      
-      const result = await response.json();
-      
-      if (result.success && result.data) {
-        // For now, just show the pedigree data in console
-        // In a real implementation, you'd navigate to a pedigree viewer page
-        console.log('Generated pedigree:', result.data);
-        toast.success('Pedigree generated successfully! Check console for data.');
-      } else {
-        toast.error(result.error || 'Error generating pedigree');
-      }
-    } catch (error) {
-      toast.error('Error generating pedigree');
+  // Load data on component mount
+  useEffect(() => {
+    if (id) {
+      loadDog();
+      loadAvailableDogs();
     }
-  };
+  }, [id, loadDog, loadAvailableDogs]);
 
+  // Load pedigree when dog data is available
+  useEffect(() => {
+    if (dog) {
+      loadPedigreeGenerations();
+    }
+  }, [dog, loadPedigreeGenerations]);
+
+  // Loading state
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
       </div>
     );
   }
 
+  // Dog not found
   if (!dog) {
     return (
       <div className="text-center py-12">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Dog Not Found</h2>
-        <Link href="/" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-          Back to Dashboard
+        <h2 className="text-2xl font-bold text-white mb-4">Dog Not Found</h2>
+        <Link href="/" className="btn-spotify-primary inline-flex items-center space-x-2">
+          <ArrowLeft className={ICON_SIZE} />
+          <span>Back to Dashboard</span>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -143,7 +388,7 @@ const DogProfile: React.FC = () => {
             onClick={() => router.back()}
             className="btn-spotify-ghost p-2"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className={ICON_SIZE} />
           </button>
           <div>
             <h1 className="text-4xl font-bold text-white">{dog.dog_name}</h1>
@@ -153,17 +398,10 @@ const DogProfile: React.FC = () => {
         
         <div className="flex space-x-3">
           <button
-            onClick={handleGeneratePedigree}
-            className="btn-spotify-primary inline-flex items-center space-x-2"
-          >
-            <TreePine className="h-4 w-4" />
-            <span>Pedigree</span>
-          </button>
-          <button
             onClick={() => setIsEditing(!isEditing)}
             className="btn-spotify-secondary inline-flex items-center space-x-2"
           >
-            <Edit className="h-4 w-4" />
+            <Edit className={SMALL_ICON_SIZE} />
             <span>{isEditing ? 'Cancel' : 'Edit'}</span>
           </button>
         </div>
@@ -303,118 +541,29 @@ const DogProfile: React.FC = () => {
         </form>
       ) : (
         /* View Mode */
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Info */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Photo and Basic Info */}
+        <div className="space-y-8">
+          {/* Basic Information */}
+          <BasicInfoCard dog={dog} />
+
+          {/* Pedigree Table */}
+          {pedigreeLoading ? (
             <div className="card-spotify">
-              <div className="flex items-start space-x-6">
-                {dog.image_url ? (
-                  <img
-                    src={dog.image_url}
-                    alt={dog.dog_name}
-                    className="h-32 w-32 rounded-xl object-cover"
-                  />
-                ) : (
-                  <div className="h-32 w-32 bg-gray-800 rounded-xl flex items-center justify-center">
-                    <Users className="h-16 w-16 text-gray-500" />
-                  </div>
-                )}
-                
-                <div className="flex-1 space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-sm font-semibold text-gray-400">Gender</label>
-                      <p className="text-lg text-white">
-                        {dog.gender === 'male' ? 'Male' : 'Female'}
-                      </p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-semibold text-gray-400">Primary Kennel</label>
-                      <p className="text-lg text-white">{dog.primary_kennel}</p>
-                    </div>
-                    {dog.secondary_kennel && (
-                      <div className="md:col-span-2">
-                        <label className="text-sm font-semibold text-gray-400">Secondary Kennel</label>
-                        <p className="text-lg text-white">{dog.secondary_kennel}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+              <div className="flex justify-center items-center h-32">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+                <span className="ml-3 text-gray-400">Loading pedigree...</span>
               </div>
             </div>
+          ) : (
+            <PedigreeTable generations={pedigreeGenerations} />
+          )}
 
-            {/* Parents */}
-            <div className="card-spotify">
-              <h2 className="text-xl font-semibold text-white mb-6">Parents</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Father */}
-                <div>
-                  <label className="text-sm font-semibold text-gray-400 mb-3 block">Father</label>
-                  {dog.father ? (
-                    <div className="p-4 bg-gray-800 rounded-xl">
-                      <p className="font-semibold text-white">{dog.father.dog_name}</p>
-                      <p className="text-sm text-gray-400">{dog.father.primary_kennel}</p>
-                      <Link href={`/dogs/${dog.father.id}`} className="text-green-400 hover:text-green-300 text-sm mt-2 inline-block">
-                        View Father's Profile →
-                      </Link>
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 italic">No father assigned</p>
-                  )}
-                </div>
-
-                {/* Mother */}
-                <div>
-                  <label className="text-sm font-semibold text-gray-400 mb-3 block">Mother</label>
-                  {dog.mother ? (
-                    <div className="p-4 bg-gray-800 rounded-xl">
-                      <p className="font-semibold text-white">{dog.mother.dog_name}</p>
-                      <p className="text-sm text-gray-400">{dog.mother.primary_kennel}</p>
-                      <Link href={`/dogs/${dog.mother.id}`} className="text-green-400 hover:text-green-300 text-sm mt-2 inline-block">
-                        View Mother's Profile →
-                      </Link>
-                    </div>
-                  ) : (
-                    <p className="text-gray-500 italic">No mother assigned</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <div className="card-spotify">
-              <h3 className="text-lg font-semibold text-white mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <button
-                  onClick={handleGeneratePedigree}
-                  className="w-full btn-spotify-primary inline-flex items-center justify-center space-x-2"
-                >
-                  <TreePine className="h-4 w-4" />
-                  <span>View Pedigree</span>
-                </button>
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="w-full btn-spotify-secondary inline-flex items-center justify-center space-x-2"
-                >
-                  <Edit className="h-4 w-4" />
-                  <span>Edit Profile</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Metadata */}
-            <div className="card-spotify">
-              <h3 className="text-lg font-semibold text-white mb-4">Metadata</h3>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <span className="text-gray-400">Created:</span>
-                  <span className="ml-2 text-white">{formatDate(dog.created_at)}</span>
-                </div>
+          {/* Metadata */}
+          <div className="card-spotify">
+            <h3 className="text-lg font-semibold text-white mb-4">Metadata</h3>
+            <div className="space-y-3 text-sm">
+              <div>
+                <span className="text-gray-400">Created:</span>
+                <span className="ml-2 text-white">{formatDate(dog.created_at)}</span>
               </div>
             </div>
           </div>

@@ -19,7 +19,6 @@ const EditDog: React.FC = () => {
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
   } = useForm<DogFormData>({
     defaultValues: {
       name: '',

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, TreePine, Users } from 'lucide-react';
+import { ArrowLeft, Download, Users } from 'lucide-react';
 import { PedigreeNode } from '../types';
 import { pedigreeApi } from '../services/api';
 import toast from 'react-hot-toast';

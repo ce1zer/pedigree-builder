@@ -15,7 +15,6 @@ const CreateDog: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     setValue,
   } = useForm<DogFormData>({
     defaultValues: {

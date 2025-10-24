@@ -241,3 +241,16 @@ body {
 .bg-spotify-card-hover {
   background-color: var(--card-hover);
 }
+
+/* ==========================================================================
+   BullyDEX Pedigree Tree Styles
+   ========================================================================== */
+
+/* Arbor Container - BullyDEX Style */
+.bg-arbor {
+  background-color: #0a0a0a;
+  border: 1px solid #1a1a1a;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+}

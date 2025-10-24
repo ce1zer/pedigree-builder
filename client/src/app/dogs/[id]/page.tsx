@@ -244,16 +244,7 @@ const PedigreeTreeBullyPedex: React.FC<PedigreeTreeBullyPedexProps> = ({ generat
       <h2 className="text-xl font-semibold text-white mb-8">3-Generation Pedigree</h2>
       
       <div className="overflow-x-auto">
-        <div className="min-w-[1200px] flex items-start gap-8">
-          {/* Selected Dog (Left of pedigree) */}
-          <div className="flex-shrink-0">
-            <div className="mb-4">
-              <div className="h-6 bg-blue-500 rounded-sm mb-2"></div>
-              <p className="text-xs text-white uppercase font-bold tracking-wider">Selected Dog</p>
-            </div>
-            <PedigreeDogTile dog={rootDog} isCurrentDog={true} />
-          </div>
-
+        <div className="min-w-[1000px] flex items-start gap-8">
           {/* 1st Generation: Parents */}
           {parents.some(p => p !== null) && (
             <div className="flex-shrink-0">

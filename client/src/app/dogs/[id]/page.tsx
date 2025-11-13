@@ -176,7 +176,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   // Image sizes - always square, scale proportionally
   // Use aspect-square to ensure square images
   const imageSizeClasses = {
-    large: 'w-1/3 aspect-square',        // Square image, 1/3 width of tile
+    large: 'w-1/2 aspect-square',        // Square image, 1/2 width of tile (bigger for vertical layout)
     medium: 'w-1/3 aspect-square',      // Square image, 1/3 width of tile
     small: 'w-1/4 aspect-square'         // Smaller square image for 3rd gen, 1/4 width of tile
   };
@@ -200,10 +200,14 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   const borderColor = isUnknown ? 'border-gray-600' : 'border-blue-500';
   const bgColor = isUnknown ? 'bg-neutral-800' : 'bg-neutral-900';
 
+  // For large size (1st generation), use vertical layout (image on top, text below)
+  // For medium and small, use horizontal layout (image left, text right)
+  const isVerticalLayout = size === 'large';
+  
   return (
-    <div className={`${sizeClasses[size]} ${bgColor} ${borderColor} border-2 rounded flex items-center p-3 gap-3`}>
+    <div className={`${sizeClasses[size]} ${bgColor} ${borderColor} border-2 rounded flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} p-3 gap-3`}>
       {/* Square Image */}
-      <div className={`${imageSizeClasses[size]} rounded overflow-hidden flex-shrink-0`}>
+      <div className={`${imageSizeClasses[size]} rounded overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'}`}>
         {dog?.image_url ? (
           <img
             src={dog.image_url}
@@ -217,8 +221,8 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
         )}
       </div>
       
-      {/* Dog Info - Vertical Layout */}
-      <div className="flex-1 min-w-0 flex flex-col justify-center">
+      {/* Dog Info - Vertical Layout for text content */}
+      <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
         <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
           {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
         </p>

@@ -1,30 +1,13 @@
 {
   "name": "pedigree-builder",
   "version": "1.0.0",
-  "description": "Een webtool voor het bouwen en beheren van hondenstambomen",
-  "main": "client/package.json",
+  "private": true,
   "scripts": {
     "dev": "cd client && npm run dev",
     "build": "cd client && npm run build",
     "start": "cd client && npm run start",
-    "install": "cd client && npm install",
-    "vercel-build": "cd client && npm install && npm run build"
+    "lint": "cd client && npm run lint"
   },
-  "keywords": ["pedigree", "dogs", "family-tree", "supabase"],
-  "author": "Jordy Lissenburg",
-  "license": "MIT",
-  "dependencies": {
-    "next": "^16.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0",
-    "typescript": "^5.2.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }

@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { ArrowLeft, Upload, Camera, Save } from 'lucide-react';
-import { DogFormData, Dog, Gender } from '@/types';
+import { DogFormData, Dog } from '@/types';
 import { dogsApi } from '@/services/api';
 import toast from 'react-hot-toast';
 

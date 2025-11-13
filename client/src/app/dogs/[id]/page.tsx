@@ -157,97 +157,145 @@ const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog }) => (
   </div>
 );
 
-// Pedigree Node Component
+// Pedigree Node Component - Matches SVG design
 interface PedigreeNodeProps {
   dog: Dog | null;
+  size?: 'large' | 'medium' | 'small';
 }
 
-const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog }) => {
-  if (!dog) {
-    return (
-      <div className="w-48 h-24 bg-neutral-800 border-2 border-gray-600 rounded-lg flex items-center p-3 gap-3">
-        <div className="w-16 h-16 bg-gray-700 rounded-lg flex items-center justify-center flex-shrink-0">
-          <User className="h-8 w-8 text-gray-500" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-xs text-gray-500 uppercase font-medium tracking-wider">UNKNOWN</p>
-          <p className="text-sm text-gray-600 uppercase font-bold tracking-wide">UNKNOWN</p>
-        </div>
-      </div>
-    );
-  }
+const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => {
+  // Size classes based on SVG dimensions
+  const sizeClasses = {
+    large: 'w-[393px] h-[323px]',      // 1st generation: 393.84 x 322.95
+    medium: 'w-[172px] h-[140px]',      // 2nd generation: 172.18 x 140.18
+    small: 'w-[99px] h-[75px]'          // 3rd generation: 98.69 x 74.96
+  };
+
+  const imageSizeClasses = {
+    large: 'w-24 h-24',                 // Larger image for main/parents
+    medium: 'w-16 h-16',                // Medium image for grandparents
+    small: 'w-12 h-12'                   // Small image for great-grandparents
+  };
+
+  const textSizeClasses = {
+    large: {
+      kennel: 'text-sm',
+      name: 'text-lg'
+    },
+    medium: {
+      kennel: 'text-xs',
+      name: 'text-sm'
+    },
+    small: {
+      kennel: 'text-[10px]',
+      name: 'text-xs'
+    }
+  };
+
+  const isUnknown = !dog;
+  const borderColor = isUnknown ? 'border-gray-600' : 'border-white';
+  const bgColor = isUnknown ? 'bg-neutral-800' : 'bg-neutral-900';
 
   return (
-    <div className="w-48 h-24 bg-neutral-900 border-2 border-blue-500 rounded-lg flex items-center p-3 gap-3 transition-all hover:bg-neutral-800">
-      {/* Dog Image */}
-      <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-        {dog.image_url ? (
+    <div className={`${sizeClasses[size]} ${bgColor} ${borderColor} border-2 rounded flex items-center p-3 gap-3`}>
+      {/* Square Image */}
+      <div className={`${imageSizeClasses[size]} rounded overflow-hidden flex-shrink-0`}>
+        {dog?.image_url ? (
           <img
             src={dog.image_url}
-            alt={dog.dog_name}
+            alt={dog.dog_name || 'Unknown'}
             className="w-full h-full object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gray-700 flex items-center justify-center">
-            <User className="h-8 w-8 text-gray-500" />
+            <User className={`${size === 'large' ? 'h-12 w-12' : size === 'medium' ? 'h-8 w-8' : 'h-6 w-6'} text-gray-500`} />
           </div>
         )}
       </div>
       
-      {/* Dog Info */}
-      <div className="flex-1 min-w-0">
-        <p className="text-xs text-gray-400 uppercase font-medium tracking-wider leading-tight">
-          {dog.primary_kennel}
+      {/* Dog Info - Vertical Layout */}
+      <div className="flex-1 min-w-0 flex flex-col justify-center">
+        <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
+          {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
         </p>
-        <Link 
-          href={`/dogs/${dog.id}`}
-          className="text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate text-sm"
-        >
-          {dog.dog_name}
-        </Link>
+        {dog ? (
+          <Link 
+            href={`/dogs/${dog.id}`}
+            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-1`}
+          >
+            {dog.dog_name}
+          </Link>
+        ) : (
+          <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
+            UNKNOWN
+          </p>
+        )}
       </div>
     </div>
   );
 };
 
-// Pedigree Column Component
-interface PedigreeColumnProps {
-  title: string;
-  dogs: (Dog | null)[];
-  showConnectors?: boolean;
+// Main Dog Display Component (Top Center)
+interface MainDogDisplayProps {
+  dog: Dog;
 }
 
-const PedigreeColumn: React.FC<PedigreeColumnProps> = ({ title, dogs, showConnectors = false }) => {
+const MainDogDisplay: React.FC<MainDogDisplayProps> = ({ dog }) => {
   return (
-    <div className="flex flex-col justify-between items-center h-full">
-      {/* Column Title */}
-      <div className="text-center mb-6">
-        <div className="h-6 bg-blue-500 rounded-sm mb-2 w-32"></div>
-        <p className="text-xs text-white uppercase font-bold tracking-wider">{title}</p>
-      </div>
-      
-      {/* Dog Nodes */}
-      <div className="flex flex-col justify-between items-center gap-8 flex-1">
-        {dogs.map((dog, index) => (
-          <div key={index} className="relative">
-            <PedigreeNode dog={dog} />
-            {/* Connection lines to next generation */}
-            {showConnectors && (
-              <div className="absolute top-1/2 -right-6 w-12 h-[2px] bg-white transform -translate-y-1/2"></div>
-            )}
-          </div>
-        ))}
-      </div>
+    <div className="flex flex-col items-center mb-8">
+      {/* Main Dog Name - Large */}
+      <h2 className="text-6xl font-bold text-white uppercase mb-2 tracking-wide">
+        {dog.dog_name}
+      </h2>
+      {/* Kennel Name */}
+      <p className="text-xl text-white text-opacity-70 uppercase font-medium tracking-wider">
+        {dog.primary_kennel}
+      </p>
     </div>
   );
 };
 
-// Pedigree Tree Arbor Component
-interface PedigreeTreeArborProps {
+// Pedigree Connector Component - White horizontal lines
+interface PedigreeConnectorProps {
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+  horizontal?: boolean;
+}
+
+const PedigreeConnector: React.FC<PedigreeConnectorProps> = ({ from, to, horizontal = true }) => {
+  if (horizontal) {
+    const width = to.x - from.x;
+    return (
+      <div 
+        className="absolute bg-white h-[2px]"
+        style={{
+          left: `${from.x}px`,
+          top: `${from.y}px`,
+          width: `${width}px`
+        }}
+      />
+    );
+  }
+  // Vertical connector
+  const height = to.y - from.y;
+  return (
+    <div 
+      className="absolute bg-white w-[2px]"
+      style={{
+        left: `${from.x}px`,
+        top: `${from.y}px`,
+        height: `${height}px`
+      }}
+    />
+  );
+};
+
+// Pedigree Tree Component - Matches SVG layout exactly
+interface PedigreeTreeProps {
   generations: PedigreeGeneration[];
 }
 
-const PedigreeTreeArbor: React.FC<PedigreeTreeArborProps> = ({ generations }) => {
+const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
   const rootDog = generations[0]?.dogs[0];
   
   if (!rootDog) {
@@ -266,56 +314,139 @@ const PedigreeTreeArbor: React.FC<PedigreeTreeArborProps> = ({ generations }) =>
   const grandparents = generations[2]?.dogs || [null, null, null, null];
   const greatGrandparents = generations[3]?.dogs || [null, null, null, null, null, null, null, null];
 
-  // Build the symmetrical tree structure
-  const firstGeneration = [
-    parents[0], // Father
-    parents[1]  // Mother
-  ];
-
-  const secondGeneration = [
-    grandparents[0], // Father's Father
-    grandparents[1], // Father's Mother
-    grandparents[2], // Mother's Father
-    grandparents[3]  // Mother's Mother
-  ];
-
-  const thirdGeneration = [
-    greatGrandparents[0], // Father's Father's Father
-    greatGrandparents[1], // Father's Father's Mother
-    greatGrandparents[2], // Father's Mother's Father
-    greatGrandparents[3], // Father's Mother's Mother
-    greatGrandparents[4], // Mother's Father's Father
-    greatGrandparents[5], // Mother's Father's Mother
-    greatGrandparents[6], // Mother's Mother's Father
-    greatGrandparents[7]  // Mother's Mother's Mother
-  ];
+  // Build tree structure matching SVG
+  const father = parents[0];
+  const mother = parents[1];
+  
+  // 2nd Generation: 4 dogs (2 per parent)
+  const fatherFather = grandparents[0];
+  const fatherMother = grandparents[1];
+  const motherFather = grandparents[2];
+  const motherMother = grandparents[3];
+  
+  // 3rd Generation: 8 dogs (4 per grandparent)
+  const ffFather = greatGrandparents[0];
+  const ffMother = greatGrandparents[1];
+  const fmFather = greatGrandparents[2];
+  const fmMother = greatGrandparents[3];
+  const mfFather = greatGrandparents[4];
+  const mfMother = greatGrandparents[5];
+  const mmFather = greatGrandparents[6];
+  const mmMother = greatGrandparents[7];
 
   return (
-    <div className="bg-arbor rounded-lg p-8">
+    <div className="bg-arbor rounded-lg p-8 w-full overflow-x-auto">
       <h2 className="text-xl font-semibold text-white mb-8">3-Generation Pedigree</h2>
       
-      <div className="w-full">
-        <div className="flex flex-row justify-between items-start gap-8 h-[600px]">
-          {/* 1st Generation: Parents */}
-          <PedigreeColumn 
-            title="1st Generation" 
-            dogs={firstGeneration}
-            showConnectors={true}
-          />
+      {/* Main Dog - Top Center */}
+      <div className="flex justify-center mb-8">
+        <MainDogDisplay dog={rootDog} />
+      </div>
 
-          {/* 2nd Generation: Grandparents */}
-          <PedigreeColumn 
-            title="2nd Generation" 
-            dogs={secondGeneration}
-            showConnectors={true}
-          />
+      {/* Horizontal divider lines below main dog */}
+      <div className="flex justify-center mb-12">
+        <div className="w-full max-w-4xl">
+          <div className="h-[2px] bg-white mb-2"></div>
+          <div className="h-[2px] bg-white"></div>
+        </div>
+      </div>
 
-          {/* 3rd Generation: Great-grandparents */}
-          <PedigreeColumn 
-            title="3rd Generation" 
-            dogs={thirdGeneration}
-            showConnectors={false}
-          />
+      {/* Generation Labels */}
+      <div className="flex justify-between items-start mb-8 px-4 max-w-6xl mx-auto">
+        <div className="text-center">
+          <p className="text-sm text-white uppercase font-bold tracking-wider">1st generation</p>
+        </div>
+        <div className="text-center">
+          <p className="text-sm text-white uppercase font-bold tracking-wider">2nd generation</p>
+        </div>
+        <div className="text-center">
+          <p className="text-sm text-white uppercase font-bold tracking-wider">3rd generation</p>
+        </div>
+      </div>
+
+      {/* Pedigree Tree Layout - Horizontal Binary Tree */}
+      <div className="relative w-full max-w-6xl mx-auto" style={{ minHeight: '700px' }}>
+        {/* 1st Generation: Parents (Left, stacked vertically) */}
+        <div className="absolute left-0 top-0 flex flex-col gap-8">
+          {/* Father (Top) */}
+          <div className="relative">
+            <PedigreeNode dog={father} size="large" />
+            {/* Connection line to 2nd gen - Father's Father */}
+            <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white"></div>
+            {/* Connection line to 2nd gen - Father's Mother */}
+            <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white translate-y-[140px]"></div>
+          </div>
+          
+          {/* Mother (Bottom) */}
+          <div className="relative mt-8">
+            <PedigreeNode dog={mother} size="large" />
+            {/* Connection line to 2nd gen - Mother's Father */}
+            <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white"></div>
+            {/* Connection line to 2nd gen - Mother's Mother */}
+            <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white translate-y-[140px]"></div>
+          </div>
+        </div>
+
+        {/* 2nd Generation: Grandparents (Center, 4 nodes in 2x2 grid) */}
+        <div className="absolute left-[420px] top-0 flex flex-col gap-4">
+          {/* Father's side (top 2) */}
+          <div className="flex gap-4">
+            <div className="relative">
+              <PedigreeNode dog={fatherFather} size="medium" />
+              {/* Connection lines to 3rd gen */}
+              <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white"></div>
+              <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white translate-y-[70px]"></div>
+            </div>
+            <div className="relative">
+              <PedigreeNode dog={fatherMother} size="medium" />
+              {/* Connection lines to 3rd gen */}
+              <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white"></div>
+              <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white translate-y-[70px]"></div>
+            </div>
+          </div>
+          
+          {/* Mother's side (bottom 2) */}
+          <div className="flex gap-4 mt-4">
+            <div className="relative">
+              <PedigreeNode dog={motherFather} size="medium" />
+              {/* Connection lines to 3rd gen */}
+              <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white"></div>
+              <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white translate-y-[70px]"></div>
+            </div>
+            <div className="relative">
+              <PedigreeNode dog={motherMother} size="medium" />
+              {/* Connection lines to 3rd gen */}
+              <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white"></div>
+              <div className="absolute top-1/2 left-full w-12 h-[2px] bg-white translate-y-[70px]"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* 3rd Generation: Great-grandparents (Right side, 8 nodes in 2x4 grid) */}
+        <div className="absolute left-[640px] top-0 flex flex-col gap-2">
+          {/* Father's Father's side (top 2) */}
+          <div className="flex gap-2">
+            <PedigreeNode dog={ffFather} size="small" />
+            <PedigreeNode dog={ffMother} size="small" />
+          </div>
+          
+          {/* Father's Mother's side */}
+          <div className="flex gap-2">
+            <PedigreeNode dog={fmFather} size="small" />
+            <PedigreeNode dog={fmMother} size="small" />
+          </div>
+          
+          {/* Mother's Father's side */}
+          <div className="flex gap-2">
+            <PedigreeNode dog={mfFather} size="small" />
+            <PedigreeNode dog={mfMother} size="small" />
+          </div>
+          
+          {/* Mother's Mother's side (bottom 2) */}
+          <div className="flex gap-2">
+            <PedigreeNode dog={mmFather} size="small" />
+            <PedigreeNode dog={mmMother} size="small" />
+          </div>
         </div>
       </div>
     </div>
@@ -624,7 +755,7 @@ const DogProfile: React.FC = () => {
           {/* Basic Information */}
           <BasicInfoCard dog={dog} />
 
-          {/* Pedigree Tree Arbor */}
+          {/* Pedigree Tree */}
           {pedigreeLoading ? (
             <div className="card-spotify">
               <div className="flex justify-center items-center h-32">
@@ -633,7 +764,7 @@ const DogProfile: React.FC = () => {
               </div>
             </div>
           ) : (
-            <PedigreeTreeArbor generations={pedigreeGenerations} />
+            <PedigreeTree generations={pedigreeGenerations} />
           )}
 
           {/* Metadata */}

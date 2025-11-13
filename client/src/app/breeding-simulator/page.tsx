@@ -636,7 +636,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           </div>
 
           {/* Column 3: Father's 1st Generation (Parents) - 2 tiles: top 50% */}
-          <div className="flex flex-col aspect-square w-full">
+          <div className="flex flex-col relative" style={{ height: '100%' }}>
             {/* Father's Father - 50% height */}
             <div className="relative" style={{ height: '50%' }}>
               <div className="h-full w-full flex items-center justify-center">
@@ -653,7 +653,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           </div>
 
           {/* Column 4: Mother's 1st Generation (Parents) - 2 tiles: bottom 50% */}
-          <div className="flex flex-col aspect-square w-full">
+          <div className="flex flex-col relative" style={{ height: '100%' }}>
             {/* Mother's Father - 50% height */}
             <div className="relative" style={{ height: '50%' }}>
               <div className="h-full w-full flex items-center justify-center">

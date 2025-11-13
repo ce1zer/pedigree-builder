@@ -768,6 +768,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           </div>
         </div>
       </div>
+      </div>
     </div>
   );
 };

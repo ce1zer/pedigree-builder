@@ -613,7 +613,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
   }, []);
 
   return (
-    <div className="bg-arbor rounded-lg p-8 w-full" ref={pedigreeRef} data-pedigree-export>
+    <div className="bg-arbor rounded-lg p-8 w-full">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-xl font-semibold text-white">3-Generation Pedigree</h2>
         <button
@@ -626,21 +626,23 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
         </button>
       </div>
       
-      {/* Generation Labels */}
-      <div className="grid grid-cols-3 gap-x-8 mb-8">
-        <div className="text-center">
-          <p className="text-sm text-white uppercase font-bold tracking-wider">1st generation</p>
+      {/* Pedigree Tree Content - This is what gets exported */}
+      <div ref={pedigreeRef} data-pedigree-export>
+        {/* Generation Labels */}
+        <div className="grid grid-cols-3 gap-x-8 mb-8">
+          <div className="text-center">
+            <p className="text-sm text-white uppercase font-bold tracking-wider">1st generation</p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-white uppercase font-bold tracking-wider">2nd generation</p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-white uppercase font-bold tracking-wider">3rd generation</p>
+          </div>
         </div>
-        <div className="text-center">
-          <p className="text-sm text-white uppercase font-bold tracking-wider">2nd generation</p>
-        </div>
-        <div className="text-center">
-          <p className="text-sm text-white uppercase font-bold tracking-wider">3rd generation</p>
-        </div>
-      </div>
 
-      {/* Pedigree Tree Layout - 3 Column Grid with Height Proportions */}
-      <div className="grid grid-cols-3 gap-x-8 w-full items-start">
+        {/* Pedigree Tree Layout - 3 Column Grid with Height Proportions */}
+        <div className="grid grid-cols-3 gap-x-8 w-full items-start">
         {/* Column 1: Parents (1st Generation) - 2 tiles: Father (top 50%) and Mother (bottom 50%) */}
         <div className="flex flex-col" style={{ height: '100%' }}>
           {/* Father - 50% height */}

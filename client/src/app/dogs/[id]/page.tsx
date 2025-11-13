@@ -299,27 +299,34 @@ interface PedigreeTreeProps {
 }
 
 const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
-  // Extract dogs from each generation - only father's side
+  // Extract dogs from each generation - both father's and mother's side
   const parents = generations[1]?.dogs || [null, null];
   const grandparents = generations[2]?.dogs || [null, null, null, null];
   const greatGrandparents = generations[3]?.dogs || [null, null, null, null, null, null, null, null];
 
-  // Father's lineage only
-  const father = parents[0]; // 1st generation
+  // 1st Generation: Parents
+  const father = parents[0]; // Father
+  const mother = parents[1]; // Mother
   
-  // 2nd Generation: Father's parents
+  // 2nd Generation: Parents' parents
   const fatherFather = grandparents[0]; // Father's Father
   const fatherMother = grandparents[1]; // Father's Mother
+  const motherFather = grandparents[2]; // Mother's Father
+  const motherMother = grandparents[3]; // Mother's Mother
   
-  // 3rd Generation: 4 great-grandparents from father's side
+  // 3rd Generation: 8 great-grandparents (4 from father's side, 4 from mother's side)
   const ffFather = greatGrandparents[0]; // Father's Father's Father
   const ffMother = greatGrandparents[1]; // Father's Father's Mother
   const fmFather = greatGrandparents[2]; // Father's Mother's Father
   const fmMother = greatGrandparents[3]; // Father's Mother's Mother
+  const mfFather = greatGrandparents[4]; // Mother's Father's Father
+  const mfMother = greatGrandparents[5]; // Mother's Father's Mother
+  const mmFather = greatGrandparents[6]; // Mother's Mother's Father
+  const mmMother = greatGrandparents[7]; // Mother's Mother's Mother
 
   return (
     <div className="bg-arbor rounded-lg p-8 w-full">
-      <h2 className="text-xl font-semibold text-white mb-8">3-Generation Pedigree (Father's Lineage)</h2>
+      <h2 className="text-xl font-semibold text-white mb-8">3-Generation Pedigree</h2>
       
       {/* Generation Labels */}
       <div className="grid grid-cols-3 gap-x-8 mb-8">
@@ -336,20 +343,33 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
 
       {/* Pedigree Tree Layout - 3 Column Grid with Height Proportions */}
       <div className="grid grid-cols-3 gap-x-8 w-full mx-auto items-start" style={{ maxWidth: '800px' }}>
-        {/* Column 1: Father (1st Generation) - Square container, 100% height */}
-        <div className="flex flex-col aspect-square w-full">
-          <div className="relative h-full w-full flex items-center justify-center">
-            <PedigreeNode dog={father} size="large" />
+        {/* Column 1: Parents (1st Generation) - 2 tiles: Father (top 50%) and Mother (bottom 50%) */}
+        <div className="flex flex-col" style={{ height: '100%' }}>
+          {/* Father - 50% height */}
+          <div className="relative" style={{ height: '50%' }}>
+            <div className="h-full w-full flex items-center justify-center">
+              <PedigreeNode dog={father} size="large" />
+            </div>
+            {/* Connection lines to 2nd generation - horizontal white lines */}
+            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+          </div>
+          
+          {/* Mother - 50% height */}
+          <div className="relative" style={{ height: '50%' }}>
+            <div className="h-full w-full flex items-center justify-center">
+              <PedigreeNode dog={mother} size="large" />
+            </div>
             {/* Connection lines to 2nd generation - horizontal white lines */}
             <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
             <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
         </div>
 
-        {/* Column 2: Grandparents (2nd Generation) - 2 tiles, each 50% of 1st generation height */}
+        {/* Column 2: Grandparents (2nd Generation) - 4 tiles: Father's parents (top 50%) and Mother's parents (bottom 50%) */}
         <div className="flex flex-col" style={{ height: '100%' }}>
-          {/* Father's Father - 50% of 1st generation height */}
-          <div className="relative" style={{ height: '50%' }}>
+          {/* Father's Father - 25% of total height */}
+          <div className="relative" style={{ height: '25%' }}>
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={fatherFather} size="medium" />
             </div>
@@ -358,8 +378,8 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
           
-          {/* Father's Mother - 50% of 1st generation height */}
-          <div className="relative" style={{ height: '50%' }}>
+          {/* Father's Mother - 25% of total height */}
+          <div className="relative" style={{ height: '25%' }}>
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={fatherMother} size="medium" />
             </div>
@@ -367,35 +387,83 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
             <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
+          
+          {/* Mother's Father - 25% of total height */}
+          <div className="relative" style={{ height: '25%' }}>
+            <div className="h-full flex items-center justify-center">
+              <PedigreeNode dog={motherFather} size="medium" />
+            </div>
+            {/* Connection lines to 3rd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+          </div>
+          
+          {/* Mother's Mother - 25% of total height */}
+          <div className="relative" style={{ height: '25%' }}>
+            <div className="h-full flex items-center justify-center">
+              <PedigreeNode dog={motherMother} size="medium" />
+            </div>
+            {/* Connection lines to 3rd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+          </div>
         </div>
 
-        {/* Column 3: Great-grandparents (3rd Generation) - 4 tiles, each 25% of 1st generation height */}
+        {/* Column 3: Great-grandparents (3rd Generation) - 8 tiles: Father's grandparents (top 50%) and Mother's grandparents (bottom 50%) */}
         <div className="flex flex-col" style={{ height: '100%' }}>
-          {/* Father's Father's Father - 25% of 1st generation height */}
-          <div className="relative" style={{ height: '25%' }}>
+          {/* Father's Father's Father - 12.5% of total height */}
+          <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={ffFather} size="small" />
             </div>
           </div>
           
-          {/* Father's Father's Mother - 25% of 1st generation height */}
-          <div className="relative" style={{ height: '25%' }}>
+          {/* Father's Father's Mother - 12.5% of total height */}
+          <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={ffMother} size="small" />
             </div>
           </div>
           
-          {/* Father's Mother's Father - 25% of 1st generation height */}
-          <div className="relative" style={{ height: '25%' }}>
+          {/* Father's Mother's Father - 12.5% of total height */}
+          <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={fmFather} size="small" />
             </div>
           </div>
           
-          {/* Father's Mother's Mother - 25% of 1st generation height */}
-          <div className="relative" style={{ height: '25%' }}>
+          {/* Father's Mother's Mother - 12.5% of total height */}
+          <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={fmMother} size="small" />
+            </div>
+          </div>
+          
+          {/* Mother's Father's Father - 12.5% of total height */}
+          <div className="relative" style={{ height: '12.5%' }}>
+            <div className="h-full flex items-center justify-center">
+              <PedigreeNode dog={mfFather} size="small" />
+            </div>
+          </div>
+          
+          {/* Mother's Father's Mother - 12.5% of total height */}
+          <div className="relative" style={{ height: '12.5%' }}>
+            <div className="h-full flex items-center justify-center">
+              <PedigreeNode dog={mfMother} size="small" />
+            </div>
+          </div>
+          
+          {/* Mother's Mother's Father - 12.5% of total height */}
+          <div className="relative" style={{ height: '12.5%' }}>
+            <div className="h-full flex items-center justify-center">
+              <PedigreeNode dog={mmFather} size="small" />
+            </div>
+          </div>
+          
+          {/* Mother's Mother's Mother - 12.5% of total height */}
+          <div className="relative" style={{ height: '12.5%' }}>
+            <div className="h-full flex items-center justify-center">
+              <PedigreeNode dog={mmMother} size="small" />
             </div>
           </div>
         </div>

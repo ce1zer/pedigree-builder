@@ -649,9 +649,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full w-full flex items-center justify-center">
               <PedigreeNode dog={father} size="large" />
             </div>
-            {/* Connection branches to 2nd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            {/* Connection lines to 2nd generation - horizontal white lines */}
+            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
           
           {/* Mother - 50% height */}
@@ -659,9 +659,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full w-full flex items-center justify-center">
               <PedigreeNode dog={mother} size="large" />
             </div>
-            {/* Connection branches to 2nd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            {/* Connection lines to 2nd generation - horizontal white lines */}
+            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
         </div>
 
@@ -672,9 +672,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={fatherFather} size="medium" />
             </div>
-            {/* Connection branches to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            {/* Connection lines to 3rd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
           
           {/* Father's Mother - 25% of total height */}
@@ -682,9 +682,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={fatherMother} size="medium" />
             </div>
-            {/* Connection branches to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            {/* Connection lines to 3rd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
           
           {/* Mother's Father - 25% of total height */}
@@ -692,9 +692,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={motherFather} size="medium" />
             </div>
-            {/* Connection branches to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            {/* Connection lines to 3rd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
           
           {/* Mother's Mother - 25% of total height */}
@@ -702,9 +702,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={motherMother} size="medium" />
             </div>
-            {/* Connection branches to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            {/* Connection lines to 3rd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
         </div>
 

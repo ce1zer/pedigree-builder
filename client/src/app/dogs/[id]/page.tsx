@@ -355,7 +355,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           const path: number[] = [];
           let current: Element | null = cloneEl;
           while (current && current !== clone) {
-            const parent = current.parentElement;
+            const parent: Element | null = current.parentElement;
             if (parent) {
               const index = Array.from(parent.children).indexOf(current);
               path.unshift(index);

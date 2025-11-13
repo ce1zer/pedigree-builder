@@ -110,8 +110,21 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const dogData = JSON.parse(formData.get('dogData') as string);
-    const photo = formData.get('photo') as File;
+    
+    // Get and parse dogData
+    const dogDataString = formData.get('dogData') as string | null;
+    if (!dogDataString) {
+      return createErrorResponse('Missing dog data', 400);
+    }
+    
+    let dogData;
+    try {
+      dogData = JSON.parse(dogDataString);
+    } catch (parseError) {
+      return createErrorResponse('Invalid dog data format', 400);
+    }
+    
+    const photo = formData.get('photo') as File | null;
     
     // Validate required fields
     const nameError = validateDogName(dogData.dog_name);
@@ -132,7 +145,13 @@ export async function POST(request: NextRequest) {
     // Handle photo upload if provided
     let imageUrl = null;
     if (photo && photo.size > 0) {
-      imageUrl = await uploadPhoto(photo);
+      try {
+        imageUrl = await uploadPhoto(photo);
+      } catch (uploadError: any) {
+        // Log upload error but don't fail the entire request
+        console.error('Photo upload failed:', uploadError);
+        // Continue without image
+      }
     }
     
     // Create new dog record
@@ -143,17 +162,21 @@ export async function POST(request: NextRequest) {
         primary_kennel: dogData.primary_kennel.trim(),
         secondary_kennel: dogData.secondary_kennel?.trim() || null,
         gender: dogData.gender,
-        father_id: dogData.father_id || null,
-        mother_id: dogData.mother_id || null,
+        father_id: (dogData.father_id && dogData.father_id.trim() !== '') ? dogData.father_id : null,
+        mother_id: (dogData.mother_id && dogData.mother_id.trim() !== '') ? dogData.mother_id : null,
         image_url: imageUrl
       }])
       .select()
       .single();
     
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase insert error:', error);
+      return createErrorResponse(error.message || 'Failed to create dog', 500);
+    }
     
     return createSuccessResponse(data);
   } catch (error: any) {
-    return createErrorResponse(error.message);
+    console.error('POST /api/dogs error:', error);
+    return createErrorResponse(error.message || 'An unexpected error occurred', 500);
   }
 }

@@ -203,17 +203,25 @@ const AddDog: React.FC = () => {
     try {
       setIsSubmitting(true);
       
+      console.log('Submitting dog data:', data);
       const response = await dogsApi.create(data);
+      console.log('API response:', response);
       
       if (response.success && response.data) {
         toast.success(`${data.dog_name} has been successfully added!`);
         router.push(`/dogs/${response.data.id}`);
       } else {
+        console.error('API error response:', response);
         toast.error(response.error || 'Error creating dog');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating dog:', error);
-      toast.error('Error creating dog');
+      console.error('Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      toast.error(error.response?.data?.error || error.message || 'Error creating dog');
     } finally {
       setIsSubmitting(false);
     }

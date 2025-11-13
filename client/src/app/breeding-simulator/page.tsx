@@ -181,31 +181,65 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
   const pedigreeRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
-  // Extract father's side
+  // Extract father's side - we need the father's parents, grandparents, and great-grandparents
+  // fatherGenerations[0] = the father dog itself
+  // fatherGenerations[1] = father's parents [father's father, father's mother]
+  // fatherGenerations[2] = father's grandparents [ffFather, ffMother, fmFather, fmMother]
+  // fatherGenerations[3] = father's great-grandparents [8 dogs]
+  
   const fatherParents = fatherGenerations[1]?.dogs || [null, null];
   const fatherGrandparents = fatherGenerations[2]?.dogs || [null, null, null, null];
   const fatherGreatGrandparents = fatherGenerations[3]?.dogs || [null, null, null, null, null, null, null, null];
   
-  const father = fatherParents[0];
-  const fatherFather = fatherGrandparents[0];
-  const fatherMother = fatherGrandparents[1];
-  const ffFather = fatherGreatGrandparents[0];
-  const ffMother = fatherGreatGrandparents[1];
-  const fmFather = fatherGreatGrandparents[2];
-  const fmMother = fatherGreatGrandparents[3];
+  // Father's parents (1st generation of father's side)
+  const fatherFather = fatherParents[0]; // Father's father
+  const fatherMother = fatherParents[1]; // Father's mother
+  
+  // Father's grandparents (2nd generation of father's side)
+  const ffFather = fatherGrandparents[0]; // Father's father's father
+  const ffMother = fatherGrandparents[1]; // Father's father's mother
+  const fmFather = fatherGrandparents[2]; // Father's mother's father
+  const fmMother = fatherGrandparents[3]; // Father's mother's mother
+  
+  // Father's great-grandparents (3rd generation of father's side) - 8 dogs
+  const fffFather = fatherGreatGrandparents[0]; // Father's father's father's father
+  const fffMother = fatherGreatGrandparents[1]; // Father's father's father's mother
+  const ffmFather = fatherGreatGrandparents[2]; // Father's father's mother's father
+  const ffmMother = fatherGreatGrandparents[3]; // Father's father's mother's mother
+  const fmfFather = fatherGreatGrandparents[4]; // Father's mother's father's father
+  const fmfMother = fatherGreatGrandparents[5]; // Father's mother's father's mother
+  const fmmFather = fatherGreatGrandparents[6]; // Father's mother's mother's father
+  const fmmMother = fatherGreatGrandparents[7]; // Father's mother's mother's mother
 
-  // Extract mother's side
+  // Extract mother's side - we need the mother's parents, grandparents, and great-grandparents
+  // motherGenerations[0] = the mother dog itself
+  // motherGenerations[1] = mother's parents [mother's father, mother's mother]
+  // motherGenerations[2] = mother's grandparents [mfFather, mfMother, mmFather, mmMother]
+  // motherGenerations[3] = mother's great-grandparents [8 dogs]
+  
   const motherParents = motherGenerations[1]?.dogs || [null, null];
   const motherGrandparents = motherGenerations[2]?.dogs || [null, null, null, null];
   const motherGreatGrandparents = motherGenerations[3]?.dogs || [null, null, null, null, null, null, null, null];
   
-  const mother = motherParents[1];
-  const motherFather = motherGrandparents[2];
-  const motherMother = motherGrandparents[3];
-  const mfFather = motherGreatGrandparents[4];
-  const mfMother = motherGreatGrandparents[5];
-  const mmFather = motherGreatGrandparents[6];
-  const mmMother = motherGreatGrandparents[7];
+  // Mother's parents (1st generation of mother's side)
+  const motherFather = motherParents[0]; // Mother's father
+  const motherMother = motherParents[1]; // Mother's mother
+  
+  // Mother's grandparents (2nd generation of mother's side)
+  const mfFather = motherGrandparents[0]; // Mother's father's father
+  const mfMother = motherGrandparents[1]; // Mother's father's mother
+  const mmFather = motherGrandparents[2]; // Mother's mother's father
+  const mmMother = motherGrandparents[3]; // Mother's mother's mother
+  
+  // Mother's great-grandparents (3rd generation of mother's side) - 8 dogs
+  const mffFather = motherGreatGrandparents[0]; // Mother's father's father's father
+  const mffMother = motherGreatGrandparents[1]; // Mother's father's father's mother
+  const mfmFather = motherGreatGrandparents[2]; // Mother's father's mother's father
+  const mfmMother = motherGreatGrandparents[3]; // Mother's father's mother's mother
+  const mmfFather = motherGreatGrandparents[4]; // Mother's mother's father's father
+  const mmfMother = motherGreatGrandparents[5]; // Mother's mother's father's mother
+  const mmmFather = motherGreatGrandparents[6]; // Mother's mother's mother's father
+  const mmmMother = motherGreatGrandparents[7]; // Mother's mother's mother's mother
 
   // Export pedigree to PNG
   const handleExportToPNG = useCallback(async () => {
@@ -507,31 +541,59 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         <div className="grid grid-cols-6 gap-x-[0.2rem] w-full items-stretch mx-auto" style={{ maxWidth: '1600px' }}>
           {/* Column 1: Father's 3rd Generation (Great-grandparents) - 8 tiles: top 50% */}
           <div className="flex flex-col" style={{ height: '100%' }}>
-            {/* Father's Father's Father - 12.5% of total height */}
+            {/* Father's Father's Father's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
               <div className="h-full flex items-center justify-center py-1">
-                <PedigreeNode dog={ffFather} size="small" />
+                <PedigreeNode dog={fffFather} size="small" />
               </div>
             </div>
             
-            {/* Father's Father's Mother - 12.5% of total height */}
+            {/* Father's Father's Father's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
               <div className="h-full flex items-center justify-center py-1">
-                <PedigreeNode dog={ffMother} size="small" />
+                <PedigreeNode dog={fffMother} size="small" />
               </div>
             </div>
             
-            {/* Father's Mother's Father - 12.5% of total height */}
+            {/* Father's Father's Mother's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
               <div className="h-full flex items-center justify-center py-1">
-                <PedigreeNode dog={fmFather} size="small" />
+                <PedigreeNode dog={ffmFather} size="small" />
               </div>
             </div>
             
-            {/* Father's Mother's Mother - 12.5% of total height */}
+            {/* Father's Father's Mother's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
               <div className="h-full flex items-center justify-center py-1">
-                <PedigreeNode dog={fmMother} size="small" />
+                <PedigreeNode dog={ffmMother} size="small" />
+              </div>
+            </div>
+            
+            {/* Father's Mother's Father's Father - 12.5% of total height */}
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNode dog={fmfFather} size="small" />
+              </div>
+            </div>
+            
+            {/* Father's Mother's Father's Mother - 12.5% of total height */}
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNode dog={fmfMother} size="small" />
+              </div>
+            </div>
+            
+            {/* Father's Mother's Mother's Father - 12.5% of total height */}
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNode dog={fmmFather} size="small" />
+              </div>
+            </div>
+            
+            {/* Father's Mother's Mother's Mother - 12.5% of total height */}
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNode dog={fmmMother} size="small" />
               </div>
             </div>
             
@@ -541,17 +603,31 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
 
           {/* Column 2: Father's 2nd Generation (Grandparents) - 4 tiles: top 50% */}
           <div className="flex flex-col relative" style={{ height: '100%' }}>
-            {/* Father's Father - 25% of total height */}
+            {/* Father's Father's Father - 25% of total height */}
             <div className="relative" style={{ height: '25%' }}>
               <div className="h-full flex items-center justify-center">
-                <PedigreeNode dog={fatherFather} size="medium" />
+                <PedigreeNode dog={ffFather} size="medium" />
               </div>
             </div>
             
-            {/* Father's Mother - 25% of total height */}
+            {/* Father's Father's Mother - 25% of total height */}
             <div className="relative" style={{ height: '25%' }}>
               <div className="h-full flex items-center justify-center">
-                <PedigreeNode dog={fatherMother} size="medium" />
+                <PedigreeNode dog={ffMother} size="medium" />
+              </div>
+            </div>
+            
+            {/* Father's Mother's Father - 25% of total height */}
+            <div className="relative" style={{ height: '25%' }}>
+              <div className="h-full flex items-center justify-center">
+                <PedigreeNode dog={fmFather} size="medium" />
+              </div>
+            </div>
+            
+            {/* Father's Mother's Mother - 25% of total height */}
+            <div className="relative" style={{ height: '25%' }}>
+              <div className="h-full flex items-center justify-center">
+                <PedigreeNode dog={fmMother} size="medium" />
               </div>
             </div>
             
@@ -559,17 +635,37 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             <div className="relative" style={{ height: '50%' }}></div>
           </div>
 
-          {/* Column 3: Father (1st Generation) - 1 tile: top 50%, square aspect */}
+          {/* Column 3: Father's 1st Generation (Parents) - 2 tiles: top 50% */}
           <div className="flex flex-col aspect-square w-full">
-            <div className="relative h-full w-full flex items-center justify-center">
-              <PedigreeNode dog={father} size="large" />
+            {/* Father's Father - 50% height */}
+            <div className="relative" style={{ height: '50%' }}>
+              <div className="h-full w-full flex items-center justify-center">
+                <PedigreeNode dog={fatherFather} size="large" />
+              </div>
+            </div>
+            
+            {/* Father's Mother - 50% height */}
+            <div className="relative" style={{ height: '50%' }}>
+              <div className="h-full w-full flex items-center justify-center">
+                <PedigreeNode dog={fatherMother} size="large" />
+              </div>
             </div>
           </div>
 
-          {/* Column 4: Mother (1st Generation) - 1 tile: bottom 50%, square aspect */}
+          {/* Column 4: Mother's 1st Generation (Parents) - 2 tiles: bottom 50% */}
           <div className="flex flex-col aspect-square w-full">
-            <div className="relative h-full w-full flex items-center justify-center">
-              <PedigreeNode dog={mother} size="large" />
+            {/* Mother's Father - 50% height */}
+            <div className="relative" style={{ height: '50%' }}>
+              <div className="h-full w-full flex items-center justify-center">
+                <PedigreeNode dog={motherFather} size="large" />
+              </div>
+            </div>
+            
+            {/* Mother's Mother - 50% height */}
+            <div className="relative" style={{ height: '50%' }}>
+              <div className="h-full w-full flex items-center justify-center">
+                <PedigreeNode dog={motherMother} size="large" />
+              </div>
             </div>
           </div>
 
@@ -578,17 +674,31 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             {/* Empty space for father's side alignment - 50% */}
             <div className="relative" style={{ height: '50%' }}></div>
             
-            {/* Mother's Father - 25% of total height */}
+            {/* Mother's Father's Father - 25% of total height */}
             <div className="relative" style={{ height: '25%' }}>
               <div className="h-full flex items-center justify-center">
-                <PedigreeNode dog={motherFather} size="medium" />
+                <PedigreeNode dog={mfFather} size="medium" />
               </div>
             </div>
             
-            {/* Mother's Mother - 25% of total height */}
+            {/* Mother's Father's Mother - 25% of total height */}
             <div className="relative" style={{ height: '25%' }}>
               <div className="h-full flex items-center justify-center">
-                <PedigreeNode dog={motherMother} size="medium" />
+                <PedigreeNode dog={mfMother} size="medium" />
+              </div>
+            </div>
+            
+            {/* Mother's Mother's Father - 25% of total height */}
+            <div className="relative" style={{ height: '25%' }}>
+              <div className="h-full flex items-center justify-center">
+                <PedigreeNode dog={mmFather} size="medium" />
+              </div>
+            </div>
+            
+            {/* Mother's Mother's Mother - 25% of total height */}
+            <div className="relative" style={{ height: '25%' }}>
+              <div className="h-full flex items-center justify-center">
+                <PedigreeNode dog={mmMother} size="medium" />
               </div>
             </div>
           </div>
@@ -598,31 +708,59 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             {/* Empty space for father's side alignment - 50% */}
             <div className="relative" style={{ height: '50%' }}></div>
             
-            {/* Mother's Father's Father - 12.5% of total height */}
+            {/* Mother's Father's Father's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
               <div className="h-full flex items-center justify-center py-1">
-                <PedigreeNode dog={mfFather} size="small" />
+                <PedigreeNode dog={mffFather} size="small" />
               </div>
             </div>
             
-            {/* Mother's Father's Mother - 12.5% of total height */}
+            {/* Mother's Father's Father's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
               <div className="h-full flex items-center justify-center py-1">
-                <PedigreeNode dog={mfMother} size="small" />
+                <PedigreeNode dog={mffMother} size="small" />
               </div>
             </div>
             
-            {/* Mother's Mother's Father - 12.5% of total height */}
+            {/* Mother's Father's Mother's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
               <div className="h-full flex items-center justify-center py-1">
-                <PedigreeNode dog={mmFather} size="small" />
+                <PedigreeNode dog={mfmFather} size="small" />
               </div>
             </div>
             
-            {/* Mother's Mother's Mother - 12.5% of total height */}
+            {/* Mother's Father's Mother's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
               <div className="h-full flex items-center justify-center py-1">
-                <PedigreeNode dog={mmMother} size="small" />
+                <PedigreeNode dog={mfmMother} size="small" />
+              </div>
+            </div>
+            
+            {/* Mother's Mother's Father's Father - 12.5% of total height */}
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNode dog={mmfFather} size="small" />
+              </div>
+            </div>
+            
+            {/* Mother's Mother's Father's Mother - 12.5% of total height */}
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNode dog={mmfMother} size="small" />
+              </div>
+            </div>
+            
+            {/* Mother's Mother's Mother's Father - 12.5% of total height */}
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNode dog={mmmFather} size="small" />
+              </div>
+            </div>
+            
+            {/* Mother's Mother's Mother's Mother - 12.5% of total height */}
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNode dog={mmmMother} size="small" />
               </div>
             </div>
           </div>

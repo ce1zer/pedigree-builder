@@ -347,7 +347,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
         </div>
 
         {/* Column 2: Grandparents (2nd Generation) - 2 tiles, each 50% of 1st generation height */}
-        <div className="flex flex-col" style={{ height: '100%', paddingTop: '10%' }}>
+        <div className="flex flex-col" style={{ height: '100%' }}>
           {/* Father's Father - 50% of 1st generation height */}
           <div className="relative" style={{ height: '50%' }}>
             <div className="h-full flex items-center justify-center">
@@ -370,7 +370,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
         </div>
 
         {/* Column 3: Great-grandparents (3rd Generation) - 4 tiles, each 25% of 1st generation height */}
-        <div className="flex flex-col" style={{ height: '100%', paddingTop: '20%' }}>
+        <div className="flex flex-col" style={{ height: '100%' }}>
           {/* Father's Father's Father - 25% of 1st generation height */}
           <div className="relative" style={{ height: '25%' }}>
             <div className="h-full flex items-center justify-center">

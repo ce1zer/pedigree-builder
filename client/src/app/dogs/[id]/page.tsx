@@ -335,9 +335,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
       </div>
 
       {/* Pedigree Tree Layout - 3 Column Grid with Height Proportions */}
-      <div className="grid grid-cols-3 gap-x-8 w-full items-stretch">
+      <div className="grid grid-cols-3 gap-x-8 w-full items-stretch" style={{ maxWidth: '800px' }}>
         {/* Column 1: Father (1st Generation) - Square container */}
-        <div className="flex flex-col aspect-square">
+        <div className="flex flex-col aspect-square w-full">
           <div className="relative h-full w-full flex items-center justify-center">
             <PedigreeNode dog={father} size="large" />
             {/* Connection lines to 2nd generation - horizontal white lines */}

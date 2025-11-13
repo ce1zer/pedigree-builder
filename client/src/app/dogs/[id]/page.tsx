@@ -380,12 +380,16 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           const originalEl = findOriginalElement(cloneEl, originalRoot);
           if (!originalEl) return;
           
-          // Copy inline styles from original (these contain important layout info like height: '100%')
-          if (originalEl.hasAttribute('style')) {
-            const originalStyle = originalEl.getAttribute('style');
-            if (originalStyle) {
-              cloneEl.setAttribute('style', originalStyle);
-            }
+          // Start with inline styles from original (these contain important layout info like height: '100%')
+          const existingInlineStyle = cloneEl.getAttribute('style') || '';
+          const inlineStyleMap = new Map<string, string>();
+          if (existingInlineStyle) {
+            existingInlineStyle.split(';').forEach(decl => {
+              const [prop, value] = decl.split(':').map(s => s.trim());
+              if (prop && value) {
+                inlineStyleMap.set(prop, value);
+              }
+            });
           }
           
           const computed = window.getComputedStyle(originalEl);
@@ -446,61 +450,69 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           const overflowX = computed.overflowX;
           const overflowY = computed.overflowY;
           
-          // Apply all layout styles
-          if (display) cloneEl.style.setProperty('display', display);
-          if (flexDirection) cloneEl.style.setProperty('flex-direction', flexDirection);
-          if (flexWrap) cloneEl.style.setProperty('flex-wrap', flexWrap);
-          if (alignItems) cloneEl.style.setProperty('align-items', alignItems);
-          if (alignContent) cloneEl.style.setProperty('align-content', alignContent);
-          if (justifyContent) cloneEl.style.setProperty('justify-content', justifyContent);
-          if (flexBasis) cloneEl.style.setProperty('flex-basis', flexBasis);
-          if (flexGrow) cloneEl.style.setProperty('flex-grow', flexGrow);
-          if (flexShrink) cloneEl.style.setProperty('flex-shrink', flexShrink);
-          if (width) cloneEl.style.setProperty('width', width);
-          if (height) cloneEl.style.setProperty('height', height);
-          if (minWidth) cloneEl.style.setProperty('min-width', minWidth);
-          if (maxWidth) cloneEl.style.setProperty('max-width', maxWidth);
-          if (minHeight) cloneEl.style.setProperty('min-height', minHeight);
-          if (maxHeight) cloneEl.style.setProperty('max-height', maxHeight);
-          if (padding) cloneEl.style.setProperty('padding', padding);
-          if (paddingTop) cloneEl.style.setProperty('padding-top', paddingTop);
-          if (paddingRight) cloneEl.style.setProperty('padding-right', paddingRight);
-          if (paddingBottom) cloneEl.style.setProperty('padding-bottom', paddingBottom);
-          if (paddingLeft) cloneEl.style.setProperty('padding-left', paddingLeft);
-          if (margin) cloneEl.style.setProperty('margin', margin);
-          if (marginTop) cloneEl.style.setProperty('margin-top', marginTop);
-          if (marginRight) cloneEl.style.setProperty('margin-right', marginRight);
-          if (marginBottom) cloneEl.style.setProperty('margin-bottom', marginBottom);
-          if (marginLeft) cloneEl.style.setProperty('margin-left', marginLeft);
-          if (gap) cloneEl.style.setProperty('gap', gap);
-          if (columnGap) cloneEl.style.setProperty('column-gap', columnGap);
-          if (rowGap) cloneEl.style.setProperty('row-gap', rowGap);
-          if (gridTemplateColumns) cloneEl.style.setProperty('grid-template-columns', gridTemplateColumns);
-          if (gridTemplateRows) cloneEl.style.setProperty('grid-template-rows', gridTemplateRows);
-          if (gridColumn) cloneEl.style.setProperty('grid-column', gridColumn);
-          if (gridRow) cloneEl.style.setProperty('grid-row', gridRow);
-          if (gridColumnStart) cloneEl.style.setProperty('grid-column-start', gridColumnStart);
-          if (gridColumnEnd) cloneEl.style.setProperty('grid-column-end', gridColumnEnd);
-          if (gridRowStart) cloneEl.style.setProperty('grid-row-start', gridRowStart);
-          if (gridRowEnd) cloneEl.style.setProperty('grid-row-end', gridRowEnd);
-          if (position) cloneEl.style.setProperty('position', position);
-          if (top) cloneEl.style.setProperty('top', top);
-          if (left) cloneEl.style.setProperty('left', left);
-          if (right) cloneEl.style.setProperty('right', right);
-          if (bottom) cloneEl.style.setProperty('bottom', bottom);
-          if (zIndex) cloneEl.style.setProperty('z-index', zIndex);
-          if (borderRadius) cloneEl.style.setProperty('border-radius', borderRadius);
-          if (borderWidth) cloneEl.style.setProperty('border-width', borderWidth);
-          if (borderStyle) cloneEl.style.setProperty('border-style', borderStyle);
-          if (fontSize) cloneEl.style.setProperty('font-size', fontSize);
-          if (fontWeight) cloneEl.style.setProperty('font-weight', fontWeight);
-          if (textAlign) cloneEl.style.setProperty('text-align', textAlign);
-          if (textTransform) cloneEl.style.setProperty('text-transform', textTransform);
-          if (aspectRatio) cloneEl.style.setProperty('aspect-ratio', aspectRatio);
-          if (boxSizing) cloneEl.style.setProperty('box-sizing', boxSizing);
-          if (overflow) cloneEl.style.setProperty('overflow', overflow);
-          if (overflowX) cloneEl.style.setProperty('overflow-x', overflowX);
-          if (overflowY) cloneEl.style.setProperty('overflow-y', overflowY);
+          // Helper to set style only if not already in inline styles (preserve inline styles)
+          const setStyleIfNotInline = (prop: string, value: string) => {
+            const camelProp = prop.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+            if (!inlineStyleMap.has(prop) && !inlineStyleMap.has(camelProp)) {
+              cloneEl.style.setProperty(prop, value);
+            }
+          };
+          
+          // Apply all layout styles (but preserve inline styles)
+          if (display) setStyleIfNotInline('display', display);
+          if (flexDirection) setStyleIfNotInline('flex-direction', flexDirection);
+          if (flexWrap) setStyleIfNotInline('flex-wrap', flexWrap);
+          if (alignItems) setStyleIfNotInline('align-items', alignItems);
+          if (alignContent) setStyleIfNotInline('align-content', alignContent);
+          if (justifyContent) setStyleIfNotInline('justify-content', justifyContent);
+          if (flexBasis) setStyleIfNotInline('flex-basis', flexBasis);
+          if (flexGrow) setStyleIfNotInline('flex-grow', flexGrow);
+          if (flexShrink) setStyleIfNotInline('flex-shrink', flexShrink);
+          if (width) setStyleIfNotInline('width', width);
+          if (height) setStyleIfNotInline('height', height);
+          if (minWidth) setStyleIfNotInline('min-width', minWidth);
+          if (maxWidth) setStyleIfNotInline('max-width', maxWidth);
+          if (minHeight) setStyleIfNotInline('min-height', minHeight);
+          if (maxHeight) setStyleIfNotInline('max-height', maxHeight);
+          if (padding) setStyleIfNotInline('padding', padding);
+          if (paddingTop) setStyleIfNotInline('padding-top', paddingTop);
+          if (paddingRight) setStyleIfNotInline('padding-right', paddingRight);
+          if (paddingBottom) setStyleIfNotInline('padding-bottom', paddingBottom);
+          if (paddingLeft) setStyleIfNotInline('padding-left', paddingLeft);
+          if (margin) setStyleIfNotInline('margin', margin);
+          if (marginTop) setStyleIfNotInline('margin-top', marginTop);
+          if (marginRight) setStyleIfNotInline('margin-right', marginRight);
+          if (marginBottom) setStyleIfNotInline('margin-bottom', marginBottom);
+          if (marginLeft) setStyleIfNotInline('margin-left', marginLeft);
+          if (gap) setStyleIfNotInline('gap', gap);
+          if (columnGap) setStyleIfNotInline('column-gap', columnGap);
+          if (rowGap) setStyleIfNotInline('row-gap', rowGap);
+          if (gridTemplateColumns) setStyleIfNotInline('grid-template-columns', gridTemplateColumns);
+          if (gridTemplateRows) setStyleIfNotInline('grid-template-rows', gridTemplateRows);
+          if (gridColumn) setStyleIfNotInline('grid-column', gridColumn);
+          if (gridRow) setStyleIfNotInline('grid-row', gridRow);
+          if (gridColumnStart) setStyleIfNotInline('grid-column-start', gridColumnStart);
+          if (gridColumnEnd) setStyleIfNotInline('grid-column-end', gridColumnEnd);
+          if (gridRowStart) setStyleIfNotInline('grid-row-start', gridRowStart);
+          if (gridRowEnd) setStyleIfNotInline('grid-row-end', gridRowEnd);
+          if (position) setStyleIfNotInline('position', position);
+          if (top) setStyleIfNotInline('top', top);
+          if (left) setStyleIfNotInline('left', left);
+          if (right) setStyleIfNotInline('right', right);
+          if (bottom) setStyleIfNotInline('bottom', bottom);
+          if (zIndex) setStyleIfNotInline('z-index', zIndex);
+          if (borderRadius) setStyleIfNotInline('border-radius', borderRadius);
+          if (borderWidth) setStyleIfNotInline('border-width', borderWidth);
+          if (borderStyle) setStyleIfNotInline('border-style', borderStyle);
+          if (fontSize) setStyleIfNotInline('font-size', fontSize);
+          if (fontWeight) setStyleIfNotInline('font-weight', fontWeight);
+          if (textAlign) setStyleIfNotInline('text-align', textAlign);
+          if (textTransform) setStyleIfNotInline('text-transform', textTransform);
+          if (aspectRatio) setStyleIfNotInline('aspect-ratio', aspectRatio);
+          if (boxSizing) setStyleIfNotInline('box-sizing', boxSizing);
+          if (overflow) setStyleIfNotInline('overflow', overflow);
+          if (overflowX) setStyleIfNotInline('overflow-x', overflowX);
+          if (overflowY) setStyleIfNotInline('overflow-y', overflowY);
           
           // Force simple RGB colors - don't care about exact colors
           const tagName = cloneEl.tagName.toLowerCase();

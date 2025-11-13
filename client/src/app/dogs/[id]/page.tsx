@@ -658,25 +658,6 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             </div>
           </div>
           
-          {/* Branch connector for Father: connects Father image to Father's Father and Father's Mother */}
-          {/* Horizontal line from Father image right edge (at 25% vertical center) */}
-          <div className="absolute top-[25%] left-full w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          {/* Vertical line spanning between Father's Father (12.5%) and Father's Mother (37.5%) centers */}
-          <div className="absolute top-[12.5%] left-[calc(100%+2rem)] w-[2px] h-[25%] bg-white z-10"></div>
-          {/* Horizontal line to Father's Father (from vertical line going left to parent at 12.5%) */}
-          <div className="absolute top-[12.5%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          {/* Horizontal line to Father's Mother (from vertical line going left to parent at 37.5%) */}
-          <div className="absolute top-[37.5%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          
-          {/* Branch connector for Mother: connects Mother image to Mother's Father and Mother's Mother */}
-          {/* Horizontal line from Mother image right edge (at 75% vertical center) */}
-          <div className="absolute top-[75%] left-full w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          {/* Vertical line spanning between Mother's Father (62.5%) and Mother's Mother (87.5%) centers */}
-          <div className="absolute top-[62.5%] left-[calc(100%+2rem)] w-[2px] h-[25%] bg-white z-10"></div>
-          {/* Horizontal line to Mother's Father (from vertical line going left to parent at 62.5%) */}
-          <div className="absolute top-[62.5%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          {/* Horizontal line to Mother's Mother (from vertical line going left to parent at 87.5%) */}
-          <div className="absolute top-[87.5%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
         </div>
 
         {/* Column 2: Grandparents (2nd Generation) - 4 tiles: Father's parents (top 50%) and Mother's parents (bottom 50%) */}
@@ -709,41 +690,6 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             </div>
           </div>
           
-          {/* Branch connector for Father's Father: connects to ffFather and ffMother */}
-          {/* Horizontal line from Father's Father image right edge (at 12.5% vertical center) */}
-          <div className="absolute top-[12.5%] left-full w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          {/* Vertical line spanning between ffFather (6.25%) and ffMother (18.75%) centers */}
-          <div className="absolute top-[6.25%] left-[calc(100%+2rem)] w-[2px] h-[12.5%] bg-white z-10"></div>
-          {/* Horizontal lines to great-grandparents (from vertical line going left) */}
-          <div className="absolute top-[6.25%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          <div className="absolute top-[18.75%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          
-          {/* Branch connector for Father's Mother: connects to fmFather and fmMother */}
-          {/* Horizontal line from Father's Mother image right edge (at 37.5% vertical center) */}
-          <div className="absolute top-[37.5%] left-full w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          {/* Vertical line spanning between fmFather (31.25%) and fmMother (43.75%) centers */}
-          <div className="absolute top-[31.25%] left-[calc(100%+2rem)] w-[2px] h-[12.5%] bg-white z-10"></div>
-          {/* Horizontal lines to great-grandparents (from vertical line going left) */}
-          <div className="absolute top-[31.25%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          <div className="absolute top-[43.75%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          
-          {/* Branch connector for Mother's Father: connects to mfFather and mfMother */}
-          {/* Horizontal line from Mother's Father image right edge (at 62.5% vertical center) */}
-          <div className="absolute top-[62.5%] left-full w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          {/* Vertical line spanning between mfFather (56.25%) and mfMother (68.75%) centers */}
-          <div className="absolute top-[56.25%] left-[calc(100%+2rem)] w-[2px] h-[12.5%] bg-white z-10"></div>
-          {/* Horizontal lines to great-grandparents (from vertical line going left) */}
-          <div className="absolute top-[56.25%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          <div className="absolute top-[68.75%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          
-          {/* Branch connector for Mother's Mother: connects to mmFather and mmMother */}
-          {/* Horizontal line from Mother's Mother image right edge (at 87.5% vertical center) */}
-          <div className="absolute top-[87.5%] left-full w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          {/* Vertical line spanning between mmFather (81.25%) and mmMother (93.75%) centers */}
-          <div className="absolute top-[81.25%] left-[calc(100%+2rem)] w-[2px] h-[12.5%] bg-white z-10"></div>
-          {/* Horizontal lines to great-grandparents (from vertical line going left) */}
-          <div className="absolute top-[81.25%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
-          <div className="absolute top-[93.75%] right-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10" style={{ transform: 'translateY(-1px)' }}></div>
         </div>
 
         {/* Column 3: Great-grandparents (3rd Generation) - 8 tiles: Father's grandparents (top 50%) and Mother's grandparents (bottom 50%) */}

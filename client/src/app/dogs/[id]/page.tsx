@@ -177,7 +177,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   // Use aspect-square to ensure square images
   const imageSizeClasses = {
     large: 'w-2/3 aspect-square',        // Square image, 2/3 width of tile (bigger for 1st generation)
-    medium: 'w-1/2 aspect-square',      // Square image, 1/2 width of tile (for vertical layout in 2nd gen)
+    medium: 'w-[35%] aspect-square',      // Square image, 35% width of tile (30% smaller than 50% for 2nd gen)
     small: 'w-1/4 aspect-square'         // Smaller square image for 3rd gen, 1/4 width of tile
   };
 

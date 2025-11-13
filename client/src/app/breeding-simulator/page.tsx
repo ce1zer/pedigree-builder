@@ -134,11 +134,32 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-blue-500';
 
   // For large and medium sizes (1st and 2nd generation), use vertical layout (image on top, text below)
-  // For small (3rd generation), use horizontal layout (image left, text right)
+  // For small (3rd generation), use horizontal layout (text left, image right)
   const isVerticalLayout = size === 'large' || size === 'medium';
   
   return (
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} gap-3`}>
+      {/* For small size (3rd generation), text comes first (left side) */}
+      {size === 'small' && (
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
+            {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
+          </p>
+          {dog ? (
+            <Link 
+              href={`/dogs/${dog.id}`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-1`}
+            >
+              {dog.dog_name}
+            </Link>
+          ) : (
+            <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
+              UNKNOWN
+            </p>
+          )}
+        </div>
+      )}
+      
       {/* Square Image with Border */}
       <div className={`${imageSizeClasses[size]} rounded overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
         {dog?.image_url ? (
@@ -154,24 +175,26 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
         )}
       </div>
       
-      {/* Dog Info - Vertical Layout for text content */}
-      <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-        <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
-          {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
-        </p>
-        {dog ? (
-          <Link 
-            href={`/dogs/${dog.id}`}
-            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-1`}
-          >
-            {dog.dog_name}
-          </Link>
-        ) : (
-          <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
-            UNKNOWN
+      {/* Dog Info - For large and medium sizes (vertical layout) */}
+      {(size === 'large' || size === 'medium') && (
+        <div className={`w-full min-w-0 flex flex-col items-center text-center`}>
+          <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
+            {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
           </p>
-        )}
-      </div>
+          {dog ? (
+            <Link 
+              href={`/dogs/${dog.id}`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-1`}
+            >
+              {dog.dog_name}
+            </Link>
+          ) : (
+            <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
+              UNKNOWN
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };

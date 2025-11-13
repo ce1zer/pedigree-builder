@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Validate environment variables
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Missing Supabase environment variables:', {
+    hasUrl: !!SUPABASE_URL,
+    hasKey: !!SUPABASE_ANON_KEY
+  });
+}
+
 // Supabase client configuration
 const supabase = createClient(
-  process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
-  process.env.SUPABASE_ANON_KEY || 'placeholder-key'
+  SUPABASE_URL || 'https://placeholder.supabase.co',
+  SUPABASE_ANON_KEY || 'placeholder-key'
 );
 
 // Constants for validation
@@ -73,13 +84,23 @@ const uploadPhoto = async (photo: File): Promise<string | null> => {
 
 // Check for duplicate dog name
 const checkDuplicateName = async (dogName: string): Promise<boolean> => {
-  const { data: existingDog } = await supabase
-    .from('dogs')
-    .select('id')
-    .eq('dog_name', dogName.trim())
-    .single();
-  
-  return !!existingDog;
+  try {
+    const { data: existingDog, error } = await supabase
+      .from('dogs')
+      .select('id')
+      .eq('dog_name', dogName.trim())
+      .maybeSingle();
+    
+    // If there's an error (like table doesn't exist), log it but don't fail
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error checking duplicate name:', error);
+    }
+    
+    return !!existingDog;
+  } catch (error) {
+    console.error('Exception checking duplicate name:', error);
+    return false; // Don't block creation if check fails
+  }
 };
 
 /**
@@ -109,6 +130,12 @@ export async function GET() {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Check environment variables
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      console.error('Missing Supabase credentials');
+      return createErrorResponse('Server configuration error: Missing Supabase credentials', 500);
+    }
+    
     const formData = await request.formData();
     
     // Get and parse dogData
@@ -121,6 +148,7 @@ export async function POST(request: NextRequest) {
     try {
       dogData = JSON.parse(dogDataString);
     } catch (parseError) {
+      console.error('JSON parse error:', parseError);
       return createErrorResponse('Invalid dog data format', 400);
     }
     
@@ -137,9 +165,14 @@ export async function POST(request: NextRequest) {
     if (genderError) return createErrorResponse(genderError, 400);
     
     // Check for duplicate names
-    const isDuplicate = await checkDuplicateName(dogData.dog_name);
-    if (isDuplicate) {
-      return createErrorResponse('A dog with this name already exists', 400);
+    try {
+      const isDuplicate = await checkDuplicateName(dogData.dog_name);
+      if (isDuplicate) {
+        return createErrorResponse('A dog with this name already exists', 400);
+      }
+    } catch (duplicateCheckError) {
+      console.error('Error checking duplicate:', duplicateCheckError);
+      // Continue - don't block creation if duplicate check fails
     }
     
     // Handle photo upload if provided
@@ -154,29 +187,54 @@ export async function POST(request: NextRequest) {
       }
     }
     
+    // Prepare insert data
+    const insertData = {
+      dog_name: dogData.dog_name.trim(),
+      primary_kennel: dogData.primary_kennel.trim(),
+      secondary_kennel: dogData.secondary_kennel?.trim() || null,
+      gender: dogData.gender,
+      father_id: (dogData.father_id && dogData.father_id.trim() !== '') ? dogData.father_id : null,
+      mother_id: (dogData.mother_id && dogData.mother_id.trim() !== '') ? dogData.mother_id : null,
+      image_url: imageUrl
+    };
+    
+    console.log('Inserting dog data:', { ...insertData, image_url: imageUrl ? '[URL]' : null });
+    
     // Create new dog record
     const { data, error } = await supabase
       .from('dogs')
-      .insert([{
-        dog_name: dogData.dog_name.trim(),
-        primary_kennel: dogData.primary_kennel.trim(),
-        secondary_kennel: dogData.secondary_kennel?.trim() || null,
-        gender: dogData.gender,
-        father_id: (dogData.father_id && dogData.father_id.trim() !== '') ? dogData.father_id : null,
-        mother_id: (dogData.mother_id && dogData.mother_id.trim() !== '') ? dogData.mother_id : null,
-        image_url: imageUrl
-      }])
+      .insert([insertData])
       .select()
       .single();
     
     if (error) {
-      console.error('Supabase insert error:', error);
-      return createErrorResponse(error.message || 'Failed to create dog', 500);
+      console.error('Supabase insert error:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      return createErrorResponse(
+        error.message || `Database error: ${error.code || 'Unknown error'}`,
+        500
+      );
+    }
+    
+    if (!data) {
+      console.error('No data returned from insert');
+      return createErrorResponse('Failed to create dog: No data returned', 500);
     }
     
     return createSuccessResponse(data);
   } catch (error: any) {
-    console.error('POST /api/dogs error:', error);
-    return createErrorResponse(error.message || 'An unexpected error occurred', 500);
+    console.error('POST /api/dogs error:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    return createErrorResponse(
+      error.message || 'An unexpected error occurred',
+      500
+    );
   }
 }

@@ -641,7 +641,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
         </div>
 
         {/* Pedigree Tree Layout - 3 Column Grid with Height Proportions */}
-        <div className="grid grid-cols-3 gap-x-8 w-full items-start">
+        <div className="grid grid-cols-3 gap-x-4 w-full items-start">
         {/* Column 1: Parents (1st Generation) - 2 tiles: Father (top 50%) and Mother (bottom 50%) */}
         <div className="flex flex-col relative" style={{ height: '100%' }}>
           {/* Father - 50% height */}

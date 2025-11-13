@@ -172,11 +172,12 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
     small: 'w-full h-full'       // 3rd generation - fills 25% container (which is 25% of 1st gen)
   };
 
-  // Image sizes scale proportionally
+  // Image sizes - always square, scale proportionally
+  // Use aspect-square to ensure square images
   const imageSizeClasses = {
-    large: 'w-1/3 h-1/3',        // 1/3 of tile for large
-    medium: 'w-1/3 h-1/3',       // 1/3 of tile for medium
-    small: 'w-1/3 h-1/3'         // 1/3 of tile for small
+    large: 'w-1/3 aspect-square',        // Square image, 1/3 width of tile
+    medium: 'w-1/3 aspect-square',      // Square image, 1/3 width of tile
+    small: 'w-1/3 aspect-square'        // Square image, 1/3 width of tile
   };
 
   const textSizeClasses = {
@@ -206,10 +207,10 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
           <img
             src={dog.image_url}
             alt={dog.dog_name || 'Unknown'}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover aspect-square"
           />
         ) : (
-          <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+          <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-square">
             <User className="w-1/2 h-1/2 text-gray-500" />
           </div>
         )}

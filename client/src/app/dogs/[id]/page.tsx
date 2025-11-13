@@ -382,16 +382,43 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           
           const computed = window.getComputedStyle(originalEl);
           
-          // Get layout properties
+          // Get all layout properties
           const display = computed.display;
           const flexDirection = computed.flexDirection;
+          const flexWrap = computed.flexWrap;
           const alignItems = computed.alignItems;
+          const alignContent = computed.alignContent;
           const justifyContent = computed.justifyContent;
+          const flexBasis = computed.flexBasis;
+          const flexGrow = computed.flexGrow;
+          const flexShrink = computed.flexShrink;
           const width = computed.width;
           const height = computed.height;
+          const minWidth = computed.minWidth;
+          const maxWidth = computed.maxWidth;
+          const minHeight = computed.minHeight;
+          const maxHeight = computed.maxHeight;
           const padding = computed.padding;
+          const paddingTop = computed.paddingTop;
+          const paddingRight = computed.paddingRight;
+          const paddingBottom = computed.paddingBottom;
+          const paddingLeft = computed.paddingLeft;
           const margin = computed.margin;
+          const marginTop = computed.marginTop;
+          const marginRight = computed.marginRight;
+          const marginBottom = computed.marginBottom;
+          const marginLeft = computed.marginLeft;
           const gap = computed.gap;
+          const columnGap = computed.columnGap;
+          const rowGap = computed.rowGap;
+          const gridTemplateColumns = computed.gridTemplateColumns;
+          const gridTemplateRows = computed.gridTemplateRows;
+          const gridColumn = computed.gridColumn;
+          const gridRow = computed.gridRow;
+          const gridColumnStart = computed.gridColumnStart;
+          const gridColumnEnd = computed.gridColumnEnd;
+          const gridRowStart = computed.gridRowStart;
+          const gridRowEnd = computed.gridRowEnd;
           const position = computed.position;
           const top = computed.top;
           const left = computed.left;
@@ -400,22 +427,54 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           const zIndex = computed.zIndex;
           const borderRadius = computed.borderRadius;
           const borderWidth = computed.borderWidth;
+          const borderStyle = computed.borderStyle;
           const fontSize = computed.fontSize;
           const fontWeight = computed.fontWeight;
           const textAlign = computed.textAlign;
           const textTransform = computed.textTransform;
           const aspectRatio = computed.aspectRatio;
+          const boxSizing = computed.boxSizing;
+          const overflow = computed.overflow;
+          const overflowX = computed.overflowX;
+          const overflowY = computed.overflowY;
           
-          // Apply layout styles
+          // Apply all layout styles
           if (display) cloneEl.style.setProperty('display', display);
           if (flexDirection) cloneEl.style.setProperty('flex-direction', flexDirection);
+          if (flexWrap) cloneEl.style.setProperty('flex-wrap', flexWrap);
           if (alignItems) cloneEl.style.setProperty('align-items', alignItems);
+          if (alignContent) cloneEl.style.setProperty('align-content', alignContent);
           if (justifyContent) cloneEl.style.setProperty('justify-content', justifyContent);
-          if (width && !width.includes('auto')) cloneEl.style.setProperty('width', width);
-          if (height && !height.includes('auto')) cloneEl.style.setProperty('height', height);
+          if (flexBasis) cloneEl.style.setProperty('flex-basis', flexBasis);
+          if (flexGrow) cloneEl.style.setProperty('flex-grow', flexGrow);
+          if (flexShrink) cloneEl.style.setProperty('flex-shrink', flexShrink);
+          if (width) cloneEl.style.setProperty('width', width);
+          if (height) cloneEl.style.setProperty('height', height);
+          if (minWidth) cloneEl.style.setProperty('min-width', minWidth);
+          if (maxWidth) cloneEl.style.setProperty('max-width', maxWidth);
+          if (minHeight) cloneEl.style.setProperty('min-height', minHeight);
+          if (maxHeight) cloneEl.style.setProperty('max-height', maxHeight);
           if (padding) cloneEl.style.setProperty('padding', padding);
+          if (paddingTop) cloneEl.style.setProperty('padding-top', paddingTop);
+          if (paddingRight) cloneEl.style.setProperty('padding-right', paddingRight);
+          if (paddingBottom) cloneEl.style.setProperty('padding-bottom', paddingBottom);
+          if (paddingLeft) cloneEl.style.setProperty('padding-left', paddingLeft);
           if (margin) cloneEl.style.setProperty('margin', margin);
+          if (marginTop) cloneEl.style.setProperty('margin-top', marginTop);
+          if (marginRight) cloneEl.style.setProperty('margin-right', marginRight);
+          if (marginBottom) cloneEl.style.setProperty('margin-bottom', marginBottom);
+          if (marginLeft) cloneEl.style.setProperty('margin-left', marginLeft);
           if (gap) cloneEl.style.setProperty('gap', gap);
+          if (columnGap) cloneEl.style.setProperty('column-gap', columnGap);
+          if (rowGap) cloneEl.style.setProperty('row-gap', rowGap);
+          if (gridTemplateColumns) cloneEl.style.setProperty('grid-template-columns', gridTemplateColumns);
+          if (gridTemplateRows) cloneEl.style.setProperty('grid-template-rows', gridTemplateRows);
+          if (gridColumn) cloneEl.style.setProperty('grid-column', gridColumn);
+          if (gridRow) cloneEl.style.setProperty('grid-row', gridRow);
+          if (gridColumnStart) cloneEl.style.setProperty('grid-column-start', gridColumnStart);
+          if (gridColumnEnd) cloneEl.style.setProperty('grid-column-end', gridColumnEnd);
+          if (gridRowStart) cloneEl.style.setProperty('grid-row-start', gridRowStart);
+          if (gridRowEnd) cloneEl.style.setProperty('grid-row-end', gridRowEnd);
           if (position) cloneEl.style.setProperty('position', position);
           if (top) cloneEl.style.setProperty('top', top);
           if (left) cloneEl.style.setProperty('left', left);
@@ -424,11 +483,16 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           if (zIndex) cloneEl.style.setProperty('z-index', zIndex);
           if (borderRadius) cloneEl.style.setProperty('border-radius', borderRadius);
           if (borderWidth) cloneEl.style.setProperty('border-width', borderWidth);
+          if (borderStyle) cloneEl.style.setProperty('border-style', borderStyle);
           if (fontSize) cloneEl.style.setProperty('font-size', fontSize);
           if (fontWeight) cloneEl.style.setProperty('font-weight', fontWeight);
           if (textAlign) cloneEl.style.setProperty('text-align', textAlign);
           if (textTransform) cloneEl.style.setProperty('text-transform', textTransform);
           if (aspectRatio) cloneEl.style.setProperty('aspect-ratio', aspectRatio);
+          if (boxSizing) cloneEl.style.setProperty('box-sizing', boxSizing);
+          if (overflow) cloneEl.style.setProperty('overflow', overflow);
+          if (overflowX) cloneEl.style.setProperty('overflow-x', overflowX);
+          if (overflowY) cloneEl.style.setProperty('overflow-y', overflowY);
           
           // Force simple RGB colors - don't care about exact colors
           const tagName = cloneEl.tagName.toLowerCase();

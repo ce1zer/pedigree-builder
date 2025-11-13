@@ -176,8 +176,8 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   // Image sizes - always square, scale proportionally
   // Use aspect-square to ensure square images
   const imageSizeClasses = {
-    large: 'w-1/2 aspect-square',        // Square image, 1/2 width of tile (bigger for vertical layout)
-    medium: 'w-1/3 aspect-square',      // Square image, 1/3 width of tile
+    large: 'w-2/3 aspect-square',        // Square image, 2/3 width of tile (bigger for 1st generation)
+    medium: 'w-1/2 aspect-square',      // Square image, 1/2 width of tile (for vertical layout in 2nd gen)
     small: 'w-1/4 aspect-square'         // Smaller square image for 3rd gen, 1/4 width of tile
   };
 
@@ -199,9 +199,9 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   const isUnknown = !dog;
   const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-blue-500';
 
-  // For large size (1st generation), use vertical layout (image on top, text below)
-  // For medium and small, use horizontal layout (image left, text right)
-  const isVerticalLayout = size === 'large';
+  // For large and medium sizes (1st and 2nd generation), use vertical layout (image on top, text below)
+  // For small (3rd generation), use horizontal layout (image left, text right)
+  const isVerticalLayout = size === 'large' || size === 'medium';
   
   return (
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} gap-3`}>

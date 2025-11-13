@@ -338,6 +338,114 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
     try {
       setIsExporting(true);
       
+      // Helper to convert any color to RGB format
+      const convertToRGB = (colorValue: string): string | null => {
+        if (!colorValue || colorValue === 'transparent' || colorValue === 'rgba(0, 0, 0, 0)') {
+          return null;
+        }
+        
+        // If already RGB, return as is
+        if (colorValue.includes('rgb')) {
+          return colorValue;
+        }
+        
+        // If hex, convert to RGB
+        if (colorValue.startsWith('#')) {
+          const hex = colorValue.replace('#', '');
+          const r = parseInt(hex.substring(0, 2), 16);
+          const g = parseInt(hex.substring(2, 4), 16);
+          const b = parseInt(hex.substring(4, 6), 16);
+          return `rgb(${r}, ${g}, ${b})`;
+        }
+        
+        // For lab() or other formats, use a temporary element to get RGB
+        try {
+          const tempEl = document.createElement('div');
+          tempEl.style.color = colorValue;
+          tempEl.style.position = 'absolute';
+          tempEl.style.visibility = 'hidden';
+          document.body.appendChild(tempEl);
+          const computed = window.getComputedStyle(tempEl).color;
+          document.body.removeChild(tempEl);
+          
+          // Only return if it's RGB format
+          if (computed && computed.includes('rgb')) {
+            return computed;
+          }
+        } catch (e) {
+          // Ignore conversion errors
+        }
+        
+        return null;
+      };
+      
+      // Apply computed styles as inline styles to avoid lab() color parsing
+      const applyInlineStyles = (element: HTMLElement) => {
+        const allElements = [element, ...Array.from(element.querySelectorAll('*'))] as HTMLElement[];
+        
+        allElements.forEach((el) => {
+          try {
+            const computed = window.getComputedStyle(el);
+            
+            // Convert colors to RGB
+            const color = convertToRGB(computed.color);
+            const bgColor = convertToRGB(computed.backgroundColor);
+            const borderColor = convertToRGB(computed.borderColor);
+            
+            // Apply colors only if they're RGB
+            if (color) el.style.color = color;
+            if (bgColor) el.style.backgroundColor = bgColor;
+            if (borderColor) el.style.borderColor = borderColor;
+            
+            // Apply other important styles
+            const borderWidth = computed.borderWidth;
+            const borderRadius = computed.borderRadius;
+            const padding = computed.padding;
+            const margin = computed.margin;
+            const fontSize = computed.fontSize;
+            const fontWeight = computed.fontWeight;
+            const display = computed.display;
+            const flexDirection = computed.flexDirection;
+            const alignItems = computed.alignItems;
+            const justifyContent = computed.justifyContent;
+            const width = computed.width;
+            const height = computed.height;
+            const gap = computed.gap;
+            const position = computed.position;
+            const top = computed.top;
+            const left = computed.left;
+            const right = computed.right;
+            const bottom = computed.bottom;
+            const zIndex = computed.zIndex;
+            
+            if (borderWidth) el.style.borderWidth = borderWidth;
+            if (borderRadius) el.style.borderRadius = borderRadius;
+            if (padding) el.style.padding = padding;
+            if (margin) el.style.margin = margin;
+            if (fontSize) el.style.fontSize = fontSize;
+            if (fontWeight) el.style.fontWeight = fontWeight;
+            if (display) el.style.display = display;
+            if (flexDirection) el.style.flexDirection = flexDirection;
+            if (alignItems) el.style.alignItems = alignItems;
+            if (justifyContent) el.style.justifyContent = justifyContent;
+            if (width && !width.includes('auto')) el.style.width = width;
+            if (height && !height.includes('auto')) el.style.height = height;
+            if (gap) el.style.gap = gap;
+            if (position) el.style.position = position;
+            if (top) el.style.top = top;
+            if (left) el.style.left = left;
+            if (right) el.style.right = right;
+            if (bottom) el.style.bottom = bottom;
+            if (zIndex) el.style.zIndex = zIndex;
+          } catch (e) {
+            // Ignore errors for individual elements
+          }
+        });
+      };
+      
+      // Apply inline styles before capturing
+      applyInlineStyles(pedigreeRef.current);
+      
       const canvas = await html2canvas(pedigreeRef.current, {
         backgroundColor: '#0a0a0a',
         scale: 2,
@@ -346,36 +454,25 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
         allowTaint: true,
         foreignObjectRendering: false,
         onclone: (clonedDoc) => {
-          // Add a style override to force RGB colors and prevent lab() parsing errors
-          const styleOverride = clonedDoc.createElement('style');
-          styleOverride.textContent = `
-            * {
-              color: rgb(255, 255, 255) !important;
-            }
-            .bg-arbor,
-            .bg-neutral-900,
-            .bg-neutral-800 {
-              background-color: rgb(23, 23, 23) !important;
-            }
-            .border-blue-500 {
-              border-color: rgb(59, 130, 246) !important;
-            }
-            .border-gray-600 {
-              border-color: rgb(75, 85, 99) !important;
-            }
-            .border-white {
-              border-color: rgb(255, 255, 255) !important;
-            }
-            .text-white {
-              color: rgb(255, 255, 255) !important;
-            }
-            .text-gray-400,
-            .text-gray-500,
-            .text-gray-600 {
-              color: rgb(156, 163, 175) !important;
-            }
-          `;
-          clonedDoc.head.appendChild(styleOverride);
+          // Remove all stylesheets to prevent lab() color parsing
+          try {
+            const stylesheets = Array.from(clonedDoc.styleSheets || []);
+            stylesheets.forEach((sheet) => {
+              try {
+                if (sheet.ownerNode) {
+                  sheet.ownerNode.remove();
+                }
+              } catch (e) {
+                // Ignore errors
+              }
+            });
+          } catch (e) {
+            // Ignore if styleSheets is not accessible
+          }
+          
+          // Remove all style and link tags
+          const styleTags = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
+          styleTags.forEach((tag) => tag.remove());
         },
       });
 

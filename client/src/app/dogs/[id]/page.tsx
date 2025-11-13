@@ -380,6 +380,14 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           const originalEl = findOriginalElement(cloneEl, originalRoot);
           if (!originalEl) return;
           
+          // Copy inline styles from original (these contain important layout info like height: '100%')
+          if (originalEl.hasAttribute('style')) {
+            const originalStyle = originalEl.getAttribute('style');
+            if (originalStyle) {
+              cloneEl.setAttribute('style', originalStyle);
+            }
+          }
+          
           const computed = window.getComputedStyle(originalEl);
           
           // Get all layout properties

@@ -164,31 +164,33 @@ interface PedigreeNodeProps {
 }
 
 const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => {
-  // Size classes - standard tile sizes
+  // Size classes - proportional to container size
+  // 1st gen: 100%, 2nd gen: 50%, 3rd gen: 25%
   const sizeClasses = {
-    large: 'w-48 h-32',      // 1st generation
-    medium: 'w-48 h-32',    // 2nd generation
-    small: 'w-48 h-32'       // 3rd generation (same size for consistency)
+    large: 'w-full h-full',      // 1st generation - fills 100% of container
+    medium: 'w-full h-full',     // 2nd generation - fills 50% container (which is 50% of 1st gen)
+    small: 'w-full h-full'       // 3rd generation - fills 25% container (which is 25% of 1st gen)
   };
 
+  // Image sizes scale proportionally
   const imageSizeClasses = {
-    large: 'w-16 h-16',     // Square image
-    medium: 'w-16 h-16',    // Square image
-    small: 'w-16 h-16'      // Square image
+    large: 'w-1/3 h-1/3',        // 1/3 of tile for large
+    medium: 'w-1/3 h-1/3',       // 1/3 of tile for medium
+    small: 'w-1/3 h-1/3'         // 1/3 of tile for small
   };
 
   const textSizeClasses = {
     large: {
-      kennel: 'text-xs',
-      name: 'text-sm'
+      kennel: 'text-sm',
+      name: 'text-lg'
     },
     medium: {
       kennel: 'text-xs',
       name: 'text-sm'
     },
     small: {
-      kennel: 'text-xs',
-      name: 'text-sm'
+      kennel: 'text-[10px]',
+      name: 'text-xs'
     }
   };
 
@@ -208,7 +210,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
           />
         ) : (
           <div className="w-full h-full bg-gray-700 flex items-center justify-center">
-            <User className={`${size === 'large' ? 'h-12 w-12' : size === 'medium' ? 'h-8 w-8' : 'h-6 w-6'} text-gray-500`} />
+            <User className="w-1/2 h-1/2 text-gray-500" />
           </div>
         )}
       </div>

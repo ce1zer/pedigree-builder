@@ -343,6 +343,40 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
         scale: 2,
         logging: false,
         useCORS: true,
+        allowTaint: true,
+        foreignObjectRendering: false,
+        onclone: (clonedDoc) => {
+          // Add a style override to force RGB colors and prevent lab() parsing errors
+          const styleOverride = clonedDoc.createElement('style');
+          styleOverride.textContent = `
+            * {
+              color: rgb(255, 255, 255) !important;
+            }
+            .bg-arbor,
+            .bg-neutral-900,
+            .bg-neutral-800 {
+              background-color: rgb(23, 23, 23) !important;
+            }
+            .border-blue-500 {
+              border-color: rgb(59, 130, 246) !important;
+            }
+            .border-gray-600 {
+              border-color: rgb(75, 85, 99) !important;
+            }
+            .border-white {
+              border-color: rgb(255, 255, 255) !important;
+            }
+            .text-white {
+              color: rgb(255, 255, 255) !important;
+            }
+            .text-gray-400,
+            .text-gray-500,
+            .text-gray-600 {
+              color: rgb(156, 163, 175) !important;
+            }
+          `;
+          clonedDoc.head.appendChild(styleOverride);
+        },
       });
 
       // Convert canvas to blob and download
@@ -372,7 +406,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
   }, []);
 
   return (
-    <div className="bg-arbor rounded-lg p-8 w-full" ref={pedigreeRef}>
+    <div className="bg-arbor rounded-lg p-8 w-full" ref={pedigreeRef} data-pedigree-export>
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-xl font-semibold text-white">3-Generation Pedigree</h2>
         <button

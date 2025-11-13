@@ -1,14 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Edit, Users, TreePine, User } from 'lucide-react';
+import { ArrowLeft, Edit, Users, TreePine, User, Download } from 'lucide-react';
 import { Dog, DogFormData } from '@/types';
 import { dogsApi } from '@/services/api';
 import { formatDate } from '@/utils/helpers';
 import toast from 'react-hot-toast';
+import html2canvas from 'html2canvas';
 
 // Constants
 const ICON_SIZE = 'h-5 w-5';
@@ -299,6 +300,9 @@ interface PedigreeTreeProps {
 }
 
 const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
+  const pedigreeRef = useRef<HTMLDivElement>(null);
+  const [isExporting, setIsExporting] = useState(false);
+
   // Extract dogs from each generation - both father's and mother's side
   const parents = generations[1]?.dogs || [null, null];
   const grandparents = generations[2]?.dogs || [null, null, null, null];
@@ -324,9 +328,62 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
   const mmFather = greatGrandparents[6]; // Mother's Mother's Father
   const mmMother = greatGrandparents[7]; // Mother's Mother's Mother
 
+  // Export pedigree to PNG
+  const handleExportToPNG = useCallback(async () => {
+    if (!pedigreeRef.current) {
+      toast.error('Unable to export pedigree');
+      return;
+    }
+
+    try {
+      setIsExporting(true);
+      
+      const canvas = await html2canvas(pedigreeRef.current, {
+        backgroundColor: '#0a0a0a',
+        scale: 2,
+        logging: false,
+        useCORS: true,
+      });
+
+      // Convert canvas to blob and download
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          toast.error('Failed to generate image');
+          return;
+        }
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `pedigree-${Date.now()}.png`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        toast.success('Pedigree exported successfully!');
+      }, 'image/png');
+    } catch (error) {
+      console.error('Export error:', error);
+      toast.error('Failed to export pedigree');
+    } finally {
+      setIsExporting(false);
+    }
+  }, []);
+
   return (
-    <div className="bg-arbor rounded-lg p-8 w-full">
-      <h2 className="text-xl font-semibold text-white mb-8">3-Generation Pedigree</h2>
+    <div className="bg-arbor rounded-lg p-8 w-full" ref={pedigreeRef}>
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-xl font-semibold text-white">3-Generation Pedigree</h2>
+        <button
+          onClick={handleExportToPNG}
+          disabled={isExporting}
+          className="btn-spotify-secondary inline-flex items-center space-x-2"
+        >
+          <Download className="h-4 w-4" />
+          <span>{isExporting ? 'Exporting...' : 'Export to PNG'}</span>
+        </button>
+      </div>
       
       {/* Generation Labels */}
       <div className="grid grid-cols-3 gap-x-8 mb-8">

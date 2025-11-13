@@ -122,8 +122,8 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       name: 'text-lg'
     },
     medium: {
-      kennel: 'text-xs',
-      name: 'text-sm'
+      kennel: 'text-[9px]',
+      name: 'text-[10px]'
     },
     small: {
       kennel: 'text-[9px]',

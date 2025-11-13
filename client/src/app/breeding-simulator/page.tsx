@@ -143,7 +143,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} gap-3`}>
       {/* For small size on father's side (3rd generation), text comes first (left side) */}
       {isSmallWithTextLeft && (
-        <div className="flex-1 min-w-0 flex flex-col justify-center">
+        <div className="flex-1 min-w-0 flex flex-col justify-center text-right">
           <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
             {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
           </p>

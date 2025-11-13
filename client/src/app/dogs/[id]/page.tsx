@@ -335,10 +335,10 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
       </div>
 
       {/* Pedigree Tree Layout - 3 Column Grid with Height Proportions */}
-      <div className="grid grid-cols-3 gap-x-8 w-full" style={{ height: '300px' }}>
-        {/* Column 1: Father (1st Generation) - 100% height */}
-        <div className="flex flex-col h-full">
-          <div className="relative h-full flex items-center justify-center">
+      <div className="grid grid-cols-3 gap-x-8 w-full">
+        {/* Column 1: Father (1st Generation) - Square container */}
+        <div className="flex flex-col aspect-square">
+          <div className="relative h-full w-full flex items-center justify-center">
             <PedigreeNode dog={father} size="large" />
             {/* Connection lines to 2nd generation - horizontal white lines */}
             <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
@@ -347,7 +347,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
         </div>
 
         {/* Column 2: Grandparents (2nd Generation) - 2 containers of 50% height each */}
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col" style={{ height: '100%' }}>
           {/* Father's Father - 50% height */}
           <div className="relative h-1/2 flex items-center justify-center">
             <PedigreeNode dog={fatherFather} size="medium" />
@@ -366,7 +366,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
         </div>
 
         {/* Column 3: Great-grandparents (3rd Generation) - 4 containers of 25% height each */}
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col" style={{ height: '100%' }}>
           {/* Father's Father's Father - 25% height */}
           <div className="relative h-1/4 flex items-center justify-center">
             <PedigreeNode dog={ffFather} size="small" />

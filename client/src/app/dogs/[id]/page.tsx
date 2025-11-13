@@ -643,15 +643,14 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
         {/* Pedigree Tree Layout - 3 Column Grid with Height Proportions */}
         <div className="grid grid-cols-3 gap-x-8 w-full items-start">
         {/* Column 1: Parents (1st Generation) - 2 tiles: Father (top 50%) and Mother (bottom 50%) */}
-        <div className="flex flex-col" style={{ height: '100%' }}>
+        <div className="flex flex-col relative" style={{ height: '100%' }}>
           {/* Father - 50% height */}
           <div className="relative" style={{ height: '50%' }}>
             <div className="h-full w-full flex items-center justify-center">
               <PedigreeNode dog={father} size="large" />
             </div>
-            {/* Connection lines to 2nd generation - horizontal white lines */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Branching connector: horizontal from child center-right */}
+            <div className="absolute top-1/2 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
           
           {/* Mother - 50% height */}
@@ -659,22 +658,34 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full w-full flex items-center justify-center">
               <PedigreeNode dog={mother} size="large" />
             </div>
-            {/* Connection lines to 2nd generation - horizontal white lines */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Branching connector: horizontal from child center-right */}
+            <div className="absolute top-1/2 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
+          
+          {/* Branch connector for Father: vertical line spanning between Father's Father and Father's Mother */}
+          {/* Vertical line from horizontal connector to span between parents (12.5% to 37.5% = 25% span) */}
+          <div className="absolute top-[12.5%] left-[calc(100%+2rem)] w-[2px] h-[25%] bg-white z-10"></div>
+          {/* Horizontal lines to Father's parents */}
+          <div className="absolute top-[12.5%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
+          <div className="absolute top-[37.5%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
+          
+          {/* Branch connector for Mother: vertical line spanning between Mother's Father and Mother's Mother */}
+          {/* Vertical line from horizontal connector to span between parents (62.5% to 87.5% = 25% span) */}
+          <div className="absolute top-[62.5%] left-[calc(100%+2rem)] w-[2px] h-[25%] bg-white z-10"></div>
+          {/* Horizontal lines to Mother's parents */}
+          <div className="absolute top-[62.5%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
+          <div className="absolute top-[87.5%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
         </div>
 
         {/* Column 2: Grandparents (2nd Generation) - 4 tiles: Father's parents (top 50%) and Mother's parents (bottom 50%) */}
-        <div className="flex flex-col" style={{ height: '100%' }}>
+        <div className="flex flex-col relative" style={{ height: '100%' }}>
           {/* Father's Father - 25% of total height */}
           <div className="relative" style={{ height: '25%' }}>
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={fatherFather} size="medium" />
             </div>
-            {/* Connection lines to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Branching connector: horizontal from child center-right */}
+            <div className="absolute top-1/2 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
           
           {/* Father's Mother - 25% of total height */}
@@ -682,9 +693,8 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={fatherMother} size="medium" />
             </div>
-            {/* Connection lines to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Branching connector: horizontal from child center-right */}
+            <div className="absolute top-1/2 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
           
           {/* Mother's Father - 25% of total height */}
@@ -692,9 +702,8 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={motherFather} size="medium" />
             </div>
-            {/* Connection lines to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Branching connector: horizontal from child center-right */}
+            <div className="absolute top-1/2 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
           
           {/* Mother's Mother - 25% of total height */}
@@ -702,10 +711,29 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={motherMother} size="medium" />
             </div>
-            {/* Connection lines to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Branching connector: horizontal from child center-right */}
+            <div className="absolute top-1/2 left-full w-8 h-[2px] bg-white z-10"></div>
           </div>
+          
+          {/* Branch connectors for Father's Father: vertical line spanning between ffFather and ffMother */}
+          <div className="absolute top-0 left-[calc(100%+2rem)] w-[2px] h-[12.5%] bg-white z-10"></div>
+          <div className="absolute top-[6.25%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
+          <div className="absolute top-[18.75%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
+          
+          {/* Branch connectors for Father's Mother: vertical line spanning between fmFather and fmMother */}
+          <div className="absolute top-[25%] left-[calc(100%+2rem)] w-[2px] h-[12.5%] bg-white z-10"></div>
+          <div className="absolute top-[31.25%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
+          <div className="absolute top-[43.75%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
+          
+          {/* Branch connectors for Mother's Father: vertical line spanning between mfFather and mfMother */}
+          <div className="absolute top-[50%] left-[calc(100%+2rem)] w-[2px] h-[12.5%] bg-white z-10"></div>
+          <div className="absolute top-[56.25%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
+          <div className="absolute top-[68.75%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
+          
+          {/* Branch connectors for Mother's Mother: vertical line spanning between mmFather and mmMother */}
+          <div className="absolute top-[75%] left-[calc(100%+2rem)] w-[2px] h-[12.5%] bg-white z-10"></div>
+          <div className="absolute top-[81.25%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
+          <div className="absolute top-[93.75%] left-[calc(100%+2rem)] w-8 h-[2px] bg-white z-10"></div>
         </div>
 
         {/* Column 3: Great-grandparents (3rd Generation) - 8 tiles: Father's grandparents (top 50%) and Mother's grandparents (bottom 50%) */}

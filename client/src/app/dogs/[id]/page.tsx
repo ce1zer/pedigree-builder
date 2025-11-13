@@ -338,162 +338,184 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
     try {
       setIsExporting(true);
       
-      // Helper to convert any color to RGB format
-      const convertToRGB = (colorValue: string): string | null => {
-        if (!colorValue || colorValue === 'transparent' || colorValue === 'rgba(0, 0, 0, 0)') {
-          return null;
-        }
+      // Create a completely isolated clone with only RGB colors
+      const createIsolatedClone = (original: HTMLElement): HTMLElement => {
+        const clone = original.cloneNode(true) as HTMLElement;
         
-        // If already RGB, return as is
-        if (colorValue.includes('rgb')) {
-          return colorValue;
-        }
+        // Remove all classes to prevent stylesheet parsing
+        const removeClasses = (el: Element) => {
+          el.removeAttribute('class');
+          Array.from(el.children).forEach(removeClasses);
+        };
+        removeClasses(clone);
         
-        // If hex, convert to RGB
-        if (colorValue.startsWith('#')) {
-          const hex = colorValue.replace('#', '');
-          const r = parseInt(hex.substring(0, 2), 16);
-          const g = parseInt(hex.substring(2, 4), 16);
-          const b = parseInt(hex.substring(4, 6), 16);
-          return `rgb(${r}, ${g}, ${b})`;
-        }
-        
-        // For lab() or other formats, use a temporary element to get RGB
-        try {
-          const tempEl = document.createElement('div');
-          tempEl.style.color = colorValue;
-          tempEl.style.position = 'absolute';
-          tempEl.style.visibility = 'hidden';
-          document.body.appendChild(tempEl);
-          const computed = window.getComputedStyle(tempEl).color;
-          document.body.removeChild(tempEl);
+        // Helper to find corresponding original element
+        const findOriginalElement = (cloneEl: Element, originalRoot: HTMLElement): HTMLElement | null => {
+          // Build a path to find the element
+          const path: number[] = [];
+          let current: Element | null = cloneEl;
+          while (current && current !== clone) {
+            const parent = current.parentElement;
+            if (parent) {
+              const index = Array.from(parent.children).indexOf(current);
+              path.unshift(index);
+            }
+            current = parent;
+          }
           
-          // Only return if it's RGB format
-          if (computed && computed.includes('rgb')) {
-            return computed;
+          // Navigate to the same element in original
+          let originalEl: Element | null = originalRoot;
+          for (const index of path) {
+            if (originalEl && originalEl.children[index]) {
+              originalEl = originalEl.children[index];
+            } else {
+              return null;
+            }
           }
-        } catch (e) {
-          // Ignore conversion errors
-        }
+          return originalEl as HTMLElement;
+        };
         
-        return null;
-      };
-      
-      // Apply computed styles as inline styles to avoid lab() color parsing
-      const applyInlineStyles = (element: HTMLElement) => {
-        const allElements = [element, ...Array.from(element.querySelectorAll('*'))] as HTMLElement[];
-        
-        allElements.forEach((el) => {
-          try {
-            const computed = window.getComputedStyle(el);
-            
-            // Convert colors to RGB
-            const color = convertToRGB(computed.color);
-            const bgColor = convertToRGB(computed.backgroundColor);
-            const borderColor = convertToRGB(computed.borderColor);
-            
-            // Apply colors only if they're RGB
-            if (color) el.style.color = color;
-            if (bgColor) el.style.backgroundColor = bgColor;
-            if (borderColor) el.style.borderColor = borderColor;
-            
-            // Apply other important styles
-            const borderWidth = computed.borderWidth;
-            const borderRadius = computed.borderRadius;
-            const padding = computed.padding;
-            const margin = computed.margin;
-            const fontSize = computed.fontSize;
-            const fontWeight = computed.fontWeight;
-            const display = computed.display;
-            const flexDirection = computed.flexDirection;
-            const alignItems = computed.alignItems;
-            const justifyContent = computed.justifyContent;
-            const width = computed.width;
-            const height = computed.height;
-            const gap = computed.gap;
-            const position = computed.position;
-            const top = computed.top;
-            const left = computed.left;
-            const right = computed.right;
-            const bottom = computed.bottom;
-            const zIndex = computed.zIndex;
-            
-            if (borderWidth) el.style.borderWidth = borderWidth;
-            if (borderRadius) el.style.borderRadius = borderRadius;
-            if (padding) el.style.padding = padding;
-            if (margin) el.style.margin = margin;
-            if (fontSize) el.style.fontSize = fontSize;
-            if (fontWeight) el.style.fontWeight = fontWeight;
-            if (display) el.style.display = display;
-            if (flexDirection) el.style.flexDirection = flexDirection;
-            if (alignItems) el.style.alignItems = alignItems;
-            if (justifyContent) el.style.justifyContent = justifyContent;
-            if (width && !width.includes('auto')) el.style.width = width;
-            if (height && !height.includes('auto')) el.style.height = height;
-            if (gap) el.style.gap = gap;
-            if (position) el.style.position = position;
-            if (top) el.style.top = top;
-            if (left) el.style.left = left;
-            if (right) el.style.right = right;
-            if (bottom) el.style.bottom = bottom;
-            if (zIndex) el.style.zIndex = zIndex;
-          } catch (e) {
-            // Ignore errors for individual elements
+        // Apply simple RGB styles to all elements
+        const applyRGBStyles = (cloneEl: HTMLElement, originalRoot: HTMLElement) => {
+          const originalEl = findOriginalElement(cloneEl, originalRoot);
+          if (!originalEl) return;
+          
+          const computed = window.getComputedStyle(originalEl);
+          
+          // Get layout properties
+          const display = computed.display;
+          const flexDirection = computed.flexDirection;
+          const alignItems = computed.alignItems;
+          const justifyContent = computed.justifyContent;
+          const width = computed.width;
+          const height = computed.height;
+          const padding = computed.padding;
+          const margin = computed.margin;
+          const gap = computed.gap;
+          const position = computed.position;
+          const top = computed.top;
+          const left = computed.left;
+          const right = computed.right;
+          const bottom = computed.bottom;
+          const zIndex = computed.zIndex;
+          const borderRadius = computed.borderRadius;
+          const borderWidth = computed.borderWidth;
+          const fontSize = computed.fontSize;
+          const fontWeight = computed.fontWeight;
+          const textAlign = computed.textAlign;
+          const textTransform = computed.textTransform;
+          const aspectRatio = computed.aspectRatio;
+          
+          // Apply layout styles
+          if (display) cloneEl.style.setProperty('display', display);
+          if (flexDirection) cloneEl.style.setProperty('flex-direction', flexDirection);
+          if (alignItems) cloneEl.style.setProperty('align-items', alignItems);
+          if (justifyContent) cloneEl.style.setProperty('justify-content', justifyContent);
+          if (width && !width.includes('auto')) cloneEl.style.setProperty('width', width);
+          if (height && !height.includes('auto')) cloneEl.style.setProperty('height', height);
+          if (padding) cloneEl.style.setProperty('padding', padding);
+          if (margin) cloneEl.style.setProperty('margin', margin);
+          if (gap) cloneEl.style.setProperty('gap', gap);
+          if (position) cloneEl.style.setProperty('position', position);
+          if (top) cloneEl.style.setProperty('top', top);
+          if (left) cloneEl.style.setProperty('left', left);
+          if (right) cloneEl.style.setProperty('right', right);
+          if (bottom) cloneEl.style.setProperty('bottom', bottom);
+          if (zIndex) cloneEl.style.setProperty('z-index', zIndex);
+          if (borderRadius) cloneEl.style.setProperty('border-radius', borderRadius);
+          if (borderWidth) cloneEl.style.setProperty('border-width', borderWidth);
+          if (fontSize) cloneEl.style.setProperty('font-size', fontSize);
+          if (fontWeight) cloneEl.style.setProperty('font-weight', fontWeight);
+          if (textAlign) cloneEl.style.setProperty('text-align', textAlign);
+          if (textTransform) cloneEl.style.setProperty('text-transform', textTransform);
+          if (aspectRatio) cloneEl.style.setProperty('aspect-ratio', aspectRatio);
+          
+          // Force simple RGB colors - don't care about exact colors
+          const tagName = cloneEl.tagName.toLowerCase();
+          
+          // Background colors - use dark gray/black
+          if (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+            cloneEl.style.setProperty('background-color', 'rgb(23, 23, 23)');
           }
-        });
-      };
-      
-      // Apply inline styles before capturing
-      applyInlineStyles(pedigreeRef.current);
-      
-      const canvas = await html2canvas(pedigreeRef.current, {
-        backgroundColor: '#0a0a0a',
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        allowTaint: true,
-        foreignObjectRendering: false,
-        onclone: (clonedDoc) => {
-          // Remove all stylesheets to prevent lab() color parsing
-          try {
-            const stylesheets = Array.from(clonedDoc.styleSheets || []);
-            stylesheets.forEach((sheet) => {
-              try {
-                if (sheet.ownerNode) {
-                  sheet.ownerNode.remove();
-                }
-              } catch (e) {
-                // Ignore errors
+          
+          // Text colors - use white
+          if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'p' || tagName === 'span' || tagName === 'div') {
+            if (computed.color && computed.color !== 'rgba(0, 0, 0, 0)') {
+              cloneEl.style.setProperty('color', 'rgb(255, 255, 255)');
+            }
+          }
+          
+          // Border colors - use blue or white
+          if (computed.borderColor && computed.borderColor !== 'rgba(0, 0, 0, 0)') {
+            // Check if it's a blue border (from border-blue-500) or white
+            const borderStyle = computed.borderStyle;
+            if (borderStyle && borderStyle !== 'none') {
+              // Use blue for pedigree tiles, white for connection lines
+              if (cloneEl.querySelector('img') || cloneEl.textContent?.trim()) {
+                cloneEl.style.setProperty('border-color', 'rgb(59, 130, 246)');
+              } else {
+                cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
               }
-            });
-          } catch (e) {
-            // Ignore if styleSheets is not accessible
+            }
           }
           
-          // Remove all style and link tags
-          const styleTags = clonedDoc.querySelectorAll('style, link[rel="stylesheet"]');
-          styleTags.forEach((tag) => tag.remove());
-        },
-      });
+          // Recursively apply to children
+          Array.from(cloneEl.children).forEach((child) => {
+            applyRGBStyles(child as HTMLElement, originalRoot);
+          });
+        };
+        
+        applyRGBStyles(clone, original);
+        return clone;
+      };
+      
+      // Create isolated clone
+      const isolatedClone = createIsolatedClone(pedigreeRef.current);
+      
+      // Create temporary container with no stylesheets
+      const tempContainer = document.createElement('div');
+      tempContainer.style.position = 'absolute';
+      tempContainer.style.left = '-9999px';
+      tempContainer.style.top = '0';
+      tempContainer.style.width = pedigreeRef.current.offsetWidth + 'px';
+      tempContainer.style.height = pedigreeRef.current.offsetHeight + 'px';
+      tempContainer.style.backgroundColor = 'rgb(10, 10, 10)';
+      tempContainer.appendChild(isolatedClone);
+      document.body.appendChild(tempContainer);
+      
+      try {
+        const canvas = await html2canvas(isolatedClone, {
+          backgroundColor: '#0a0a0a',
+          scale: 2,
+          logging: false,
+          useCORS: true,
+          allowTaint: true,
+          foreignObjectRendering: false,
+          ignoreElements: () => false,
+        });
 
-      // Convert canvas to blob and download
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          toast.error('Failed to generate image');
-          return;
-        }
+        // Convert canvas to blob and download
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            toast.error('Failed to generate image');
+            return;
+          }
 
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `pedigree-${Date.now()}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `pedigree-${Date.now()}.png`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
 
-        toast.success('Pedigree exported successfully!');
-      }, 'image/png');
+          toast.success('Pedigree exported successfully!');
+        }, 'image/png');
+      } finally {
+        // Clean up temporary container
+        document.body.removeChild(tempContainer);
+      }
     } catch (error) {
       console.error('Export error:', error);
       toast.error('Failed to export pedigree');

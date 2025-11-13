@@ -132,35 +132,15 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
 
   const isUnknown = !dog;
   const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-blue-500';
-  // Large (1st gen): horizontal layout (text left, image right)
-  // Medium (2nd gen): vertical layout (image top, text bottom)
-  // Small (3rd gen): horizontal layout (image left, text right)
-  const isVerticalLayout = size === 'medium';
+
+  // For large and medium sizes (1st and 2nd generation), use vertical layout (image on top, text below)
+  // For small (3rd generation), use horizontal layout (image left, text right)
+  const isVerticalLayout = size === 'large' || size === 'medium';
   
   return (
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} gap-3`}>
-      {/* For large size, text comes first (left side) */}
-      {size === 'large' && (
-        <div className="flex-1 min-w-0 flex flex-col justify-center">
-          <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
-            {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
-          </p>
-          {dog ? (
-            <Link 
-              href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-1`}
-            >
-              {dog.dog_name}
-            </Link>
-          ) : (
-            <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
-              UNKNOWN
-            </p>
-          )}
-        </div>
-      )}
-      
-      <div className={`${imageSizeClasses[size]} rounded overflow-hidden flex-shrink-0 ${imageBorderColor} border-2`}>
+      {/* Square Image with Border */}
+      <div className={`${imageSizeClasses[size]} rounded overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
         {dog?.image_url ? (
           <img
             src={dog.image_url}
@@ -174,26 +154,24 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
         )}
       </div>
       
-      {/* For medium and small sizes, text comes after image */}
-      {size !== 'large' && (
-        <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-          <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
-            {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
+      {/* Dog Info - Vertical Layout for text content */}
+      <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
+        <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
+          {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
+        </p>
+        {dog ? (
+          <Link 
+            href={`/dogs/${dog.id}`}
+            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-1`}
+          >
+            {dog.dog_name}
+          </Link>
+        ) : (
+          <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
+            UNKNOWN
           </p>
-          {dog ? (
-            <Link 
-              href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-1`}
-            >
-              {dog.dog_name}
-            </Link>
-          ) : (
-            <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
-              UNKNOWN
-            </p>
-          )}
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
@@ -544,7 +522,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       <div ref={pedigreeRef} data-pedigree-export>
         {/* Generation Labels - 6 columns */}
         <div className="grid grid-cols-6 gap-x-[0.2rem] mb-8">
-          <div className="text-center">
+          <div className="text-left">
             <p className="text-sm text-white uppercase font-bold tracking-wider">Father 3rd gen</p>
           </div>
           <div className="text-center">

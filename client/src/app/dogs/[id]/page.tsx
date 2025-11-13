@@ -197,17 +197,16 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   };
 
   const isUnknown = !dog;
-  const borderColor = isUnknown ? 'border-gray-600' : 'border-blue-500';
-  const bgColor = isUnknown ? 'bg-neutral-800' : 'bg-neutral-900';
+  const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-blue-500';
 
   // For large size (1st generation), use vertical layout (image on top, text below)
   // For medium and small, use horizontal layout (image left, text right)
   const isVerticalLayout = size === 'large';
   
   return (
-    <div className={`${sizeClasses[size]} ${bgColor} ${borderColor} border-2 rounded flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} p-3 gap-3`}>
-      {/* Square Image */}
-      <div className={`${imageSizeClasses[size]} rounded overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'}`}>
+    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} gap-3`}>
+      {/* Square Image with Border */}
+      <div className={`${imageSizeClasses[size]} rounded overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
         {dog?.image_url ? (
           <img
             src={dog.image_url}
@@ -650,9 +649,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full w-full flex items-center justify-center">
               <PedigreeNode dog={father} size="large" />
             </div>
-            {/* Connection lines to 2nd generation - horizontal white lines */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Connection branches to 2nd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
           </div>
           
           {/* Mother - 50% height */}
@@ -660,9 +659,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full w-full flex items-center justify-center">
               <PedigreeNode dog={mother} size="large" />
             </div>
-            {/* Connection lines to 2nd generation - horizontal white lines */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Connection branches to 2nd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
           </div>
         </div>
 
@@ -673,9 +672,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={fatherFather} size="medium" />
             </div>
-            {/* Connection lines to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Connection branches to 3rd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
           </div>
           
           {/* Father's Mother - 25% of total height */}
@@ -683,9 +682,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={fatherMother} size="medium" />
             </div>
-            {/* Connection lines to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Connection branches to 3rd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
           </div>
           
           {/* Mother's Father - 25% of total height */}
@@ -693,9 +692,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={motherFather} size="medium" />
             </div>
-            {/* Connection lines to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Connection branches to 3rd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
           </div>
           
           {/* Mother's Mother - 25% of total height */}
@@ -703,9 +702,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
             <div className="h-full flex items-center justify-center">
               <PedigreeNode dog={motherMother} size="medium" />
             </div>
-            {/* Connection lines to 3rd generation */}
-            <div className="absolute top-1/4 left-full w-8 h-[2px] bg-white z-10"></div>
-            <div className="absolute top-3/4 left-full w-8 h-[2px] bg-white z-10"></div>
+            {/* Connection branches to 3rd generation */}
+            <div className="absolute top-1/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
+            <div className="absolute top-3/4 left-full w-8 h-[3px] bg-amber-800 z-10 rounded-full"></div>
           </div>
         </div>
 

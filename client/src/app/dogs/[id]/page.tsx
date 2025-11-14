@@ -178,7 +178,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   const imageSizeClasses = {
     large: 'w-2/3 aspect-[4/3]',        // 4:3 image, 2/3 width of tile (bigger for 1st generation)
     medium: 'w-[35%] aspect-[4/3]',      // 4:3 image, 35% width of tile (30% smaller than 50% for 2nd gen)
-    small: 'w-[17.5%] aspect-[4/3]'     // Smaller 4:3 image for 3rd gen, 17.5% width of tile (30% smaller than 25%)
+    small: 'w-1/4 aspect-[4/3]'         // Smaller 4:3 image for 3rd gen, 1/4 width of tile
   };
 
   const textSizeClasses = {

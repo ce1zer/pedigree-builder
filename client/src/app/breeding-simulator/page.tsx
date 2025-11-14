@@ -139,8 +139,13 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   const isVerticalLayout = size === 'large' || size === 'medium';
   const isSmallWithTextLeft = size === 'small' && side === 'father';
   
+  // For medium size (2nd gen), use justify-start to align content to top and reduce spacing
+  // For large size (1st gen), use justify-center
+  const verticalJustify = size === 'medium' ? 'justify-start' : 'justify-center';
+  const gapClass = size === 'medium' ? 'gap-1' : 'gap-3';
+  
   return (
-    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} gap-3`}>
+    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? `flex-col items-center ${verticalJustify}` : 'items-center'} ${gapClass}`}>
       {/* For small size on father's side (3rd generation), text comes first (left side) */}
       {isSmallWithTextLeft && (
         <div className="flex-1 min-w-0 flex flex-col justify-center text-right">

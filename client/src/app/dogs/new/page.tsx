@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { ArrowLeft, Upload, Camera, Save, ChevronDown, X } from 'lucide-react';
+import Cropper from 'react-easy-crop';
 import { DogFormData, Dog } from '@/types';
 import { dogsApi } from '@/services/api';
 import toast from 'react-hot-toast';
@@ -29,51 +30,217 @@ const VALIDATION_RULES = {
   }
 } as const;
 
-// Photo upload component
+// Helper function to create image from blob
+const createImage = (url: string): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener('load', () => resolve(image));
+    image.addEventListener('error', (error) => reject(error));
+    image.src = url;
+  });
+
+// Helper function to get cropped image blob
+const getCroppedImg = async (
+  imageSrc: string,
+  pixelCrop: { x: number; y: number; width: number; height: number }
+): Promise<Blob> => {
+  const image = await createImage(imageSrc);
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+
+  if (!ctx) {
+    throw new Error('No 2d context');
+  }
+
+  canvas.width = pixelCrop.width;
+  canvas.height = pixelCrop.height;
+
+  ctx.drawImage(
+    image,
+    pixelCrop.x,
+    pixelCrop.y,
+    pixelCrop.width,
+    pixelCrop.height,
+    0,
+    0,
+    pixelCrop.width,
+    pixelCrop.height
+  );
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        reject(new Error('Canvas is empty'));
+        return;
+      }
+      resolve(blob);
+    }, 'image/jpeg');
+  });
+};
+
+// Photo upload component with cropping
 interface PhotoUploadProps {
   photoPreview: string | null;
-  onPhotoChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onPhotoChange: (file: File) => void;
 }
 
-const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }) => (
-  <div className="card-spotify">
-    <h2 className="text-xl font-semibold text-white mb-6">Photo</h2>
-    
-    <div className="flex items-center space-x-6">
-      {/* Photo Preview */}
-      <div className="flex-shrink-0">
-        {photoPreview ? (
-          <img
-            src={photoPreview}
-            alt="Preview"
-            className={`${PHOTO_SIZE} rounded-xl object-cover`}
-          />
-        ) : (
-          <div className={`${PHOTO_SIZE} bg-gray-800 rounded-xl flex items-center justify-center`}>
-            <Camera className={`${CAMERA_ICON_SIZE} text-gray-500`} />
+const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }) => {
+  const [showCrop, setShowCrop] = useState(false);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const aspectRatio = 4 / 3; // 4:3 aspect ratio
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImageSrc(reader.result as string);
+        setShowCrop(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  const handleCrop = async () => {
+    if (!imageSrc || !croppedAreaPixels) return;
+
+    try {
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+      const file = new File([croppedImage], 'cropped-image.jpg', { type: 'image/jpeg' });
+      onPhotoChange(file);
+      setShowCrop(false);
+      setImageSrc(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    } catch (error) {
+      console.error('Error cropping image:', error);
+      toast.error('Error cropping image');
+    }
+  };
+
+  const handleCancelCrop = () => {
+    setShowCrop(false);
+    setImageSrc(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <>
+      <div className="card-spotify">
+        <h2 className="text-xl font-semibold text-white mb-6">Photo</h2>
+        
+        <div className="flex items-center space-x-6">
+          {/* Photo Preview */}
+          <div className="flex-shrink-0">
+            {photoPreview ? (
+              <img
+                src={photoPreview}
+                alt="Preview"
+                className={`${PHOTO_SIZE} rounded-xl object-cover`}
+              />
+            ) : (
+              <div className={`${PHOTO_SIZE} bg-gray-800 rounded-xl flex items-center justify-center`}>
+                <Camera className={`${CAMERA_ICON_SIZE} text-gray-500`} />
+              </div>
+            )}
           </div>
-        )}
+          
+          {/* Upload Button */}
+          <div className="flex-1">
+            <label className="btn-spotify-secondary inline-flex items-center space-x-2 cursor-pointer">
+              <Upload className={SMALL_ICON_SIZE} />
+              <span>Upload Photo</span>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+            </label>
+            <p className="text-sm text-gray-400 mt-3">
+              JPG, PNG or GIF. Maximum 5MB. Crop to 4:3 aspect ratio.
+            </p>
+          </div>
+        </div>
       </div>
-      
-      {/* Upload Button */}
-      <div className="flex-1">
-        <label className="btn-spotify-secondary inline-flex items-center space-x-2 cursor-pointer">
-          <Upload className={SMALL_ICON_SIZE} />
-          <span>Upload Photo</span>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={onPhotoChange}
-            className="hidden"
-          />
-        </label>
-        <p className="text-sm text-gray-400 mt-3">
-          JPG, PNG or GIF. Maximum 5MB.
-        </p>
-      </div>
-    </div>
-  </div>
-);
+
+      {/* Crop Modal */}
+      {showCrop && imageSrc && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+          <div className="bg-gray-900 rounded-lg p-6 max-w-4xl w-full max-h-[90vh] overflow-auto">
+            <h3 className="text-xl font-semibold text-white mb-4">Crop Image (4:3 aspect ratio)</h3>
+            
+            <div className="relative w-full" style={{ height: '400px', background: '#1a1a1a' }}>
+              <Cropper
+                image={imageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={aspectRatio}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+                style={{
+                  containerStyle: {
+                    width: '100%',
+                    height: '100%',
+                    position: 'relative',
+                  },
+                }}
+              />
+            </div>
+
+            <div className="mt-4 flex items-center space-x-4">
+              <label className="text-white text-sm">
+                Zoom:
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  className="ml-2 w-32"
+                />
+              </label>
+            </div>
+
+            <div className="mt-6 flex justify-end space-x-4">
+              <button
+                onClick={handleCancelCrop}
+                className="btn-spotify-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCrop}
+                className="btn-spotify-primary"
+              >
+                Crop & Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+};
 
 // Form field component
 interface FormFieldProps {

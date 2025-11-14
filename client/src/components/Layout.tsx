@@ -3,12 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Dog, Plus, Home } from 'lucide-react';
+import { Database, Plus, GitBranch } from 'lucide-react';
 
 // Constants
-const ICON_SIZE = 'h-5 w-5';
 const SMALL_ICON_SIZE = 'h-4 w-4';
-const LOGO_SIZE = 'w-8 h-8';
 
 // Navigation item interface
 interface NavItem {
@@ -21,8 +19,13 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   {
     href: '/',
-    label: 'Dashboard',
-    icon: <Home className={SMALL_ICON_SIZE} />
+    label: 'Database',
+    icon: <Database className={SMALL_ICON_SIZE} />
+  },
+  {
+    href: '/breeding-simulator',
+    label: 'Breeding Simulator',
+    icon: <GitBranch className={SMALL_ICON_SIZE} />
   },
   {
     href: '/dogs/new',
@@ -30,16 +33,6 @@ const NAV_ITEMS: NavItem[] = [
     icon: <Plus className={SMALL_ICON_SIZE} />
   }
 ];
-
-// Logo component
-const Logo: React.FC = () => (
-  <Link href="/" className="flex items-center space-x-3">
-    <div className={`${LOGO_SIZE} bg-green-500 rounded-full flex items-center justify-center`}>
-      <Dog className={`${ICON_SIZE} text-black`} />
-    </div>
-    <span className="text-xl font-bold text-white">PedigreeBuilder</span>
-  </Link>
-);
 
 // Navigation link component
 interface NavLinkProps {
@@ -63,14 +56,17 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive }) => (
 
 // Header component
 const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
-  const isActive = (path: string) => pathname === path;
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return pathname === '/';
+    }
+    return pathname.startsWith(path);
+  };
 
   return (
     <header className="bg-gray-900 border-b border-gray-800 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Logo />
-          
+        <div className="flex items-center h-16">
           <nav className="flex space-x-2">
             {NAV_ITEMS.map((item) => (
               <NavLink 

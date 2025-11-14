@@ -62,7 +62,7 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-4xl font-bold text-white mb-2">Dogs Dashboard</h1>
+          <h1 className="text-4xl font-bold text-white mb-2">Database</h1>
           <p className="text-gray-400 text-lg">
             Manage your dog profiles and pedigrees
           </p>

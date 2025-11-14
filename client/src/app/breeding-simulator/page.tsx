@@ -379,6 +379,10 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           const fontWeight = computed.fontWeight;
           const textAlign = computed.textAlign;
           const textTransform = computed.textTransform;
+          const lineHeight = computed.lineHeight;
+          const letterSpacing = computed.letterSpacing;
+          const whiteSpace = computed.whiteSpace;
+          const textOverflow = computed.textOverflow;
           const aspectRatio = computed.aspectRatio;
           const boxSizing = computed.boxSizing;
           const overflow = computed.overflow;
@@ -441,11 +445,29 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           if (fontWeight) setStyleIfNotInline('font-weight', fontWeight);
           if (textAlign) setStyleIfNotInline('text-align', textAlign);
           if (textTransform) setStyleIfNotInline('text-transform', textTransform);
+          if (lineHeight) setStyleIfNotInline('line-height', lineHeight);
+          if (letterSpacing) setStyleIfNotInline('letter-spacing', letterSpacing);
+          if (whiteSpace) setStyleIfNotInline('white-space', whiteSpace);
+          if (textOverflow) setStyleIfNotInline('text-overflow', textOverflow);
           if (aspectRatio) setStyleIfNotInline('aspect-ratio', aspectRatio);
           if (boxSizing) setStyleIfNotInline('box-sizing', boxSizing);
-          if (overflow) setStyleIfNotInline('overflow', overflow);
-          if (overflowX) setStyleIfNotInline('overflow-x', overflowX);
-          if (overflowY) setStyleIfNotInline('overflow-y', overflowY);
+          // For text elements, ensure overflow is visible to show all text
+          if (tagName === 'p' || tagName === 'a' || tagName === 'span' || (tagName === 'div' && cloneEl.textContent?.trim())) {
+            if (overflow === 'hidden' || overflowX === 'hidden' || overflowY === 'hidden') {
+              cloneEl.style.setProperty('overflow', 'visible');
+              cloneEl.style.setProperty('overflow-x', 'visible');
+              cloneEl.style.setProperty('overflow-y', 'visible');
+            }
+            // Remove text truncation for export
+            if (cloneEl.classList.contains('truncate') || whiteSpace === 'nowrap') {
+              cloneEl.style.setProperty('white-space', 'normal');
+              cloneEl.style.setProperty('text-overflow', 'clip');
+            }
+          } else {
+            if (overflow) setStyleIfNotInline('overflow', overflow);
+            if (overflowX) setStyleIfNotInline('overflow-x', overflowX);
+            if (overflowY) setStyleIfNotInline('overflow-y', overflowY);
+          }
           
           const tagName = cloneEl.tagName.toLowerCase();
           
@@ -453,10 +475,13 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             cloneEl.style.setProperty('background-color', 'rgb(23, 23, 23)');
           }
           
-          if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'p' || tagName === 'span' || tagName === 'div') {
+          // Apply text color to all text elements including links
+          if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'p' || tagName === 'span' || tagName === 'div' || tagName === 'a') {
             if (computed.color && computed.color !== 'rgba(0, 0, 0, 0)') {
               cloneEl.style.setProperty('color', 'rgb(255, 255, 255)');
             }
+            // Ensure text is visible
+            cloneEl.style.setProperty('opacity', '1');
           }
           
           if (computed.borderColor && computed.borderColor !== 'rgba(0, 0, 0, 0)') {

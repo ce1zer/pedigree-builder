@@ -153,12 +153,12 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-1`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-0.5`}
             >
               {dog.dog_name}
             </Link>
           ) : (
-            <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
+            <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-0.5`}>
               UNKNOWN
             </p>
           )}
@@ -189,12 +189,12 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-1`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate ${size === 'large' ? 'mt-1' : 'mt-0.5'}`}
             >
               {dog.dog_name}
             </Link>
           ) : (
-            <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
+            <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight ${size === 'large' ? 'mt-1' : 'mt-0.5'}`}>
               UNKNOWN
             </p>
           )}

@@ -391,6 +391,10 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           const overflow = computed.overflow;
           const overflowX = computed.overflowX;
           const overflowY = computed.overflowY;
+          const objectFit = computed.objectFit;
+          const objectPosition = computed.objectPosition;
+          const visibility = computed.visibility;
+          const opacity = computed.opacity;
           
           const setStyleIfNotInline = (prop: string, value: string) => {
             const camelProp = prop.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
@@ -454,8 +458,39 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           if (textOverflow) setStyleIfNotInline('text-overflow', textOverflow);
           if (aspectRatio) setStyleIfNotInline('aspect-ratio', aspectRatio);
           if (boxSizing) setStyleIfNotInline('box-sizing', boxSizing);
+          if (objectFit) setStyleIfNotInline('object-fit', objectFit);
+          if (objectPosition) setStyleIfNotInline('object-position', objectPosition);
+          if (visibility) setStyleIfNotInline('visibility', visibility);
+          if (opacity) setStyleIfNotInline('opacity', opacity);
           
           const tagName = cloneEl.tagName.toLowerCase();
+          
+          // For images, ensure proper rendering
+          if (tagName === 'img') {
+            // Ensure images maintain aspect ratio and don't distort
+            if (!cloneEl.getAttribute('style')?.includes('object-fit')) {
+              cloneEl.style.setProperty('object-fit', objectFit || 'cover');
+            }
+            if (!cloneEl.getAttribute('style')?.includes('object-position')) {
+              cloneEl.style.setProperty('object-position', objectPosition || 'center');
+            }
+            // Ensure width and height are preserved
+            const img = originalEl as HTMLImageElement;
+            if (img.naturalWidth && img.naturalHeight) {
+              const naturalAspectRatio = img.naturalWidth / img.naturalHeight;
+              const currentWidth = parseFloat(width) || img.offsetWidth;
+              const currentHeight = parseFloat(height) || img.offsetHeight;
+              if (currentWidth && currentHeight) {
+                const currentAspectRatio = currentWidth / currentHeight;
+                // If aspect ratios don't match, adjust to maintain natural aspect ratio
+                if (Math.abs(currentAspectRatio - naturalAspectRatio) > 0.01) {
+                  // Maintain width, adjust height
+                  const adjustedHeight = currentWidth / naturalAspectRatio;
+                  cloneEl.style.setProperty('height', `${adjustedHeight}px`);
+                }
+              }
+            }
+          }
           
           // For text elements, ensure overflow is visible to show all text
           if (tagName === 'p' || tagName === 'a' || tagName === 'span' || (tagName === 'div' && cloneEl.textContent?.trim())) {
@@ -482,11 +517,12 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           
           // Apply text color to all text elements including links
           if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'p' || tagName === 'span' || tagName === 'div' || tagName === 'a') {
+            // Ensure text is visible
+            cloneEl.style.setProperty('visibility', 'visible');
+            cloneEl.style.setProperty('opacity', '1');
             if (computed.color && computed.color !== 'rgba(0, 0, 0, 0)') {
               cloneEl.style.setProperty('color', 'rgb(255, 255, 255)');
             }
-            // Ensure text is visible
-            cloneEl.style.setProperty('opacity', '1');
           }
           
           if (computed.borderColor && computed.borderColor !== 'rgba(0, 0, 0, 0)') {
@@ -528,8 +564,27 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           logging: false,
           useCORS: true,
           allowTaint: true,
-          foreignObjectRendering: false,
+          foreignObjectRendering: true,
           ignoreElements: () => false,
+          onclone: (clonedDoc) => {
+            // Ensure all images are loaded and rendered properly
+            const images = clonedDoc.querySelectorAll('img');
+            images.forEach((img) => {
+              const htmlImg = img as HTMLImageElement;
+              if (htmlImg.complete && htmlImg.naturalWidth > 0) {
+                // Image is loaded, ensure it renders
+                htmlImg.style.display = 'block';
+              }
+            });
+            // Ensure all text is visible
+            const textElements = clonedDoc.querySelectorAll('p, span, a, div, h1, h2, h3');
+            textElements.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              htmlEl.style.visibility = 'visible';
+              htmlEl.style.opacity = '1';
+              htmlEl.style.color = 'rgb(255, 255, 255)';
+            });
+          },
         });
 
         canvas.toBlob((blob) => {

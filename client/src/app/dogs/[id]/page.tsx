@@ -452,6 +452,14 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           const overflow = computed.overflow;
           const overflowX = computed.overflowX;
           const overflowY = computed.overflowY;
+          const objectFit = computed.objectFit;
+          const objectPosition = computed.objectPosition;
+          const lineHeight = computed.lineHeight;
+          const letterSpacing = computed.letterSpacing;
+          const whiteSpace = computed.whiteSpace;
+          const textOverflow = computed.textOverflow;
+          const visibility = computed.visibility;
+          const opacity = computed.opacity;
           
           // Helper to set style only if not already in inline styles (preserve inline styles)
           const setStyleIfNotInline = (prop: string, value: string) => {
@@ -516,21 +524,67 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           if (overflow) setStyleIfNotInline('overflow', overflow);
           if (overflowX) setStyleIfNotInline('overflow-x', overflowX);
           if (overflowY) setStyleIfNotInline('overflow-y', overflowY);
+          if (objectFit) setStyleIfNotInline('object-fit', objectFit);
+          if (objectPosition) setStyleIfNotInline('object-position', objectPosition);
+          if (lineHeight) setStyleIfNotInline('line-height', lineHeight);
+          if (letterSpacing) setStyleIfNotInline('letter-spacing', letterSpacing);
+          if (whiteSpace) setStyleIfNotInline('white-space', whiteSpace);
+          if (textOverflow) setStyleIfNotInline('text-overflow', textOverflow);
+          if (visibility) setStyleIfNotInline('visibility', visibility);
+          if (opacity) setStyleIfNotInline('opacity', opacity);
           
           // Force simple RGB colors - don't care about exact colors
           const tagName = cloneEl.tagName.toLowerCase();
+          
+          // For images, ensure proper rendering
+          if (tagName === 'img') {
+            // Ensure images maintain aspect ratio and don't distort
+            if (!cloneEl.getAttribute('style')?.includes('object-fit')) {
+              cloneEl.style.setProperty('object-fit', objectFit || 'cover');
+            }
+            if (!cloneEl.getAttribute('style')?.includes('object-position')) {
+              cloneEl.style.setProperty('object-position', objectPosition || 'center');
+            }
+            // Ensure width and height are preserved
+            const img = originalEl as HTMLImageElement;
+            if (img.naturalWidth && img.naturalHeight) {
+              const naturalAspectRatio = img.naturalWidth / img.naturalHeight;
+              const currentWidth = parseFloat(width) || img.offsetWidth;
+              const currentHeight = parseFloat(height) || img.offsetHeight;
+              if (currentWidth && currentHeight) {
+                const currentAspectRatio = currentWidth / currentHeight;
+                // If aspect ratios don't match, adjust to maintain natural aspect ratio
+                if (Math.abs(currentAspectRatio - naturalAspectRatio) > 0.01) {
+                  // Maintain width, adjust height
+                  const adjustedHeight = currentWidth / naturalAspectRatio;
+                  cloneEl.style.setProperty('height', `${adjustedHeight}px`);
+                }
+              }
+            }
+          }
+          
+          // For text elements, ensure visibility and proper rendering
+          if (tagName === 'p' || tagName === 'span' || tagName === 'a' || tagName === 'div' || tagName === 'h1' || tagName === 'h2' || tagName === 'h3') {
+            // Ensure text is visible
+            cloneEl.style.setProperty('visibility', 'visible');
+            cloneEl.style.setProperty('opacity', '1');
+            // Remove any text truncation
+            if (whiteSpace === 'nowrap' || textOverflow === 'ellipsis') {
+              cloneEl.style.setProperty('white-space', 'normal');
+              cloneEl.style.setProperty('text-overflow', 'clip');
+              cloneEl.style.setProperty('overflow', 'visible');
+            }
+            // Ensure text color is set
+            if (computed.color && computed.color !== 'rgba(0, 0, 0, 0)') {
+              cloneEl.style.setProperty('color', 'rgb(255, 255, 255)');
+            }
+          }
           
           // Background colors - make transparent (only images and text should be visible)
           if (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') {
             cloneEl.style.setProperty('background-color', 'transparent');
           }
           
-          // Text colors - use white
-          if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'p' || tagName === 'span' || tagName === 'div') {
-            if (computed.color && computed.color !== 'rgba(0, 0, 0, 0)') {
-              cloneEl.style.setProperty('color', 'rgb(255, 255, 255)');
-            }
-          }
           
           // Border colors - use blue or white
           if (computed.borderColor && computed.borderColor !== 'rgba(0, 0, 0, 0)') {
@@ -577,8 +631,27 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           logging: false,
           useCORS: true,
           allowTaint: true,
-          foreignObjectRendering: false,
+          foreignObjectRendering: true,
           ignoreElements: () => false,
+          onclone: (clonedDoc) => {
+            // Ensure all images are loaded and rendered properly
+            const images = clonedDoc.querySelectorAll('img');
+            images.forEach((img) => {
+              const htmlImg = img as HTMLImageElement;
+              if (htmlImg.complete && htmlImg.naturalWidth > 0) {
+                // Image is loaded, ensure it renders
+                htmlImg.style.display = 'block';
+              }
+            });
+            // Ensure all text is visible
+            const textElements = clonedDoc.querySelectorAll('p, span, a, div, h1, h2, h3');
+            textElements.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              htmlEl.style.visibility = 'visible';
+              htmlEl.style.opacity = '1';
+              htmlEl.style.color = 'rgb(255, 255, 255)';
+            });
+          },
         });
 
         // Convert canvas to blob and download

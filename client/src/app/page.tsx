@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Plus, Edit, Users } from 'lucide-react';
 import { Dog } from '@/types';
 import { dogsApi } from '@/services/api';
@@ -9,6 +10,7 @@ import { formatDate, getAge } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
+  const router = useRouter();
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -119,13 +121,16 @@ const Dashboard: React.FC = () => {
               className="card-spotify group cursor-pointer relative"
             >
               {/* Edit Icon - Top Right Corner */}
-              <Link
-                href={`/dogs/${dog.id}/edit`}
-                onClick={(e) => e.stopPropagation()}
-                className="absolute top-4 right-4 p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  router.push(`/dogs/${dog.id}/edit`);
+                }}
+                className="absolute top-4 right-4 p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100 z-10"
               >
                 <Edit className="h-4 w-4 text-white" />
-              </Link>
+              </button>
 
               <div className="flex items-start space-x-4">
                 {/* Photo */}

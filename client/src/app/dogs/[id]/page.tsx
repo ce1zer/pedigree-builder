@@ -520,9 +520,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           // Force simple RGB colors - don't care about exact colors
           const tagName = cloneEl.tagName.toLowerCase();
           
-          // Background colors - use dark gray/black
+          // Background colors - make transparent (only images and text should be visible)
           if (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-            cloneEl.style.setProperty('background-color', 'rgb(23, 23, 23)');
+            cloneEl.style.setProperty('background-color', 'transparent');
           }
           
           // Text colors - use white
@@ -566,13 +566,13 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
       tempContainer.style.top = '0';
       tempContainer.style.width = pedigreeRef.current.offsetWidth + 'px';
       tempContainer.style.height = pedigreeRef.current.offsetHeight + 'px';
-      tempContainer.style.backgroundColor = 'rgb(10, 10, 10)';
+      tempContainer.style.backgroundColor = 'transparent';
       tempContainer.appendChild(isolatedClone);
       document.body.appendChild(tempContainer);
       
       try {
         const canvas = await html2canvas(isolatedClone, {
-          backgroundColor: '#0a0a0a',
+          backgroundColor: null,
           scale: 2,
           logging: false,
           useCORS: true,

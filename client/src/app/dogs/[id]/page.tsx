@@ -539,27 +539,11 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           // For images, ensure proper rendering
           if (tagName === 'img') {
             // Ensure images maintain aspect ratio and don't distort
-            if (!cloneEl.getAttribute('style')?.includes('object-fit')) {
-              cloneEl.style.setProperty('object-fit', objectFit || 'cover');
+            if (objectFit) {
+              cloneEl.style.setProperty('object-fit', objectFit);
             }
-            if (!cloneEl.getAttribute('style')?.includes('object-position')) {
-              cloneEl.style.setProperty('object-position', objectPosition || 'center');
-            }
-            // Ensure width and height are preserved
-            const img = originalEl as HTMLImageElement;
-            if (img.naturalWidth && img.naturalHeight) {
-              const naturalAspectRatio = img.naturalWidth / img.naturalHeight;
-              const currentWidth = parseFloat(width) || img.offsetWidth;
-              const currentHeight = parseFloat(height) || img.offsetHeight;
-              if (currentWidth && currentHeight) {
-                const currentAspectRatio = currentWidth / currentHeight;
-                // If aspect ratios don't match, adjust to maintain natural aspect ratio
-                if (Math.abs(currentAspectRatio - naturalAspectRatio) > 0.01) {
-                  // Maintain width, adjust height
-                  const adjustedHeight = currentWidth / naturalAspectRatio;
-                  cloneEl.style.setProperty('height', `${adjustedHeight}px`);
-                }
-              }
+            if (objectPosition) {
+              cloneEl.style.setProperty('object-position', objectPosition);
             }
           }
           
@@ -631,27 +615,8 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           logging: false,
           useCORS: true,
           allowTaint: true,
-          foreignObjectRendering: true,
+          foreignObjectRendering: false,
           ignoreElements: () => false,
-          onclone: (clonedDoc) => {
-            // Ensure all images are loaded and rendered properly
-            const images = clonedDoc.querySelectorAll('img');
-            images.forEach((img) => {
-              const htmlImg = img as HTMLImageElement;
-              if (htmlImg.complete && htmlImg.naturalWidth > 0) {
-                // Image is loaded, ensure it renders
-                htmlImg.style.display = 'block';
-              }
-            });
-            // Ensure all text is visible
-            const textElements = clonedDoc.querySelectorAll('p, span, a, div, h1, h2, h3');
-            textElements.forEach((el) => {
-              const htmlEl = el as HTMLElement;
-              htmlEl.style.visibility = 'visible';
-              htmlEl.style.opacity = '1';
-              htmlEl.style.color = 'rgb(255, 255, 255)';
-            });
-          },
         });
 
         // Convert canvas to blob and download

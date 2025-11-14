@@ -466,19 +466,16 @@ const AddDog: React.FC = () => {
     }
   }, []);
 
-  // Handle photo file selection
-  const handlePhotoChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setValue('photo', file);
-      
-      // Create preview
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setPhotoPreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+  // Handle photo file selection (now receives cropped file)
+  const handlePhotoChange = useCallback((file: File) => {
+    setValue('photo', file);
+    
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setPhotoPreview(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
   }, [setValue]);
 
   // Handle form submission

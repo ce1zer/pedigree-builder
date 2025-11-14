@@ -912,10 +912,13 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
           </span>
           <div className="flex items-center space-x-2">
             {value && (
-              <X
-                className="h-4 w-4 text-gray-400 hover:text-white"
+              <button
+                type="button"
                 onClick={handleClear}
-              />
+                className="p-1 hover:bg-gray-700 rounded"
+              >
+                <X className="h-4 w-4 text-gray-400 hover:text-white" />
+              </button>
             )}
             <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </div>

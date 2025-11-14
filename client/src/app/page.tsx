@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Plus, Search, Eye, Edit, Users } from 'lucide-react';
+import { Plus, Edit, Users } from 'lucide-react';
 import { Dog } from '@/types';
 import { dogsApi } from '@/services/api';
 import { formatDate, getAge } from '@/utils/helpers';
@@ -77,49 +77,6 @@ const Dashboard: React.FC = () => {
         </Link>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card-spotify">
-          <div className="flex items-center">
-            <div className="p-3 bg-gray-800 rounded-xl">
-              <Users className="h-6 w-6 text-white" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-400">Total Dogs</p>
-              <p className="text-2xl font-bold text-white">{dogs.length}</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card-spotify">
-          <div className="flex items-center">
-            <div className="p-3 bg-gray-800 rounded-xl">
-              <Users className="h-6 w-6 text-gray-400" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-400">Male</p>
-              <p className="text-2xl font-bold text-white">
-                {dogs.filter(dog => dog.gender === 'male').length}
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="card-spotify">
-          <div className="flex items-center">
-            <div className="p-3 bg-gray-800 rounded-xl">
-              <Users className="h-6 w-6 text-pink-400" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-400">Female</p>
-              <p className="text-2xl font-bold text-white">
-                {dogs.filter(dog => dog.gender === 'female').length}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Search */}
       <div className="card-spotify">
         <div className="relative">
@@ -156,7 +113,20 @@ const Dashboard: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDogs.map((dog) => (
-            <div key={dog.id} className="card-spotify group cursor-pointer">
+            <Link 
+              key={dog.id} 
+              href={`/dogs/${dog.id}`}
+              className="card-spotify group cursor-pointer relative"
+            >
+              {/* Edit Icon - Top Right Corner */}
+              <Link
+                href={`/dogs/${dog.id}/edit`}
+                onClick={(e) => e.stopPropagation()}
+                className="absolute top-4 right-4 p-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+              >
+                <Edit className="h-4 w-4 text-white" />
+              </Link>
+
               <div className="flex items-start space-x-4">
                 {/* Photo */}
                 <div className="flex-shrink-0">
@@ -190,25 +160,7 @@ const Dashboard: React.FC = () => {
                   </p>
                 </div>
               </div>
-              
-              {/* Actions */}
-              <div className="mt-4 flex space-x-2">
-                <Link
-                  href={`/dogs/${dog.id}`}
-                  className="flex-1 btn-spotify-secondary text-center text-sm"
-                >
-                  <Eye className="h-4 w-4 inline mr-1" />
-                  View
-                </Link>
-                <Link
-                  href={`/dogs/${dog.id}/edit`}
-                  className="flex-1 btn-spotify-secondary text-center text-sm"
-                >
-                  <Edit className="h-4 w-4 inline mr-1" />
-                  Edit
-                </Link>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       )}

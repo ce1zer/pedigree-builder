@@ -735,12 +735,12 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             </div>
           </div>
 
-          {/* Column 5: Mother's 2nd Generation (Grandparents) - 4 tiles: aligned with Father's 2nd gen for symmetry */}
+          {/* Column 5: Mother's 2nd Generation (Grandparents) - 4 tiles: EXACT same structure as Father's 2nd gen */}
           <div className="generation-col flex flex-col relative" style={{ height: '100%' }}>
-            {/* Top 50% - first pair, aligned with Father's 2nd gen top pair */}
+            {/* Top 50% - aligned with Column 4 (Mother's 1st gen) */}
             <div className="relative" style={{ height: '50%' }}>
               <div className="h-full flex flex-col">
-                {/* Mother's Father's Father - 50% of this 50% section */}
+                {/* Mother's Father's Father - 50% of this 50% section, aligned with top 1st gen tile */}
                 <div className="relative" style={{ height: '50%' }}>
                   <div className="h-full w-full flex items-center justify-center">
                     <PedigreeNode dog={mfFather} size="medium" />
@@ -756,10 +756,10 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
               </div>
             </div>
             
-            {/* Bottom 50% - second pair, aligned with Father's 2nd gen bottom pair */}
+            {/* Bottom 50% - aligned with Column 4 (Mother's 1st gen) */}
             <div className="relative" style={{ height: '50%' }}>
               <div className="h-full flex flex-col">
-                {/* Mother's Mother's Father - 50% of this 50% section */}
+                {/* Mother's Mother's Father - 50% of this 50% section, aligned with bottom 1st gen tile */}
                 <div className="relative" style={{ height: '50%' }}>
                   <div className="h-full w-full flex items-center justify-center">
                     <PedigreeNode dog={mmFather} size="medium" />

@@ -662,7 +662,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           </div>
 
           {/* Column 2: Father's 2nd Generation (Grandparents) - 4 tiles: top 50%, aligned with 1st gen */}
-          <div className="generation-col flex flex-col relative" style={{ height: '100%', width: '120px', maxWidth: '120px', minWidth: '120px' }}>
+          <div className="generation-col flex flex-col relative" style={{ height: '100%' }}>
             {/* Top 50% - aligned with Column 3 (Father's 1st gen) */}
             <div className="relative" style={{ height: '50%' }}>
               <div className="h-full flex flex-col">
@@ -737,7 +737,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           </div>
 
           {/* Column 5: Mother's 2nd Generation (Grandparents) - 4 tiles: EXACT same structure as Father's 2nd gen */}
-          <div className="generation-col flex flex-col relative" style={{ height: '100%', width: '120px', maxWidth: '120px', minWidth: '120px' }}>
+          <div className="generation-col flex flex-col relative" style={{ height: '100%' }}>
             {/* Top 50% - aligned with Column 4 (Mother's 1st gen) */}
             <div className="relative" style={{ height: '50%' }}>
               <div className="h-full flex flex-col">

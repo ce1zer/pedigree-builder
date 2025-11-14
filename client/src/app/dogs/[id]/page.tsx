@@ -197,7 +197,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   };
 
   const isUnknown = !dog;
-  const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-blue-500';
+  const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-white';
 
   // For large size (1st generation), use vertical layout (image on top, text below)
   // For medium and small sizes (2nd and 3rd generation), use horizontal layout (image left, text right)
@@ -228,7 +228,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
         {dog ? (
           <Link 
             href={`/dogs/${dog.id}`}
-            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-1`}
+            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-gray-300 transition-colors block truncate mt-1`}
           >
             {dog.dog_name}
           </Link>
@@ -534,12 +534,12 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           
           // Border colors - use blue or white
           if (computed.borderColor && computed.borderColor !== 'rgba(0, 0, 0, 0)') {
-            // Check if it's a blue border (from border-blue-500) or white
+            // Check if it's a white border for pedigree tiles or connection lines
             const borderStyle = computed.borderStyle;
             if (borderStyle && borderStyle !== 'none') {
-              // Use blue for pedigree tiles, white for connection lines
+              // Use white for pedigree tiles and connection lines
               if (cloneEl.querySelector('img') || cloneEl.textContent?.trim()) {
-                cloneEl.style.setProperty('border-color', 'rgb(59, 130, 246)');
+                cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
               } else {
                 cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
               }
@@ -874,7 +874,7 @@ const DogProfile: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
       </div>
     );
   }
@@ -1062,7 +1062,7 @@ const DogProfile: React.FC = () => {
           {pedigreeLoading ? (
             <div className="card-spotify">
               <div className="flex justify-center items-center h-32">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
                 <span className="ml-3 text-gray-400">Loading pedigree...</span>
               </div>
             </div>

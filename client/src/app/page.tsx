@@ -52,7 +52,7 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
       </div>
     );
   }
@@ -82,7 +82,7 @@ const Dashboard: React.FC = () => {
         <div className="card-spotify">
           <div className="flex items-center">
             <div className="p-3 bg-gray-800 rounded-xl">
-              <Users className="h-6 w-6 text-green-500" />
+              <Users className="h-6 w-6 text-white" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-400">Total Dogs</p>
@@ -94,7 +94,7 @@ const Dashboard: React.FC = () => {
         <div className="card-spotify">
           <div className="flex items-center">
             <div className="p-3 bg-gray-800 rounded-xl">
-              <Users className="h-6 w-6 text-blue-400" />
+              <Users className="h-6 w-6 text-gray-400" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-400">Male</p>
@@ -175,7 +175,7 @@ const Dashboard: React.FC = () => {
                 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-semibold text-white truncate group-hover:text-green-400 transition-colors">
+                  <h3 className="text-lg font-semibold text-white truncate group-hover:text-gray-300 transition-colors">
                     {dog.dog_name}
                   </h3>
                   <p className="text-sm text-gray-400">{dog.primary_kennel}</p>

@@ -132,7 +132,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   };
 
   const isUnknown = !dog;
-  const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-blue-500';
+  const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-white';
 
   // For large and medium sizes (1st and 2nd generation), use vertical layout (image on top, text below)
   // For small (3rd generation): father's side = text left, mother's side = text right
@@ -153,7 +153,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-0.5`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-gray-300 transition-colors block truncate mt-0.5`}
             >
               {dog.dog_name}
             </Link>
@@ -189,7 +189,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-blue-400 transition-colors block truncate mt-0.5`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-gray-300 transition-colors block truncate mt-0.5`}
             >
               {dog.dog_name}
             </Link>
@@ -493,7 +493,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             const borderStyle = computed.borderStyle;
             if (borderStyle && borderStyle !== 'none') {
               if (cloneEl.querySelector('img') || cloneEl.textContent?.trim()) {
-                cloneEl.style.setProperty('border-color', 'rgb(59, 130, 246)');
+                cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
               } else {
                 cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
               }
@@ -932,7 +932,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                 placeholder="Search by name or kennel..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white"
                 autoFocus
               />
             </div>
@@ -946,7 +946,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                     type="button"
                     onClick={() => handleSelect(dog)}
                     className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors ${
-                      value?.id === dog.id ? 'bg-blue-600 hover:bg-blue-700' : ''
+                      value?.id === dog.id ? 'bg-gray-600 hover:bg-gray-700' : ''
                     }`}
                   >
                     <div className="text-white font-medium">{dog.dog_name}</div>
@@ -1065,7 +1065,7 @@ const BreedingSimulator: React.FC = () => {
       {loading || pedigreeLoading ? (
         <div className="card-spotify">
           <div className="flex justify-center items-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
             <span className="ml-3 text-gray-400">Loading...</span>
           </div>
         </div>

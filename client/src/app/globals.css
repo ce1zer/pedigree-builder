@@ -9,8 +9,8 @@
   /* Color Palette */
   --background: #121212;
   --foreground: #ffffff;
-  --spotify-green: #1DB954;
-  --spotify-green-hover: #1ed760;
+  --primary-button: #ffffff;
+  --primary-button-hover: #e5e5e5;
   --card-bg: #181818;
   --card-hover: #282828;
   --border-color: #2a2a2a;
@@ -26,12 +26,12 @@
   /* Input States */
   --input-bg: #2a2a2a;
   --input-border: #404040;
-  --input-focus-border: var(--spotify-green);
-  --input-focus-shadow: rgba(29, 185, 84, 0.2);
+  --input-focus-border: #ffffff;
+  --input-focus-shadow: rgba(255, 255, 255, 0.2);
   
   /* Shadows */
   --shadow-elevated: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  --shadow-elevated-hover: 0 25px 50px -12px rgba(29, 185, 84, 0.1);
+  --shadow-elevated-hover: 0 25px 50px -12px rgba(255, 255, 255, 0.1);
 }
 
 /* Tailwind Theme Configuration */
@@ -59,9 +59,9 @@ body {
    Button Components
    ========================================================================== */
 
-/* Primary Button - Spotify Green */
+/* Primary Button - White */
 .btn-spotify-primary {
-  background-color: var(--spotify-green);
+  background-color: var(--primary-button);
   color: #000000;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
@@ -77,7 +77,7 @@ body {
 }
 
 .btn-spotify-primary:hover:not(:disabled) {
-  background-color: var(--spotify-green-hover);
+  background-color: var(--primary-button-hover);
   transform: scale(1.05);
 }
 
@@ -251,6 +251,6 @@ body {
   background-color: #0a0a0a;
   border: 1px solid #1a1a1a;
   background-image: 
-    radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-    radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
 }

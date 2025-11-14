@@ -199,9 +199,9 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   const isUnknown = !dog;
   const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-blue-500';
 
-  // For large and medium sizes (1st and 2nd generation), use vertical layout (image on top, text below)
-  // For small (3rd generation), use horizontal layout (image left, text right)
-  const isVerticalLayout = size === 'large' || size === 'medium';
+  // For large size (1st generation), use vertical layout (image on top, text below)
+  // For medium and small sizes (2nd and 3rd generation), use horizontal layout (image left, text right)
+  const isVerticalLayout = size === 'large';
   
   return (
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} gap-3`}>

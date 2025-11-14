@@ -123,13 +123,13 @@ const Dashboard: React.FC = () => {
       {/* Search */}
       <div className="card-spotify">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
           <input
             type="text"
             placeholder="Search by name or kennel..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="input-spotify w-full pl-12"
+            className="input-spotify w-full pl-12 pr-4"
           />
         </div>
       </div>

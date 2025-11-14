@@ -740,7 +740,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             {/* Top 50% - empty space for father's side alignment */}
             <div className="relative" style={{ height: '50%' }}></div>
             
-            {/* Bottom 50% - aligned with Column 4 (Mother's 1st gen) - top pair */}
+            {/* Bottom 50% - aligned with Column 4 (Mother's 1st gen) */}
             <div className="relative" style={{ height: '50%' }}>
               <div className="h-full flex flex-col">
                 {/* Mother's Father's Father - 50% of this 50% section, aligned with top 1st gen tile */}
@@ -759,8 +759,8 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
               </div>
             </div>
             
-            {/* Additional 50% section for bottom pair - aligned with bottom 1st gen tile */}
-            <div className="relative" style={{ height: '50%', marginTop: '-50%' }}>
+            {/* Second 50% section - aligned with bottom 1st gen tile */}
+            <div className="relative" style={{ height: '50%' }}>
               <div className="h-full flex flex-col">
                 {/* Mother's Mother's Father - 50% of this 50% section */}
                 <div className="relative" style={{ height: '50%' }}>

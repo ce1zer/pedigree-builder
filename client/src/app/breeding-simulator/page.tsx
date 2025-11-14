@@ -451,6 +451,9 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           if (textOverflow) setStyleIfNotInline('text-overflow', textOverflow);
           if (aspectRatio) setStyleIfNotInline('aspect-ratio', aspectRatio);
           if (boxSizing) setStyleIfNotInline('box-sizing', boxSizing);
+          
+          const tagName = cloneEl.tagName.toLowerCase();
+          
           // For text elements, ensure overflow is visible to show all text
           if (tagName === 'p' || tagName === 'a' || tagName === 'span' || (tagName === 'div' && cloneEl.textContent?.trim())) {
             if (overflow === 'hidden' || overflowX === 'hidden' || overflowY === 'hidden') {
@@ -468,8 +471,6 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             if (overflowX) setStyleIfNotInline('overflow-x', overflowX);
             if (overflowY) setStyleIfNotInline('overflow-y', overflowY);
           }
-          
-          const tagName = cloneEl.tagName.toLowerCase();
           
           if (computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)') {
             cloneEl.style.setProperty('background-color', 'rgb(23, 23, 23)');

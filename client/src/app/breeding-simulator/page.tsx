@@ -735,15 +735,12 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             </div>
           </div>
 
-          {/* Column 5: Mother's 2nd Generation (Grandparents) - 4 tiles: bottom 50%, aligned with 1st gen */}
+          {/* Column 5: Mother's 2nd Generation (Grandparents) - 4 tiles: aligned with Father's 2nd gen for symmetry */}
           <div className="generation-col flex flex-col relative" style={{ height: '100%' }}>
-            {/* Top 50% - empty space for father's side alignment */}
-            <div className="relative" style={{ height: '50%' }}></div>
-            
-            {/* Bottom 50% - aligned with Column 4 (Mother's 1st gen) */}
+            {/* Top 50% - first pair, aligned with Father's 2nd gen top pair */}
             <div className="relative" style={{ height: '50%' }}>
               <div className="h-full flex flex-col">
-                {/* Mother's Father's Father - 50% of this 50% section, aligned with top 1st gen tile */}
+                {/* Mother's Father's Father - 50% of this 50% section */}
                 <div className="relative" style={{ height: '50%' }}>
                   <div className="h-full w-full flex items-center justify-center">
                     <PedigreeNode dog={mfFather} size="medium" />
@@ -759,7 +756,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
               </div>
             </div>
             
-            {/* Second 50% section - aligned with bottom 1st gen tile */}
+            {/* Bottom 50% - second pair, aligned with Father's 2nd gen bottom pair */}
             <div className="relative" style={{ height: '50%' }}>
               <div className="h-full flex flex-col">
                 {/* Mother's Mother's Father - 50% of this 50% section */}
@@ -777,6 +774,9 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
                 </div>
               </div>
             </div>
+            
+            {/* Empty space for father's side alignment - 50% */}
+            <div className="relative" style={{ height: '50%' }}></div>
           </div>
 
           {/* Column 6: Mother's 3rd Generation (Great-grandparents) - 8 tiles: bottom 50% */}

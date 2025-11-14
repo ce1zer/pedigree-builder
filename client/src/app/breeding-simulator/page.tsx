@@ -597,7 +597,8 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         </div>
 
         {/* 6 Column Mirrored Layout - Matching exact layout from original pedigree */}
-        <div className="pedigree-grid grid grid-cols-6 gap-x-[0.2rem] w-full items-start mx-auto" style={{ maxWidth: '1600px' }}>
+        {/* Gap reduced by 70%: from 0.2rem to 0.06rem (~1px) */}
+        <div className="pedigree-grid grid grid-cols-6 gap-x-[0.06rem] w-full items-start mx-auto" style={{ maxWidth: '1600px' }}>
           {/* Column 1: Father's 3rd Generation (Great-grandparents) - 8 tiles: top 50% */}
           <div className="flex flex-col" style={{ height: '100%' }}>
             {/* Father's Father's Father's Father - 12.5% of total height */}

@@ -461,8 +461,8 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
               cloneEl.style.setProperty('overflow-x', 'visible');
               cloneEl.style.setProperty('overflow-y', 'visible');
             }
-            // Remove text truncation for export
-            if (cloneEl.classList.contains('truncate') || whiteSpace === 'nowrap') {
+            // Remove text truncation for export - check computed styles
+            if (whiteSpace === 'nowrap' || textOverflow === 'ellipsis') {
               cloneEl.style.setProperty('white-space', 'normal');
               cloneEl.style.setProperty('text-overflow', 'clip');
             }

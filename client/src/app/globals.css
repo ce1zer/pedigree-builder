@@ -254,3 +254,22 @@ body {
     radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.05) 0%, transparent 50%),
     radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
 }
+
+/* ==========================================================================
+   Color Overrides - Remove Blue Tints
+   ========================================================================== */
+
+/* Override any blue-tinted grays with pure grey tones */
+* {
+  /* Replace #121827 (dark blue-grey) with pure dark grey */
+  /* Replace #202937 (blue-grey) with pure grey */
+}
+
+/* Ensure all gray backgrounds use pure grey without blue tint */
+.bg-gray-900 {
+  background-color: #171717 !important; /* Pure dark grey instead of #121827 */
+}
+
+.bg-gray-800 {
+  background-color: #262626 !important; /* Pure grey instead of #202937 */
+}

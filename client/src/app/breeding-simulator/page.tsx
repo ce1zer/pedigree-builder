@@ -597,7 +597,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         </div>
 
         {/* 6 Column Mirrored Layout - Matching exact layout from original pedigree */}
-        <div className="grid grid-cols-6 gap-x-[0.2rem] w-full items-stretch mx-auto" style={{ maxWidth: '1600px' }}>
+        <div className="pedigree-grid grid grid-cols-6 gap-x-[0.2rem] w-full items-start mx-auto" style={{ maxWidth: '1600px' }}>
           {/* Column 1: Father's 3rd Generation (Great-grandparents) - 8 tiles: top 50% */}
           <div className="flex flex-col" style={{ height: '100%' }}>
             {/* Father's Father's Father's Father - 12.5% of total height */}
@@ -661,67 +661,74 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           </div>
 
           {/* Column 2: Father's 2nd Generation (Grandparents) - 4 tiles: top 50%, aligned with 1st gen */}
-          <div className="flex flex-col relative" style={{ height: '100%' }}>
-            {/* Father's Father's Father - 25% of total height, aligned with top 1st gen tile */}
-            <div className="relative" style={{ height: '25%' }}>
-              <div className="h-full w-full flex items-center justify-center">
-                <PedigreeNode dog={ffFather} size="medium" />
+          <div className="generation-col flex flex-col relative" style={{ height: '100%' }}>
+            {/* Top 50% - aligned with Column 3 (Father's 1st gen) */}
+            <div className="relative" style={{ height: '50%' }}>
+              <div className="h-full flex flex-col">
+                {/* Father's Father's Father - 25% of this 50% section, aligned with top 1st gen tile */}
+                <div className="relative" style={{ height: '50%' }}>
+                  <div className="h-full w-full flex items-center justify-center">
+                    <PedigreeNode dog={ffFather} size="medium" />
+                  </div>
+                </div>
+                
+                {/* Father's Father's Mother - 25% of this 50% section */}
+                <div className="relative" style={{ height: '50%' }}>
+                  <div className="h-full w-full flex items-center justify-center">
+                    <PedigreeNode dog={ffMother} size="medium" />
+                  </div>
+                </div>
               </div>
             </div>
             
-            {/* Father's Father's Mother - 25% of total height */}
-            <div className="relative" style={{ height: '25%' }}>
-              <div className="h-full w-full flex items-center justify-center">
-                <PedigreeNode dog={ffMother} size="medium" />
+            {/* Bottom 50% - aligned with Column 3 (Father's 1st gen) */}
+            <div className="relative" style={{ height: '50%' }}>
+              <div className="h-full flex flex-col">
+                {/* Father's Mother's Father - 25% of this 50% section, aligned with bottom 1st gen tile */}
+                <div className="relative" style={{ height: '50%' }}>
+                  <div className="h-full w-full flex items-center justify-center">
+                    <PedigreeNode dog={fmFather} size="medium" />
+                  </div>
+                </div>
+                
+                {/* Father's Mother's Mother - 25% of this 50% section */}
+                <div className="relative" style={{ height: '50%' }}>
+                  <div className="h-full w-full flex items-center justify-center">
+                    <PedigreeNode dog={fmMother} size="medium" />
+                  </div>
+                </div>
               </div>
             </div>
-            
-            {/* Father's Mother's Father - 25% of total height, aligned with bottom 1st gen tile */}
-            <div className="relative" style={{ height: '25%' }}>
-              <div className="h-full w-full flex items-center justify-center">
-                <PedigreeNode dog={fmFather} size="medium" />
-              </div>
-            </div>
-            
-            {/* Father's Mother's Mother - 25% of total height */}
-            <div className="relative" style={{ height: '25%' }}>
-              <div className="h-full w-full flex items-center justify-center">
-                <PedigreeNode dog={fmMother} size="medium" />
-              </div>
-            </div>
-            
-            {/* Empty space for mother's side alignment - 50% */}
-            <div className="relative" style={{ height: '50%' }}></div>
           </div>
 
-          {/* Column 3: Father's 1st Generation (Parents) - 2 tiles: top 50% */}
-          <div className="flex flex-col relative" style={{ height: '100%' }}>
+          {/* Column 3: Father's 1st Generation (Parents) - 2 tiles: reference for alignment */}
+          <div className="generation-col parent-pair flex flex-col relative" style={{ height: '100%' }}>
             {/* Father's Father - 50% height */}
-            <div className="relative" style={{ height: '50%' }}>
+            <div className="relative pedigree-tile" style={{ height: '50%' }}>
               <div className="h-full w-full flex items-center justify-center">
                 <PedigreeNode dog={fatherFather} size="large" />
               </div>
             </div>
             
             {/* Father's Mother - 50% height */}
-            <div className="relative" style={{ height: '50%' }}>
+            <div className="relative pedigree-tile" style={{ height: '50%' }}>
               <div className="h-full w-full flex items-center justify-center">
                 <PedigreeNode dog={fatherMother} size="large" />
               </div>
             </div>
           </div>
 
-          {/* Column 4: Mother's 1st Generation (Parents) - 2 tiles: bottom 50% */}
-          <div className="flex flex-col relative" style={{ height: '100%' }}>
+          {/* Column 4: Mother's 1st Generation (Parents) - 2 tiles: reference for alignment */}
+          <div className="generation-col parent-pair flex flex-col relative" style={{ height: '100%' }}>
             {/* Mother's Father - 50% height */}
-            <div className="relative" style={{ height: '50%' }}>
+            <div className="relative pedigree-tile" style={{ height: '50%' }}>
               <div className="h-full w-full flex items-center justify-center">
                 <PedigreeNode dog={motherFather} size="large" />
               </div>
             </div>
             
             {/* Mother's Mother - 50% height */}
-            <div className="relative" style={{ height: '50%' }}>
+            <div className="relative pedigree-tile" style={{ height: '50%' }}>
               <div className="h-full w-full flex items-center justify-center">
                 <PedigreeNode dog={motherMother} size="large" />
               </div>
@@ -729,35 +736,45 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           </div>
 
           {/* Column 5: Mother's 2nd Generation (Grandparents) - 4 tiles: bottom 50%, aligned with 1st gen */}
-          <div className="flex flex-col relative" style={{ height: '100%' }}>
-            {/* Empty space for father's side alignment - 50% */}
+          <div className="generation-col flex flex-col relative" style={{ height: '100%' }}>
+            {/* Top 50% - empty space for father's side alignment */}
             <div className="relative" style={{ height: '50%' }}></div>
             
-            {/* Mother's Father's Father - 25% of total height, aligned with top 1st gen tile */}
-            <div className="relative" style={{ height: '25%' }}>
-              <div className="h-full w-full flex items-center justify-center">
-                <PedigreeNode dog={mfFather} size="medium" />
+            {/* Bottom 50% - aligned with Column 4 (Mother's 1st gen) - top pair */}
+            <div className="relative" style={{ height: '50%' }}>
+              <div className="h-full flex flex-col">
+                {/* Mother's Father's Father - 50% of this 50% section, aligned with top 1st gen tile */}
+                <div className="relative" style={{ height: '50%' }}>
+                  <div className="h-full w-full flex items-center justify-center">
+                    <PedigreeNode dog={mfFather} size="medium" />
+                  </div>
+                </div>
+                
+                {/* Mother's Father's Mother - 50% of this 50% section */}
+                <div className="relative" style={{ height: '50%' }}>
+                  <div className="h-full w-full flex items-center justify-center">
+                    <PedigreeNode dog={mfMother} size="medium" />
+                  </div>
+                </div>
               </div>
             </div>
             
-            {/* Mother's Father's Mother - 25% of total height */}
-            <div className="relative" style={{ height: '25%' }}>
-              <div className="h-full w-full flex items-center justify-center">
-                <PedigreeNode dog={mfMother} size="medium" />
-              </div>
-            </div>
-            
-            {/* Mother's Mother's Father - 25% of total height, aligned with bottom 1st gen tile */}
-            <div className="relative" style={{ height: '25%' }}>
-              <div className="h-full w-full flex items-center justify-center">
-                <PedigreeNode dog={mmFather} size="medium" />
-              </div>
-            </div>
-            
-            {/* Mother's Mother's Mother - 25% of total height */}
-            <div className="relative" style={{ height: '25%' }}>
-              <div className="h-full w-full flex items-center justify-center">
-                <PedigreeNode dog={mmMother} size="medium" />
+            {/* Additional 50% section for bottom pair - aligned with bottom 1st gen tile */}
+            <div className="relative" style={{ height: '50%', marginTop: '-50%' }}>
+              <div className="h-full flex flex-col">
+                {/* Mother's Mother's Father - 50% of this 50% section */}
+                <div className="relative" style={{ height: '50%' }}>
+                  <div className="h-full w-full flex items-center justify-center">
+                    <PedigreeNode dog={mmFather} size="medium" />
+                  </div>
+                </div>
+                
+                {/* Mother's Mother's Mother - 50% of this 50% section */}
+                <div className="relative" style={{ height: '50%' }}>
+                  <div className="h-full w-full flex items-center justify-center">
+                    <PedigreeNode dog={mmMother} size="medium" />
+                  </div>
+                </div>
               </div>
             </div>
           </div>

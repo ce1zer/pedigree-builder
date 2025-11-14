@@ -774,9 +774,6 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
                 </div>
               </div>
             </div>
-            
-            {/* Empty space for father's side alignment - 50% */}
-            <div className="relative" style={{ height: '50%' }}></div>
           </div>
 
           {/* Column 6: Mother's 3rd Generation (Great-grandparents) - 8 tiles: bottom 50% */}

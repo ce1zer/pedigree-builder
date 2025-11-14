@@ -82,17 +82,6 @@ const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
   );
 };
 
-// Footer component
-const Footer: React.FC = () => (
-  <footer className="bg-gray-900 border-t border-gray-800 mt-16">
-    <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-      <div className="text-center text-gray-400">
-        <p>&copy; 2024 PedigreeBuilder. Built for dog lovers.</p>
-      </div>
-    </div>
-  </footer>
-);
-
 // Main layout component
 interface LayoutProps {
   children: React.ReactNode;
@@ -108,8 +97,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
         {children}
       </main>
-      
-      <Footer />
     </div>
   );
 };

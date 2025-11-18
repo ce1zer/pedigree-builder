@@ -150,11 +150,25 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
       }
       
       // Otherwise, fetch the image and convert to data URL
-      const response = await fetch(photoPreview);
+      // Add cache busting to ensure we get the latest version
+      const urlWithCacheBust = photoPreview.includes('?') 
+        ? `${photoPreview}&_crop=${Date.now()}` 
+        : `${photoPreview}?_crop=${Date.now()}`;
+      
+      const response = await fetch(urlWithCacheBust, {
+        mode: 'cors',
+        cache: 'no-cache'
+      });
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch image');
+        throw new Error(`Failed to fetch image: ${response.status} ${response.statusText}`);
       }
+      
       const blob = await response.blob();
+      if (blob.size === 0) {
+        throw new Error('Fetched image is empty');
+      }
+      
       const reader = new FileReader();
       reader.onload = () => {
         setImageSrc(reader.result as string);
@@ -166,7 +180,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
       reader.readAsDataURL(blob);
     } catch (error) {
       console.error('Error loading existing photo:', error);
-      toast.error('Error loading photo for cropping');
+      toast.error('Error loading photo for cropping: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 
@@ -1193,26 +1207,49 @@ const DogProfile: React.FC = () => {
         photo: currentPhoto || photoFile || data.photo,
       };
       
+      // Debug: Log photo information
       console.log('Submitting form data:', {
         ...formData,
-        photo: formData.photo ? `File: ${formData.photo.name} (${formData.photo.size} bytes)` : 'No photo'
+        photo: formData.photo ? `File: ${formData.photo.name} (${formData.photo.size} bytes), type: ${formData.photo.type}` : 'No photo',
+        hasPhoto: !!formData.photo,
+        photoFile: !!photoFile,
+        currentPhoto: !!currentPhoto,
       });
       
+      // Ensure we have a photo file to upload
+      if (!formData.photo) {
+        console.warn('No photo file found in form data');
+      }
+      
       const response = await dogsApi.update(id!, formData);
+      
+      console.log('Update response:', {
+        success: response.success,
+        image_url: response.data?.image_url,
+        error: response.error
+      });
       
       if (response.success) {
         toast.success('Dog profile updated successfully!');
         setIsEditing(false);
+        
+        // Update cache buster BEFORE reloading to force image refresh
+        setImageCacheBuster(Date.now());
+        
+        // Update photo preview with new image URL immediately
+        if (response.data?.image_url) {
+          const newImageUrl = response.data.image_url;
+          console.log('Setting new image URL:', newImageUrl);
+          setPhotoPreview(newImageUrl);
+          // Also update the dog state immediately
+          setDog(prev => prev ? { ...prev, image_url: newImageUrl } : null);
+        }
+        
         // Clear photo from form after successful update
         setValue('photo', undefined);
-        // Update cache buster to force image refresh
-        setImageCacheBuster(Date.now());
-        // Reload dog data with fresh image
+        
+        // Reload dog data with fresh image (this will also update the cache buster)
         await loadDog(); 
-        // Update photo preview with new image URL
-        if (response.data?.image_url) {
-          setPhotoPreview(response.data.image_url);
-        }
         await loadPedigreeGenerations(); // Reload pedigree data
       } else {
         toast.error(response.error || 'Error updating dog profile');

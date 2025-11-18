@@ -145,8 +145,23 @@ export async function PUT(
 
     // Handle photo upload if provided
     let imageUrl = null;
+    console.log('Photo upload check:', {
+      hasPhoto: !!photo,
+      photoSize: photo?.size,
+      photoName: photo?.name,
+      photoType: photo?.type
+    });
+    
     if (photo && photo.size > 0) {
-      imageUrl = await uploadPhoto(photo);
+      try {
+        imageUrl = await uploadPhoto(photo);
+        console.log('Photo uploaded successfully:', imageUrl);
+      } catch (error) {
+        console.error('Photo upload error:', error);
+        throw new Error('Failed to upload photo: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      }
+    } else {
+      console.log('No photo provided or photo is empty');
     }
 
     // Prepare update data
@@ -162,6 +177,9 @@ export async function PUT(
     // Only update image_url if a new photo was uploaded
     if (imageUrl) {
       updateData.image_url = imageUrl;
+      console.log('Updating image_url to:', imageUrl);
+    } else {
+      console.log('No image URL to update - keeping existing image');
     }
 
     const { data, error } = await supabase

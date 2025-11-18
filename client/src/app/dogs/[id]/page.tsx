@@ -1328,10 +1328,10 @@ const DogProfile: React.FC = () => {
       // Get the photo from the form state (react-hook-form doesn't always include files in data)
       // Try multiple methods to get the photo file
       const currentPhoto = getValues('photo');
-      const watchedPhoto = watch('photo');
       
       // Ensure photo is included if it was set
-      const photoToUpload = currentPhoto || watchedPhoto || photoFile || data.photo;
+      // photoFile is already watching 'photo', so use that instead of calling watch again
+      const photoToUpload = currentPhoto || photoFile || data.photo;
       
       const formData: DogFormData = {
         ...data,
@@ -1345,7 +1345,6 @@ const DogProfile: React.FC = () => {
         hasPhoto: !!formData.photo,
         photoFile: !!photoFile,
         currentPhoto: !!currentPhoto,
-        watchedPhoto: !!watchedPhoto,
         dataPhoto: !!data.photo,
       });
       

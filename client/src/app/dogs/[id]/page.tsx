@@ -860,13 +860,42 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           
           // For images, ensure proper rendering
           if (tagName === 'img') {
+            const imgEl = cloneEl as HTMLImageElement;
+            const originalImg = originalEl as HTMLImageElement;
+            
+            // Copy the exact src from the original (with cache busting if present)
+            if (originalImg.src) {
+              imgEl.src = originalImg.src;
+            }
+            
             // Ensure images maintain aspect ratio and don't distort
             if (objectFit) {
               cloneEl.style.setProperty('object-fit', objectFit);
+            } else {
+              cloneEl.style.setProperty('object-fit', 'cover');
             }
             if (objectPosition) {
               cloneEl.style.setProperty('object-position', objectPosition);
             }
+            
+            // Preserve exact dimensions from computed styles
+            const imgWidth = computed.width;
+            const imgHeight = computed.height;
+            if (imgWidth && imgWidth !== 'auto') {
+              cloneEl.style.setProperty('width', imgWidth);
+            }
+            if (imgHeight && imgHeight !== 'auto') {
+              cloneEl.style.setProperty('height', imgHeight);
+            }
+            
+            // Preserve aspect ratio
+            if (aspectRatio) {
+              cloneEl.style.setProperty('aspect-ratio', aspectRatio);
+            }
+            
+            // Ensure image is visible
+            cloneEl.style.setProperty('visibility', 'visible');
+            cloneEl.style.setProperty('opacity', '1');
           }
           
           // For text elements, ensure visibility and proper rendering
@@ -919,16 +948,54 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       // Create isolated clone
       const isolatedClone = createIsolatedClone(pedigreeRef.current);
       
-      // Create temporary container with no stylesheets
+      // Wait for all images to load before exporting
+      const images = isolatedClone.querySelectorAll('img');
+      const imagePromises = Array.from(images).map((img) => {
+        return new Promise<void>((resolve, reject) => {
+          if (img.complete && img.naturalHeight !== 0) {
+            resolve();
+          } else {
+            img.onload = () => resolve();
+            img.onerror = () => {
+              console.warn('Image failed to load:', img.src);
+              resolve(); // Continue even if image fails
+            };
+            // Timeout after 5 seconds
+            setTimeout(() => {
+              console.warn('Image load timeout:', img.src);
+              resolve();
+            }, 5000);
+          }
+        });
+      });
+      
+      // Wait for all images to load
+      await Promise.all(imagePromises);
+      
+      // Create temporary container with exact dimensions
+      const originalWidth = pedigreeRef.current.offsetWidth;
+      const originalHeight = pedigreeRef.current.offsetHeight;
+      
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';
       tempContainer.style.left = '-9999px';
       tempContainer.style.top = '0';
-      tempContainer.style.width = pedigreeRef.current.offsetWidth + 'px';
-      tempContainer.style.height = pedigreeRef.current.offsetHeight + 'px';
+      tempContainer.style.width = originalWidth + 'px';
+      tempContainer.style.height = originalHeight + 'px';
       tempContainer.style.backgroundColor = 'transparent';
+      tempContainer.style.overflow = 'visible';
+      
+      // Ensure the clone maintains the exact dimensions
+      isolatedClone.style.width = originalWidth + 'px';
+      isolatedClone.style.height = originalHeight + 'px';
+      isolatedClone.style.maxWidth = originalWidth + 'px';
+      isolatedClone.style.maxHeight = originalHeight + 'px';
+      
       tempContainer.appendChild(isolatedClone);
       document.body.appendChild(tempContainer);
+      
+      // Give the browser a moment to render
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       try {
         const canvas = await html2canvas(isolatedClone, {
@@ -939,6 +1006,17 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           allowTaint: true,
           foreignObjectRendering: false,
           ignoreElements: () => false,
+          onclone: (clonedDoc) => {
+            // Ensure all images in the cloned document are loaded
+            const clonedImages = clonedDoc.querySelectorAll('img');
+            clonedImages.forEach((img) => {
+              const htmlImg = img as HTMLImageElement;
+              // Ensure images maintain their aspect ratio
+              if (!htmlImg.style.aspectRatio && htmlImg.width && htmlImg.height) {
+                htmlImg.style.aspectRatio = `${htmlImg.width} / ${htmlImg.height}`;
+              }
+            });
+          },
         });
 
         // Convert canvas to blob and download

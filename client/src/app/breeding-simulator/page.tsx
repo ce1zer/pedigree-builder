@@ -543,31 +543,16 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       const isolatedClone = createIsolatedClone(pedigreeRef.current);
       
       // Remove generation labels from export
-      // Find paragraphs with generation text and remove their parent grid container
-      const allParagraphs = isolatedClone.querySelectorAll('p');
-      for (const p of Array.from(allParagraphs)) {
-        const text = p.textContent?.trim();
-        if (text === 'Father 3rd gen' || text === 'Father 2nd gen' || text === 'Father' || 
-            text === 'Mother' || text === 'Mother 2nd gen' || text === 'Mother 3rd gen') {
-          // Traverse up to find the grid container (should be a few levels up)
-          let current: Element | null = p;
-          for (let i = 0; i < 5 && current; i++) {
-            current = current.parentElement;
-            if (current && current.tagName === 'DIV') {
-              // Check if this div contains all generation labels
-              const divText = current.textContent || '';
-              if (divText.includes('Father 3rd gen') && 
-                  divText.includes('Father 2nd gen') && 
-                  divText.includes('Father') &&
-                  divText.includes('Mother') &&
-                  divText.includes('Mother 2nd gen') &&
-                  divText.includes('Mother 3rd gen')) {
-                current.remove();
-                break;
-              }
-            }
-          }
-          break; // Only need to find and remove once
+      // The generation labels are always the first direct child div of the pedigree container
+      // Check the first child - if it contains generation label text, remove it
+      const firstChild = isolatedClone.firstElementChild;
+      if (firstChild) {
+        const firstChildText = firstChild.textContent || '';
+        if (firstChildText.includes('Father 3rd gen') && 
+            firstChildText.includes('Father 2nd gen') && 
+            firstChildText.includes('Mother 2nd gen') &&
+            firstChildText.includes('Mother 3rd gen')) {
+          firstChild.remove();
         }
       }
       

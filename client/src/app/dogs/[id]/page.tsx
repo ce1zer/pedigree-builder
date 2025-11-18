@@ -974,27 +974,14 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       
       // Remove generation labels from export
       // The generation labels are always the first direct child div of the pedigree container
-      // Find paragraphs with generation text and remove their parent grid container
-      const allParagraphs = isolatedClone.querySelectorAll('p');
-      for (const p of Array.from(allParagraphs)) {
-        const text = p.textContent?.trim();
-        if (text === '1st generation' || text === '2nd generation' || text === '3rd generation') {
-          // Traverse up to find the grid container (should be a few levels up)
-          let current: Element | null = p;
-          for (let i = 0; i < 5 && current; i++) {
-            current = current.parentElement;
-            if (current && current.tagName === 'DIV') {
-              // Check if this div contains all three generation labels
-              const divText = current.textContent || '';
-              if (divText.includes('1st generation') && 
-                  divText.includes('2nd generation') && 
-                  divText.includes('3rd generation')) {
-                current.remove();
-                break;
-              }
-            }
-          }
-          break; // Only need to find and remove once
+      // Check the first child - if it contains generation label text, remove it
+      const firstChild = isolatedClone.firstElementChild;
+      if (firstChild) {
+        const firstChildText = firstChild.textContent || '';
+        if (firstChildText.includes('1st generation') && 
+            firstChildText.includes('2nd generation') && 
+            firstChildText.includes('3rd generation')) {
+          firstChild.remove();
         }
       }
       

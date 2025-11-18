@@ -19,6 +19,13 @@ const PHOTO_SIZE = 'h-32 w-32';
 const USER_ICON_SIZE = 'h-16 w-16';
 const CAMERA_ICON_SIZE = 'h-8 w-8';
 
+// Helper function to add cache busting to image URLs
+const getImageUrl = (url: string | null | undefined): string | null => {
+  if (!url) return null;
+  // Add cache busting if URL doesn't already have query params
+  return url.includes('?') ? url : `${url}?t=${Date.now()}`;
+};
+
 // Helper function to create image from blob
 const createImage = (url: string): Promise<HTMLImageElement> =>
   new Promise((resolve, reject) => {
@@ -374,11 +381,12 @@ const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog }) => (
     <div className="flex items-start space-x-6">
       {/* Profile Image */}
       <div className="flex-shrink-0">
-        {dog.image_url ? (
+        {getImageUrl(dog.image_url) ? (
           <img
-            src={dog.image_url}
+            src={getImageUrl(dog.image_url)!}
             alt={dog.dog_name}
             className={`${PHOTO_SIZE} rounded-xl object-cover`}
+            key={dog.image_url} // Force re-render when image changes
           />
         ) : (
           <div className={`${PHOTO_SIZE} bg-gray-800 rounded-xl flex items-center justify-center`}>
@@ -472,11 +480,12 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
           href={`/dogs/${dog.id}`} 
           className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2 hover:underline block`}
         >
-          {dog?.image_url ? (
+          {getImageUrl(dog?.image_url) ? (
             <img
-              src={dog.image_url}
+              src={getImageUrl(dog.image_url)!}
               alt={dog.dog_name || 'Unknown'}
               className="w-full h-full object-cover aspect-[4/3]"
+              key={dog.image_url} // Force re-render when image changes
             />
           ) : (
             <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-[4/3]">
@@ -1087,13 +1096,15 @@ const DogProfile: React.FC = () => {
     formState: { errors },
     setValue,
     watch,
+    getValues,
   } = useForm<DogFormData>();
 
   const selectedGender = watch('gender');
+  const photoFile = watch('photo');
 
   // Handle photo file selection (now receives cropped file)
   const handlePhotoChange = useCallback((file: File) => {
-    setValue('photo', file);
+    setValue('photo', file, { shouldDirty: true, shouldValidate: false });
     
     // Create preview
     const reader = new FileReader();
@@ -1117,9 +1128,9 @@ const DogProfile: React.FC = () => {
         setValue('gender', response.data.gender);
         setValue('father_id', response.data.father_id || '');
         setValue('mother_id', response.data.mother_id || '');
-        // Set photo preview if image exists
+        // Set photo preview if image exists (with cache busting to ensure fresh image)
         if (response.data.image_url) {
-          setPhotoPreview(response.data.image_url);
+          setPhotoPreview(`${response.data.image_url}?t=${Date.now()}`);
         } else {
           setPhotoPreview(null);
         }
@@ -1167,22 +1178,45 @@ const DogProfile: React.FC = () => {
   const handleUpdate = useCallback(async (data: DogFormData) => {
     try {
       setIsSubmitting(true);
-      const response = await dogsApi.update(id!, data);
+      
+      // Get the photo from the form state (react-hook-form doesn't always include files in data)
+      const currentPhoto = getValues('photo');
+      
+      // Ensure photo is included if it was set
+      const formData: DogFormData = {
+        ...data,
+        photo: currentPhoto || photoFile || data.photo,
+      };
+      
+      console.log('Submitting form data:', {
+        ...formData,
+        photo: formData.photo ? `File: ${formData.photo.name} (${formData.photo.size} bytes)` : 'No photo'
+      });
+      
+      const response = await dogsApi.update(id!, formData);
       
       if (response.success) {
         toast.success('Dog profile updated successfully!');
         setIsEditing(false);
-        await loadDog(); // Reload dog data
+        // Clear photo from form after successful update
+        setValue('photo', undefined);
+        // Reload dog data with fresh image (add cache busting)
+        await loadDog(); 
+        // Update photo preview with new image URL (with cache busting)
+        if (response.data?.image_url) {
+          setPhotoPreview(`${response.data.image_url}?t=${Date.now()}`);
+        }
         await loadPedigreeGenerations(); // Reload pedigree data
       } else {
         toast.error(response.error || 'Error updating dog profile');
       }
     } catch (error) {
+      console.error('Update error:', error);
       toast.error('Error updating dog profile');
     } finally {
       setIsSubmitting(false);
     }
-  }, [id, loadDog, loadPedigreeGenerations]);
+  }, [id, loadDog, loadPedigreeGenerations, photoFile, setValue, getValues]);
 
   // Load data on component mount
   useEffect(() => {

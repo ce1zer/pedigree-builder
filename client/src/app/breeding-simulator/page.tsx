@@ -548,10 +548,11 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       const firstChild = isolatedClone.firstElementChild;
       if (firstChild) {
         const firstChildText = firstChild.textContent || '';
-        if (firstChildText.includes('Father 3rd gen') && 
-            firstChildText.includes('Father 2nd gen') && 
-            firstChildText.includes('Mother 2nd gen') &&
-            firstChildText.includes('Mother 3rd gen')) {
+        // Check for all generation label texts
+        if ((firstChildText.includes('Father 3rd gen') || firstChildText.includes('FATHER 3RD GEN')) && 
+            (firstChildText.includes('Father 2nd gen') || firstChildText.includes('FATHER 2ND GEN')) && 
+            (firstChildText.includes('Mother 2nd gen') || firstChildText.includes('MOTHER 2ND GEN')) &&
+            (firstChildText.includes('Mother 3rd gen') || firstChildText.includes('MOTHER 3RD GEN'))) {
           firstChild.remove();
         }
       }

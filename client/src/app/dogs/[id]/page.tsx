@@ -567,18 +567,18 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
       
       {/* Dog Info - Vertical Layout for text content */}
       <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-        <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
+        <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-1`}>
           {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
         </p>
         {dog ? (
           <Link 
             href={`/dogs/${dog.id}`}
-            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:underline block truncate mt-1`}
+            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-1 hover:underline block truncate mt-1`}
           >
             {dog.dog_name}
           </Link>
         ) : (
-          <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
+          <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-1 mt-1`}>
             UNKNOWN
           </p>
         )}

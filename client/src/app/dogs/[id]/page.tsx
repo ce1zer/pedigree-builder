@@ -566,7 +566,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
       
       {/* Dog Info - Vertical Layout for text content */}
       <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-        <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
+        <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight`}>
           {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
         </p>
         {dog ? (
@@ -599,7 +599,7 @@ const MainDogDisplay: React.FC<MainDogDisplayProps> = ({ dog }) => {
         {dog.dog_name}
       </h2>
       {/* Kennel Name */}
-      <p className="text-xl text-white text-opacity-70 uppercase font-medium tracking-wider">
+      <p className="text-xl text-[#717179] uppercase font-medium tracking-wider">
         {dog.primary_kennel}
       </p>
     </div>

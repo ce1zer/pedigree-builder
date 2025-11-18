@@ -147,7 +147,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {/* For small size on father's side (3rd generation), text comes first (left side) */}
       {isSmallWithTextLeft && (
         <div className="flex-1 min-w-0 flex flex-col justify-center text-right">
-          <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight`}>
             {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
           </p>
           {dog ? (
@@ -194,7 +194,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {/* Dog Info - For large and medium sizes (vertical layout) and small size on mother's side (text right) */}
       {(size === 'large' || size === 'medium' || (size === 'small' && side === 'mother')) && (
         <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-          <p className={`${textSizeClasses[size].kennel} text-white text-opacity-70 uppercase font-medium tracking-wider leading-tight`}>
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight`}>
             {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
           </p>
           {dog ? (

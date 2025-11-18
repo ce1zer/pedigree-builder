@@ -1326,12 +1326,16 @@ const DogProfile: React.FC = () => {
       setIsSubmitting(true);
       
       // Get the photo from the form state (react-hook-form doesn't always include files in data)
+      // Try multiple methods to get the photo file
       const currentPhoto = getValues('photo');
+      const watchedPhoto = watch('photo');
       
       // Ensure photo is included if it was set
+      const photoToUpload = currentPhoto || watchedPhoto || photoFile || data.photo;
+      
       const formData: DogFormData = {
         ...data,
-        photo: currentPhoto || photoFile || data.photo,
+        photo: photoToUpload,
       };
       
       // Debug: Log photo information
@@ -1341,11 +1345,15 @@ const DogProfile: React.FC = () => {
         hasPhoto: !!formData.photo,
         photoFile: !!photoFile,
         currentPhoto: !!currentPhoto,
+        watchedPhoto: !!watchedPhoto,
+        dataPhoto: !!data.photo,
       });
       
       // Ensure we have a photo file to upload
       if (!formData.photo) {
-        console.warn('No photo file found in form data');
+        console.warn('No photo file found in form data - form will be submitted without photo');
+      } else {
+        console.log('Photo file found, will be uploaded:', formData.photo.name, formData.photo.size, 'bytes');
       }
       
       const response = await dogsApi.update(id!, formData);

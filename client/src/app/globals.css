@@ -7,15 +7,15 @@
 /* CSS Custom Properties (Design Tokens) - Supabase Color Scheme */
 :root {
   /* Supabase Color Palette */
-  --background: hsl(240, 10%, 3.9%); /* #0a0d14 - Dark blue-grey background */
+  --background: #121212; /* Main background */
   --foreground: hsl(0, 0%, 100%); /* White text */
   --primary: hsl(142.1, 76.2%, 36.3%); /* #3ecf8e - Supabase green */
   --primary-foreground: hsl(240, 10%, 3.9%); /* Dark text on green */
   --primary-hover: hsl(142.1, 76.2%, 42%); /* Slightly lighter green on hover */
   
   /* Card Colors */
-  --card-bg: hsl(240, 10%, 3.9%); /* Same as background */
-  --card-hover: hsl(240, 10%, 6%); /* Slightly lighter on hover */
+  --card-bg: #171717; /* Cards and tiles background */
+  --card-hover: #1f1f1f; /* Slightly lighter on hover */
   --card-foreground: hsl(0, 0%, 100%); /* White text on cards */
   
   /* Border Colors */
@@ -262,7 +262,7 @@ body {
 
 /* Arbor Container - Supabase Style */
 .bg-arbor {
-  background-color: hsl(240, 10%, 3.9%);
+  background-color: #121212;
   border: 1px solid hsl(240, 5.9%, 20%);
 }
 
@@ -278,11 +278,11 @@ body {
 
 /* Supabase Color Overrides */
 .bg-gray-900 {
-  background-color: hsl(240, 10%, 3.9%) !important; /* Supabase dark background */
+  background-color: #121212 !important; /* Main background */
 }
 
 .bg-gray-800 {
-  background-color: hsl(240, 10%, 6%) !important; /* Slightly lighter for cards */
+  background-color: #171717 !important; /* Cards and tiles background */
 }
 
 .bg-gray-700 {

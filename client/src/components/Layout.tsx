@@ -45,7 +45,7 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive }) => (
     href={item.href}
     className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
       isActive 
-        ? 'bg-gray-800 text-white' 
+        ? 'bg-[#171717] text-white' 
         : 'text-gray-300 hover:text-[#3ecf8e] hover:bg-[#303036]'
     }`}
   >
@@ -64,7 +64,7 @@ const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
   };
 
   return (
-    <header className="bg-gray-900 border-b border-gray-600 backdrop-blur-sm sticky top-0 z-50">
+    <header className="bg-[#121212] border-b border-gray-600 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center h-16">
           <nav className="flex space-x-2">
@@ -91,7 +91,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-[#121212]">
       <Header pathname={pathname} />
       
       <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">

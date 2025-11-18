@@ -973,28 +973,28 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       const isolatedClone = createIsolatedClone(pedigreeRef.current);
       
       // Remove generation labels from export
-      // Find all paragraph tags and check for generation label text
+      // The generation labels are always the first direct child div of the pedigree container
+      // Find paragraphs with generation text and remove their parent grid container
       const allParagraphs = isolatedClone.querySelectorAll('p');
-      let labelsGridRemoved = false;
       for (const p of Array.from(allParagraphs)) {
         const text = p.textContent?.trim();
-        if ((text === '1st generation' || text === '2nd generation' || text === '3rd generation') && !labelsGridRemoved) {
-          // Find the parent grid container
-          let parent = p.parentElement;
-          while (parent && parent !== isolatedClone) {
-            // Check if this element is a grid (has display: grid in computed styles)
-            const computedStyle = window.getComputedStyle(parent);
-            if (computedStyle.display === 'grid') {
-              // Check if it has 3 columns (generation labels grid)
-              const gridCols = computedStyle.gridTemplateColumns;
-              if (gridCols && gridCols.split(' ').length === 3) {
-                parent.remove();
-                labelsGridRemoved = true;
-                break; // Found and removed
+        if (text === '1st generation' || text === '2nd generation' || text === '3rd generation') {
+          // Traverse up to find the grid container (should be a few levels up)
+          let current: Element | null = p;
+          for (let i = 0; i < 5 && current; i++) {
+            current = current.parentElement;
+            if (current && current.tagName === 'DIV') {
+              // Check if this div contains all three generation labels
+              const divText = current.textContent || '';
+              if (divText.includes('1st generation') && 
+                  divText.includes('2nd generation') && 
+                  divText.includes('3rd generation')) {
+                current.remove();
+                break;
               }
             }
-            parent = parent.parentElement;
           }
+          break; // Only need to find and remove once
         }
       }
       

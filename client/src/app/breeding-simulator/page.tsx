@@ -543,29 +543,31 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       const isolatedClone = createIsolatedClone(pedigreeRef.current);
       
       // Remove generation labels from export
-      // Find all paragraph tags and check for generation label text
+      // Find paragraphs with generation text and remove their parent grid container
       const allParagraphs = isolatedClone.querySelectorAll('p');
-      let labelsGridRemoved = false;
       for (const p of Array.from(allParagraphs)) {
         const text = p.textContent?.trim();
-        if ((text === 'Father 3rd gen' || text === 'Father 2nd gen' || text === 'Father' || 
-            text === 'Mother' || text === 'Mother 2nd gen' || text === 'Mother 3rd gen') && !labelsGridRemoved) {
-          // Find the parent grid container
-          let parent = p.parentElement;
-          while (parent && parent !== isolatedClone) {
-            // Check if this element is a grid (has display: grid in computed styles)
-            const computedStyle = window.getComputedStyle(parent);
-            if (computedStyle.display === 'grid') {
-              // Check if it has 6 columns (generation labels grid)
-              const gridCols = computedStyle.gridTemplateColumns;
-              if (gridCols && gridCols.split(' ').length === 6) {
-                parent.remove();
-                labelsGridRemoved = true;
-                break; // Found and removed
+        if (text === 'Father 3rd gen' || text === 'Father 2nd gen' || text === 'Father' || 
+            text === 'Mother' || text === 'Mother 2nd gen' || text === 'Mother 3rd gen') {
+          // Traverse up to find the grid container (should be a few levels up)
+          let current: Element | null = p;
+          for (let i = 0; i < 5 && current; i++) {
+            current = current.parentElement;
+            if (current && current.tagName === 'DIV') {
+              // Check if this div contains all generation labels
+              const divText = current.textContent || '';
+              if (divText.includes('Father 3rd gen') && 
+                  divText.includes('Father 2nd gen') && 
+                  divText.includes('Father') &&
+                  divText.includes('Mother') &&
+                  divText.includes('Mother 2nd gen') &&
+                  divText.includes('Mother 3rd gen')) {
+                current.remove();
+                break;
               }
             }
-            parent = parent.parentElement;
           }
+          break; // Only need to find and remove once
         }
       }
       

@@ -110,9 +110,14 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
   }, []);
 
   const handleCrop = async () => {
-    if (!imageSrc || !croppedAreaPixels) return;
+    if (!imageSrc || !croppedAreaPixels) {
+      console.warn('Cannot crop: missing imageSrc or croppedAreaPixels', { imageSrc: !!imageSrc, croppedAreaPixels: !!croppedAreaPixels });
+      return;
+    }
 
     try {
+      console.log('Starting crop process...');
+      
       // Get cropped image as Blob
       const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
       console.log('Cropped image blob:', {
@@ -144,9 +149,16 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
       }
       
       // Pass the cropped file to the parent component
+      console.log('Calling onPhotoChange with cropped file');
       onPhotoChange(file);
+      
+      // Reset crop state
       setShowCrop(false);
       setImageSrc(null);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setCroppedAreaPixels(null);
+      
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -186,6 +198,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
         ? `${photoPreview}&_crop=${Date.now()}` 
         : `${photoPreview}?_crop=${Date.now()}`;
       
+      console.log('Loading existing photo for cropping:', urlWithCacheBust);
+      
       const response = await fetch(urlWithCacheBust, {
         mode: 'cors',
         cache: 'no-cache'
@@ -200,9 +214,13 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
         throw new Error('Fetched image is empty');
       }
       
+      console.log('Fetched image blob:', { size: blob.size, type: blob.type });
+      
       const reader = new FileReader();
       reader.onload = () => {
-        setImageSrc(reader.result as string);
+        const dataUrl = reader.result as string;
+        console.log('Image loaded as data URL, opening crop modal');
+        setImageSrc(dataUrl);
         setShowCrop(true);
       };
       reader.onerror = () => {

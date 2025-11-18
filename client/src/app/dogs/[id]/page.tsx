@@ -19,11 +19,10 @@ const PHOTO_SIZE = 'h-32 w-32';
 const USER_ICON_SIZE = 'h-16 w-16';
 const CAMERA_ICON_SIZE = 'h-8 w-8';
 
-// Helper function to add cache busting to image URLs
+// Helper function to get image URL (used for display)
 const getImageUrl = (url: string | null | undefined): string | null => {
   if (!url) return null;
-  // Add cache busting if URL doesn't already have query params
-  return url.includes('?') ? url : `${url}?t=${Date.now()}`;
+  return url;
 };
 
 // Helper function to create image from blob
@@ -372,9 +371,10 @@ const buildPedigreeGenerations = async (rootDog: Dog): Promise<PedigreeGeneratio
 // Basic Info Card Component
 interface BasicInfoCardProps {
   dog: Dog;
+  imageCacheBuster: number;
 }
 
-const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog }) => (
+const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog, imageCacheBuster }) => (
   <div className="card-spotify">
     <h2 className="text-xl font-semibold text-white mb-6">Basic Information</h2>
     
@@ -383,10 +383,10 @@ const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog }) => (
       <div className="flex-shrink-0">
         {getImageUrl(dog.image_url) ? (
           <img
-            src={getImageUrl(dog.image_url)!}
+            src={`${getImageUrl(dog.image_url)!}?t=${imageCacheBuster}`}
             alt={dog.dog_name}
             className={`${PHOTO_SIZE} rounded-xl object-cover`}
-            key={dog.image_url} // Force re-render when image changes
+            key={`${dog.image_url}-${imageCacheBuster}`} // Force re-render when image changes
           />
         ) : (
           <div className={`${PHOTO_SIZE} bg-gray-800 rounded-xl flex items-center justify-center`}>
@@ -431,9 +431,10 @@ const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog }) => (
 interface PedigreeNodeProps {
   dog: Dog | null;
   size?: 'large' | 'medium' | 'small';
+  imageCacheBuster?: number;
 }
 
-const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => {
+const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', imageCacheBuster = 0 }) => {
   // Size classes - proportional to container size
   // 1st gen: 100%, 2nd gen: 50%, 3rd gen: 25%
   const sizeClasses = {
@@ -482,10 +483,10 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
         >
           {getImageUrl(dog?.image_url) ? (
             <img
-              src={getImageUrl(dog.image_url)!}
+              src={`${getImageUrl(dog.image_url)!}?t=${imageCacheBuster}`}
               alt={dog.dog_name || 'Unknown'}
               className="w-full h-full object-cover aspect-[4/3]"
-              key={dog.image_url} // Force re-render when image changes
+              key={`${dog.image_url}-${imageCacheBuster}`} // Force re-render when image changes
             />
           ) : (
             <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-[4/3]">
@@ -581,9 +582,10 @@ const PedigreeConnector: React.FC<PedigreeConnectorProps> = ({ from, to, horizon
 // Pedigree Tree Component - Father's Lineage Only (Top Half)
 interface PedigreeTreeProps {
   generations: PedigreeGeneration[];
+  imageCacheBuster: number;
 }
 
-const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
+const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBuster }) => {
   const pedigreeRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
@@ -966,14 +968,14 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           {/* Father - 50% height */}
           <div className="relative" style={{ height: '50%' }}>
             <div className="h-full w-full flex items-center justify-center">
-              <PedigreeNode dog={father} size="large" />
+              <PedigreeNode dog={father} size="large" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Mother - 50% height */}
           <div className="relative" style={{ height: '50%' }}>
             <div className="h-full w-full flex items-center justify-center">
-              <PedigreeNode dog={mother} size="large" />
+              <PedigreeNode dog={mother} size="large" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
@@ -984,28 +986,28 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           {/* Father's Father - 25% of total height */}
           <div className="relative" style={{ height: '25%' }}>
             <div className="h-full flex items-center justify-center">
-              <PedigreeNode dog={fatherFather} size="medium" />
+              <PedigreeNode dog={fatherFather} size="medium" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Father's Mother - 25% of total height */}
           <div className="relative" style={{ height: '25%' }}>
             <div className="h-full flex items-center justify-center">
-              <PedigreeNode dog={fatherMother} size="medium" />
+              <PedigreeNode dog={fatherMother} size="medium" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Mother's Father - 25% of total height */}
           <div className="relative" style={{ height: '25%' }}>
             <div className="h-full flex items-center justify-center">
-              <PedigreeNode dog={motherFather} size="medium" />
+              <PedigreeNode dog={motherFather} size="medium" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Mother's Mother - 25% of total height */}
           <div className="relative" style={{ height: '25%' }}>
             <div className="h-full flex items-center justify-center">
-              <PedigreeNode dog={motherMother} size="medium" />
+              <PedigreeNode dog={motherMother} size="medium" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
@@ -1016,56 +1018,56 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations }) => {
           {/* Father's Father's Father - 12.5% of total height */}
           <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center py-1">
-              <PedigreeNode dog={ffFather} size="small" />
+              <PedigreeNode dog={ffFather} size="small" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Father's Father's Mother - 12.5% of total height */}
           <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center py-1">
-              <PedigreeNode dog={ffMother} size="small" />
+              <PedigreeNode dog={ffMother} size="small" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Father's Mother's Father - 12.5% of total height */}
           <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center py-1">
-              <PedigreeNode dog={fmFather} size="small" />
+              <PedigreeNode dog={fmFather} size="small" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Father's Mother's Mother - 12.5% of total height */}
           <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center py-1">
-              <PedigreeNode dog={fmMother} size="small" />
+              <PedigreeNode dog={fmMother} size="small" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Mother's Father's Father - 12.5% of total height */}
           <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center py-1">
-              <PedigreeNode dog={mfFather} size="small" />
+              <PedigreeNode dog={mfFather} size="small" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Mother's Father's Mother - 12.5% of total height */}
           <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center py-1">
-              <PedigreeNode dog={mfMother} size="small" />
+              <PedigreeNode dog={mfMother} size="small" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Mother's Mother's Father - 12.5% of total height */}
           <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center py-1">
-              <PedigreeNode dog={mmFather} size="small" />
+              <PedigreeNode dog={mmFather} size="small" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
           
           {/* Mother's Mother's Mother - 12.5% of total height */}
           <div className="relative" style={{ height: '12.5%' }}>
             <div className="h-full flex items-center justify-center py-1">
-              <PedigreeNode dog={mmMother} size="small" />
+              <PedigreeNode dog={mmMother} size="small" imageCacheBuster={imageCacheBuster} />
             </div>
           </div>
         </div>
@@ -1089,6 +1091,7 @@ const DogProfile: React.FC = () => {
   const [pedigreeGenerations, setPedigreeGenerations] = useState<PedigreeGeneration[]>([]);
   const [pedigreeLoading, setPedigreeLoading] = useState(false);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [imageCacheBuster, setImageCacheBuster] = useState<number>(Date.now());
 
   const {
     register,
@@ -1128,9 +1131,11 @@ const DogProfile: React.FC = () => {
         setValue('gender', response.data.gender);
         setValue('father_id', response.data.father_id || '');
         setValue('mother_id', response.data.mother_id || '');
-        // Set photo preview if image exists (with cache busting to ensure fresh image)
+        // Set photo preview if image exists
         if (response.data.image_url) {
-          setPhotoPreview(`${response.data.image_url}?t=${Date.now()}`);
+          setPhotoPreview(response.data.image_url);
+          // Update cache buster to force image refresh
+          setImageCacheBuster(Date.now());
         } else {
           setPhotoPreview(null);
         }
@@ -1200,11 +1205,13 @@ const DogProfile: React.FC = () => {
         setIsEditing(false);
         // Clear photo from form after successful update
         setValue('photo', undefined);
-        // Reload dog data with fresh image (add cache busting)
+        // Update cache buster to force image refresh
+        setImageCacheBuster(Date.now());
+        // Reload dog data with fresh image
         await loadDog(); 
-        // Update photo preview with new image URL (with cache busting)
+        // Update photo preview with new image URL
         if (response.data?.image_url) {
-          setPhotoPreview(`${response.data.image_url}?t=${Date.now()}`);
+          setPhotoPreview(response.data.image_url);
         }
         await loadPedigreeGenerations(); // Reload pedigree data
       } else {
@@ -1425,7 +1432,7 @@ const DogProfile: React.FC = () => {
         /* View Mode */
         <div className="space-y-8">
           {/* Basic Information */}
-          <BasicInfoCard dog={dog} />
+          <BasicInfoCard dog={dog} imageCacheBuster={imageCacheBuster} />
 
           {/* Pedigree Tree */}
           {pedigreeLoading ? (
@@ -1436,7 +1443,7 @@ const DogProfile: React.FC = () => {
               </div>
             </div>
           ) : (
-            <PedigreeTree generations={pedigreeGenerations} />
+            <PedigreeTree generations={pedigreeGenerations} imageCacheBuster={imageCacheBuster} />
           )}
 
           {/* Metadata */}

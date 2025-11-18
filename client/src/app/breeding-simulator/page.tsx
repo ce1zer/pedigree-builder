@@ -153,7 +153,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-gray-300 transition-colors block truncate mt-0.5`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:underline block truncate mt-0.5`}
             >
               {dog.dog_name}
             </Link>
@@ -165,20 +165,30 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
         </div>
       )}
       
-      {/* Square Image with Border */}
-      <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
-        {dog?.image_url ? (
-          <img
-            src={dog.image_url}
-            alt={dog.dog_name || 'Unknown'}
-            className="w-full h-full object-cover aspect-square"
-          />
-        ) : (
+      {/* Square Image with Border - Clickable if dog exists */}
+      {dog ? (
+        <Link href={`/dogs/${dog.id}`} className="hover:underline">
+          <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
+            {dog?.image_url ? (
+              <img
+                src={dog.image_url}
+                alt={dog.dog_name || 'Unknown'}
+                className="w-full h-full object-cover aspect-square"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-square">
+                <User className="w-1/2 h-1/2 text-gray-500" />
+              </div>
+            )}
+          </div>
+        </Link>
+      ) : (
+        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
           <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-square">
             <User className="w-1/2 h-1/2 text-gray-500" />
           </div>
-        )}
-      </div>
+        </div>
+      )}
       
       {/* Dog Info - For large and medium sizes (vertical layout) and small size on mother's side (text right) */}
       {(size === 'large' || size === 'medium' || (size === 'small' && side === 'mother')) && (
@@ -189,7 +199,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-gray-300 transition-colors block truncate mt-0.5`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:underline block truncate mt-0.5`}
             >
               {dog.dog_name}
             </Link>

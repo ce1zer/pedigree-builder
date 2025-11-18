@@ -205,20 +205,30 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
   
   return (
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} gap-3`}>
-      {/* Square Image with Border */}
-      <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
-        {dog?.image_url ? (
-          <img
-            src={dog.image_url}
-            alt={dog.dog_name || 'Unknown'}
-            className="w-full h-full object-cover aspect-[4/3]"
-          />
-        ) : (
+      {/* Square Image with Border - Clickable if dog exists */}
+      {dog ? (
+        <Link href={`/dogs/${dog.id}`} className="hover:underline">
+          <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
+            {dog?.image_url ? (
+              <img
+                src={dog.image_url}
+                alt={dog.dog_name || 'Unknown'}
+                className="w-full h-full object-cover aspect-[4/3]"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-[4/3]">
+                <User className="w-1/2 h-1/2 text-gray-500" />
+              </div>
+            )}
+          </div>
+        </Link>
+      ) : (
+        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
           <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-[4/3]">
             <User className="w-1/2 h-1/2 text-gray-500" />
           </div>
-        )}
-      </div>
+        </div>
+      )}
       
       {/* Dog Info - Vertical Layout for text content */}
       <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
@@ -228,7 +238,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium' }) => 
         {dog ? (
           <Link 
             href={`/dogs/${dog.id}`}
-            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-gray-300 transition-colors block truncate mt-1`}
+            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:underline block truncate mt-1`}
           >
             {dog.dog_name}
           </Link>

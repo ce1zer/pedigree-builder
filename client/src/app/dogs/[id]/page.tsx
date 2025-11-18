@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Edit, Users, TreePine, User, Download, Upload, Camera } from 'lucide-react';
+import { ArrowLeft, Edit, Users, TreePine, User, Download, Upload, Camera, Trash2 } from 'lucide-react';
 import Cropper from 'react-easy-crop';
 import { Dog, DogFormData } from '@/types';
 import { dogsApi } from '@/services/api';
@@ -1241,6 +1241,7 @@ const DogProfile: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [availableDogs, setAvailableDogs] = useState<Dog[]>([]);
   const [pedigreeGenerations, setPedigreeGenerations] = useState<PedigreeGeneration[]>([]);
   const [pedigreeLoading, setPedigreeLoading] = useState(false);
@@ -1412,6 +1413,35 @@ const DogProfile: React.FC = () => {
     }
   }, [id, loadDog, loadPedigreeGenerations, photoFile, setValue, getValues]);
 
+  // Handle dog deletion
+  const handleDelete = useCallback(async () => {
+    if (!dog) return;
+    
+    // Confirm deletion
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${dog.dog_name}"? This action cannot be undone.`
+    );
+    
+    if (!confirmed) return;
+    
+    try {
+      setIsDeleting(true);
+      const response = await dogsApi.delete(id!);
+      
+      if (response.success) {
+        toast.success(`${dog.dog_name} has been deleted successfully`);
+        router.push('/');
+      } else {
+        toast.error(response.error || 'Error deleting dog');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('Error deleting dog');
+    } finally {
+      setIsDeleting(false);
+    }
+  }, [dog, id, router]);
+
   // Load data on component mount
   useEffect(() => {
     if (id) {
@@ -1470,9 +1500,18 @@ const DogProfile: React.FC = () => {
           <button
             onClick={() => setIsEditing(!isEditing)}
             className="btn-spotify-secondary inline-flex items-center space-x-2"
+            disabled={isDeleting}
           >
             <Edit className={SMALL_ICON_SIZE} />
             <span>{isEditing ? 'Cancel' : 'Edit'}</span>
+          </button>
+          <button
+            onClick={handleDelete}
+            className="btn-spotify-secondary inline-flex items-center space-x-2 text-red-400 hover:text-red-300"
+            disabled={isDeleting || isEditing}
+          >
+            <Trash2 className={SMALL_ICON_SIZE} />
+            <span>{isDeleting ? 'Deleting...' : 'Delete'}</span>
           </button>
         </div>
       </div>

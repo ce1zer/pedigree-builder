@@ -87,6 +87,14 @@ export const dogsApi = {
   },
 
   /**
+   * Delete a dog profile
+   */
+  delete: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await api.delete(`/dogs/${id}`);
+    return handleApiResponse(response);
+  },
+
+  /**
    * Search dogs by name or kennel
    */
   search: async (query: string): Promise<ApiResponse<Dog[]>> => {

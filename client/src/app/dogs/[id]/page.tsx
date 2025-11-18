@@ -114,16 +114,41 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
 
     try {
       const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
-      const file = new File([croppedImage], 'cropped-image.jpg', { type: 'image/jpeg' });
+      console.log('Cropped image blob:', {
+        size: croppedImage.size,
+        type: croppedImage.type
+      });
+      
+      // Create a File object with a unique name
+      const fileName = `cropped-image-${Date.now()}.jpg`;
+      const file = new File([croppedImage], fileName, { 
+        type: 'image/jpeg',
+        lastModified: Date.now()
+      });
+      
+      console.log('Created file:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified
+      });
+      
+      // Verify the file is valid
+      if (file.size === 0) {
+        throw new Error('Cropped image is empty');
+      }
+      
       onPhotoChange(file);
       setShowCrop(false);
       setImageSrc(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
+      
+      toast.success('Image cropped successfully!');
     } catch (error) {
       console.error('Error cropping image:', error);
-      toast.error('Error cropping image');
+      toast.error('Error cropping image: ' + (error instanceof Error ? error.message : 'Unknown error'));
     }
   };
 

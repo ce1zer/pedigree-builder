@@ -124,8 +124,43 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
   const handleCancelCrop = () => {
     setShowCrop(false);
     setImageSrc(null);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  // Handle cropping existing photo
+  const handleCropExisting = async () => {
+    if (!photoPreview) return;
+    
+    try {
+      // If it's already a data URL, use it directly
+      if (photoPreview.startsWith('data:')) {
+        setImageSrc(photoPreview);
+        setShowCrop(true);
+        return;
+      }
+      
+      // Otherwise, fetch the image and convert to data URL
+      const response = await fetch(photoPreview);
+      if (!response.ok) {
+        throw new Error('Failed to fetch image');
+      }
+      const blob = await response.blob();
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImageSrc(reader.result as string);
+        setShowCrop(true);
+      };
+      reader.onerror = () => {
+        throw new Error('Failed to read image');
+      };
+      reader.readAsDataURL(blob);
+    } catch (error) {
+      console.error('Error loading existing photo:', error);
+      toast.error('Error loading photo for cropping');
     }
   };
 
@@ -150,20 +185,32 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
             )}
           </div>
           
-          {/* Upload Button */}
-          <div className="flex-1">
-            <label className="btn-spotify-secondary inline-flex items-center space-x-2 cursor-pointer">
-              <Upload className={SMALL_ICON_SIZE} />
-              <span>Upload Photo</span>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleFileSelect}
-                className="hidden"
-              />
-            </label>
-            <p className="text-sm text-gray-400 mt-3">
+          {/* Upload and Crop Buttons */}
+          <div className="flex-1 space-y-3">
+            <div className="flex space-x-3">
+              <label className="btn-spotify-secondary inline-flex items-center space-x-2 cursor-pointer">
+                <Upload className={SMALL_ICON_SIZE} />
+                <span>Upload New Photo</span>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </label>
+              {photoPreview && (
+                <button
+                  type="button"
+                  onClick={handleCropExisting}
+                  className="btn-spotify-secondary inline-flex items-center space-x-2"
+                >
+                  <Edit className={SMALL_ICON_SIZE} />
+                  <span>Crop Photo</span>
+                </button>
+              )}
+            </div>
+            <p className="text-sm text-gray-400">
               JPG, PNG or GIF. Maximum 5MB. Crop to 4:3 aspect ratio.
             </p>
           </div>

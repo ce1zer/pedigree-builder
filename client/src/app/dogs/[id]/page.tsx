@@ -973,21 +973,26 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       const isolatedClone = createIsolatedClone(pedigreeRef.current);
       
       // Remove generation labels from export
-      // Find the generation labels by looking for text content
-      const allDivs = isolatedClone.querySelectorAll('div');
-      for (const div of Array.from(allDivs)) {
-        const text = div.textContent?.trim();
+      // Find all paragraph tags and check for generation label text
+      const allParagraphs = isolatedClone.querySelectorAll('p');
+      for (const p of Array.from(allParagraphs)) {
+        const text = p.textContent?.trim();
         if (text === '1st generation' || text === '2nd generation' || text === '3rd generation') {
-          // Find the parent grid container
-          let parent = div.parentElement;
+          // Find the parent grid container (should be a direct ancestor)
+          let parent = p.parentElement;
           while (parent && parent !== isolatedClone) {
-            if (parent.classList.contains('grid') && parent.classList.contains('grid-cols-3')) {
-              parent.remove();
-              break;
+            // Check if this is the grid container with 3 columns
+            if (parent.classList && parent.classList.contains('grid')) {
+              // Verify it has grid-cols-3 by checking computed styles or class list
+              const hasGridCols3 = parent.className.includes('grid-cols-3') || 
+                                   window.getComputedStyle(parent).gridTemplateColumns.split(' ').length === 3;
+              if (hasGridCols3) {
+                parent.remove();
+                break; // Found and removed, exit loop
+              }
             }
             parent = parent.parentElement;
           }
-          break;
         }
       }
       

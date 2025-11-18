@@ -542,6 +542,17 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       
       const isolatedClone = createIsolatedClone(pedigreeRef.current);
       
+      // Remove generation labels from export
+      // Find the generation labels div by looking for the first grid with 6 columns
+      const allGrids = isolatedClone.querySelectorAll('.grid');
+      for (const grid of Array.from(allGrids)) {
+        const classes = grid.className;
+        if (classes.includes('grid-cols-6') && classes.includes('mb-8')) {
+          grid.remove();
+          break;
+        }
+      }
+      
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';
       tempContainer.style.left = '-9999px';

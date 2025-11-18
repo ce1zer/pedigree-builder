@@ -972,6 +972,12 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       // Create isolated clone
       const isolatedClone = createIsolatedClone(pedigreeRef.current);
       
+      // Remove generation labels from export
+      const generationLabels = isolatedClone.querySelector('.grid.grid-cols-3.gap-x-8.mb-8');
+      if (generationLabels) {
+        generationLabels.remove();
+      }
+      
       // Wait for all images to load before exporting
       const images = isolatedClone.querySelectorAll('img');
       const imagePromises = Array.from(images).map((img) => {

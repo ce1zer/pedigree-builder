@@ -529,7 +529,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
   };
 
   const isUnknown = !dog;
-  const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-supabase';
+  const imageBorderColor = 'border-white';
 
   // For large size (1st generation), use vertical layout (image on top, text below)
   // For medium and small sizes (2nd and 3rd generation), use horizontal layout (image left, text right)
@@ -577,7 +577,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
             {dog.dog_name}
           </Link>
         ) : (
-          <p className={`${textSizeClasses[size].name} text-gray-600 uppercase font-bold tracking-wide leading-tight mt-1`}>
+          <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-1`}>
             UNKNOWN
           </p>
         )}

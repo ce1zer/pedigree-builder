@@ -545,20 +545,23 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       // Remove generation labels from export
       // Find all paragraph tags and check for generation label text
       const allParagraphs = isolatedClone.querySelectorAll('p');
+      let labelsGridRemoved = false;
       for (const p of Array.from(allParagraphs)) {
         const text = p.textContent?.trim();
-        if (text === 'Father 3rd gen' || text === 'Father 2nd gen' || text === 'Father' || 
-            text === 'Mother' || text === 'Mother 2nd gen' || text === 'Mother 3rd gen') {
-          // Find the parent grid container (should be a direct ancestor)
+        if ((text === 'Father 3rd gen' || text === 'Father 2nd gen' || text === 'Father' || 
+            text === 'Mother' || text === 'Mother 2nd gen' || text === 'Mother 3rd gen') && !labelsGridRemoved) {
+          // Find the parent grid container
           let parent = p.parentElement;
           while (parent && parent !== isolatedClone) {
-            // Check if this is the grid container with 6 columns
-            if (parent.classList && parent.classList.contains('grid')) {
-              // Verify it has grid-cols-6 by checking class name
-              const hasGridCols6 = parent.className.includes('grid-cols-6');
-              if (hasGridCols6) {
+            // Check if this element is a grid (has display: grid in computed styles)
+            const computedStyle = window.getComputedStyle(parent);
+            if (computedStyle.display === 'grid') {
+              // Check if it has 6 columns (generation labels grid)
+              const gridCols = computedStyle.gridTemplateColumns;
+              if (gridCols && gridCols.split(' ').length === 6) {
                 parent.remove();
-                break; // Found and removed, exit loop
+                labelsGridRemoved = true;
+                break; // Found and removed
               }
             }
             parent = parent.parentElement;

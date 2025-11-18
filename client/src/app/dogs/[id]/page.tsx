@@ -975,20 +975,22 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       // Remove generation labels from export
       // Find all paragraph tags and check for generation label text
       const allParagraphs = isolatedClone.querySelectorAll('p');
+      let labelsGridRemoved = false;
       for (const p of Array.from(allParagraphs)) {
         const text = p.textContent?.trim();
-        if (text === '1st generation' || text === '2nd generation' || text === '3rd generation') {
-          // Find the parent grid container (should be a direct ancestor)
+        if ((text === '1st generation' || text === '2nd generation' || text === '3rd generation') && !labelsGridRemoved) {
+          // Find the parent grid container
           let parent = p.parentElement;
           while (parent && parent !== isolatedClone) {
-            // Check if this is the grid container with 3 columns
-            if (parent.classList && parent.classList.contains('grid')) {
-              // Verify it has grid-cols-3 by checking computed styles or class list
-              const hasGridCols3 = parent.className.includes('grid-cols-3') || 
-                                   window.getComputedStyle(parent).gridTemplateColumns.split(' ').length === 3;
-              if (hasGridCols3) {
+            // Check if this element is a grid (has display: grid in computed styles)
+            const computedStyle = window.getComputedStyle(parent);
+            if (computedStyle.display === 'grid') {
+              // Check if it has 3 columns (generation labels grid)
+              const gridCols = computedStyle.gridTemplateColumns;
+              if (gridCols && gridCols.split(' ').length === 3) {
                 parent.remove();
-                break; // Found and removed, exit loop
+                labelsGridRemoved = true;
+                break; // Found and removed
               }
             }
             parent = parent.parentElement;

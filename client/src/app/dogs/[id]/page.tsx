@@ -113,20 +113,25 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
     if (!imageSrc || !croppedAreaPixels) return;
 
     try {
-      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+      // Get cropped image as Blob
+      const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
       console.log('Cropped image blob:', {
-        size: croppedImage.size,
-        type: croppedImage.type
+        size: croppedImageBlob.size,
+        type: croppedImageBlob.type
       });
       
-      // Create a File object with a unique name
-      const fileName = `cropped-image-${Date.now()}.jpg`;
-      const file = new File([croppedImage], fileName, { 
+      // Verify the blob is valid
+      if (croppedImageBlob.size === 0) {
+        throw new Error('Cropped image is empty');
+      }
+      
+      // Create a File object from the blob (this will be saved as photo.jpg)
+      const file = new File([croppedImageBlob], 'photo.jpg', { 
         type: 'image/jpeg',
         lastModified: Date.now()
       });
       
-      console.log('Created file:', {
+      console.log('Created file from cropped blob:', {
         name: file.name,
         size: file.size,
         type: file.type,
@@ -135,9 +140,10 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
       
       // Verify the file is valid
       if (file.size === 0) {
-        throw new Error('Cropped image is empty');
+        throw new Error('Cropped image file is empty');
       }
       
+      // Pass the cropped file to the parent component
       onPhotoChange(file);
       setShowCrop(false);
       setImageSrc(null);
@@ -145,7 +151,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
         fileInputRef.current.value = '';
       }
       
-      toast.success('Image cropped successfully!');
+      toast.success('Image cropped successfully! Ready to save.');
     } catch (error) {
       console.error('Error cropping image:', error);
       toast.error('Error cropping image: ' + (error instanceof Error ? error.message : 'Unknown error'));

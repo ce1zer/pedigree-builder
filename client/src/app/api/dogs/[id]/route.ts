@@ -45,29 +45,39 @@ const validateGender = (gender: string): string | null => {
 };
 
 // Photo upload helper function
-const uploadPhoto = async (photo: File): Promise<string | null> => {
+// Saves cropped image to /dogs/{dogId}/photo.jpg and replaces existing if needed
+const uploadPhoto = async (photo: File, dogId: string): Promise<string | null> => {
   try {
-    const fileExt = photo.name.split('.').pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+    // Ensure the photo is a JPEG blob (cropped images are already JPEG)
+    const photoBlob = photo instanceof Blob ? photo : new Blob([photo], { type: 'image/jpeg' });
     
+    // Save to /dogs/{dogId}/photo.jpg
+    const filePath = `dogs/${dogId}/photo.jpg`;
+    
+    // Use upsert: true to replace existing photo
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(STORAGE_BUCKET)
-      .upload(fileName, photo, {
-        contentType: photo.type,
-        upsert: false
+      .upload(filePath, photoBlob, {
+        contentType: 'image/jpeg',
+        upsert: true // Replace existing photo
       });
     
     if (uploadError) {
-      throw new Error('Failed to upload photo');
+      console.error('Upload error:', uploadError);
+      throw new Error(`Failed to upload photo: ${uploadError.message}`);
     }
     
+    // Get the public URL for the uploaded photo
     const { data: { publicUrl } } = supabase.storage
       .from(STORAGE_BUCKET)
-      .getPublicUrl(fileName);
+      .getPublicUrl(filePath);
+    
+    console.log('Photo uploaded to:', filePath, 'Public URL:', publicUrl);
     
     return publicUrl;
   } catch (error) {
-    throw new Error('Failed to upload photo');
+    console.error('Photo upload error:', error);
+    throw new Error(`Failed to upload photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 };
 
@@ -154,8 +164,9 @@ export async function PUT(
     
     if (photo && photo.size > 0) {
       try {
-        imageUrl = await uploadPhoto(photo);
-        console.log('Photo uploaded successfully:', imageUrl);
+        // Upload cropped photo to /dogs/{dogId}/photo.jpg
+        imageUrl = await uploadPhoto(photo, id);
+        console.log('Cropped photo uploaded successfully to:', imageUrl);
       } catch (error) {
         console.error('Photo upload error:', error);
         throw new Error('Failed to upload photo: ' + (error instanceof Error ? error.message : 'Unknown error'));

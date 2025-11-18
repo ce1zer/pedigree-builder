@@ -46,7 +46,7 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive }) => (
     className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
       isActive 
         ? 'bg-gray-800 text-white' 
-        : 'text-gray-300 hover:text-white hover:bg-gray-800'
+        : 'text-gray-300 hover:text-[#3ecf8e] hover:bg-gray-800'
     }`}
   >
     {item.icon}

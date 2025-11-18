@@ -1259,23 +1259,52 @@ const DogProfile: React.FC = () => {
         setIsEditing(false);
         
         // Update cache buster BEFORE reloading to force image refresh
-        setImageCacheBuster(Date.now());
+        const newCacheBuster = Date.now();
+        setImageCacheBuster(newCacheBuster);
         
         // Update photo preview with new image URL immediately
         if (response.data?.image_url) {
           const newImageUrl = response.data.image_url;
           console.log('Setting new image URL:', newImageUrl);
           setPhotoPreview(newImageUrl);
-          // Also update the dog state immediately
-          setDog(prev => prev ? { ...prev, image_url: newImageUrl } : null);
+          
+          // Update the dog state immediately with the new image
+          setDog(prev => {
+            if (!prev) return null;
+            const updatedDog = { ...prev, image_url: newImageUrl };
+            console.log('Updated dog state with new image:', updatedDog);
+            return updatedDog;
+          });
         }
         
         // Clear photo from form after successful update
         setValue('photo', undefined);
         
-        // Reload dog data with fresh image (this will also update the cache buster)
-        await loadDog(); 
-        await loadPedigreeGenerations(); // Reload pedigree data
+        // Rebuild pedigree immediately with updated dog state
+        // Use the response data to update the dog and rebuild pedigree
+        if (response.data) {
+          const updatedDog = response.data;
+          
+          // Update the dog state with the full response data
+          setDog(updatedDog);
+          
+          // Rebuild pedigree with the updated dog immediately (before reloading)
+          try {
+            setPedigreeLoading(true);
+            const generations = await buildPedigreeGenerations(updatedDog);
+            setPedigreeGenerations(generations);
+            setPedigreeLoading(false);
+            console.log('Pedigree rebuilt with updated image:', updatedDog.image_url);
+          } catch (error) {
+            console.error('Error rebuilding pedigree:', error);
+            setPedigreeLoading(false);
+            toast.error('Error rebuilding pedigree');
+          }
+        }
+        
+        // Also reload dog data to ensure everything is in sync with database
+        // This will trigger loadPedigreeGenerations via useEffect if needed
+        await loadDog();
       } else {
         toast.error(response.error || 'Error updating dog profile');
       }

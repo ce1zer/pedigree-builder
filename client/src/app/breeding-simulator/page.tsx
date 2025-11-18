@@ -543,12 +543,21 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       const isolatedClone = createIsolatedClone(pedigreeRef.current);
       
       // Remove generation labels from export
-      // Find the generation labels div by looking for the first grid with 6 columns
-      const allGrids = isolatedClone.querySelectorAll('.grid');
-      for (const grid of Array.from(allGrids)) {
-        const classes = grid.className;
-        if (classes.includes('grid-cols-6') && classes.includes('mb-8')) {
-          grid.remove();
+      // Find the generation labels by looking for text content
+      const allDivs = isolatedClone.querySelectorAll('div');
+      for (const div of Array.from(allDivs)) {
+        const text = div.textContent?.trim();
+        if (text === 'Father 3rd gen' || text === 'Father 2nd gen' || text === 'Father' || 
+            text === 'Mother' || text === 'Mother 2nd gen' || text === 'Mother 3rd gen') {
+          // Find the parent grid container
+          let parent = div.parentElement;
+          while (parent && parent !== isolatedClone) {
+            if (parent.classList.contains('grid') && parent.classList.contains('grid-cols-6')) {
+              parent.remove();
+              break;
+            }
+            parent = parent.parentElement;
+          }
           break;
         }
       }

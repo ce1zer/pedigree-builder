@@ -973,9 +973,22 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       const isolatedClone = createIsolatedClone(pedigreeRef.current);
       
       // Remove generation labels from export
-      const generationLabels = isolatedClone.querySelector('.grid.grid-cols-3.gap-x-8.mb-8');
-      if (generationLabels) {
-        generationLabels.remove();
+      // Find the generation labels by looking for text content
+      const allDivs = isolatedClone.querySelectorAll('div');
+      for (const div of Array.from(allDivs)) {
+        const text = div.textContent?.trim();
+        if (text === '1st generation' || text === '2nd generation' || text === '3rd generation') {
+          // Find the parent grid container
+          let parent = div.parentElement;
+          while (parent && parent !== isolatedClone) {
+            if (parent.classList.contains('grid') && parent.classList.contains('grid-cols-3')) {
+              parent.remove();
+              break;
+            }
+            parent = parent.parentElement;
+          }
+          break;
+        }
       }
       
       // Wait for all images to load before exporting

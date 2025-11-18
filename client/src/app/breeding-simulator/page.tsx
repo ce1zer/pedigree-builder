@@ -111,9 +111,9 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   };
 
   const imageSizeClasses = {
-    large: 'w-2/3 aspect-square',
-    medium: 'w-[35%] aspect-square',
-    small: 'w-1/4 aspect-square'
+    large: 'w-2/3 aspect-[4/3]',
+    medium: 'w-[35%] aspect-[4/3]',
+    small: 'w-1/4 aspect-[4/3]'
   };
 
   const textSizeClasses = {
@@ -175,10 +175,10 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
             <img
               src={dog.image_url}
               alt={dog.dog_name || 'Unknown'}
-              className="w-full h-full object-cover aspect-square"
+              className="w-full h-full object-cover aspect-[4/3]"
             />
           ) : (
-            <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-square">
+            <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-[4/3]">
               <User className="w-1/2 h-1/2 text-gray-500" />
             </div>
           )}

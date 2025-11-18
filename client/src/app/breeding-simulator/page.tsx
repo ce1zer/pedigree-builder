@@ -178,15 +178,15 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
               className="w-full h-full object-cover aspect-[4/3]"
             />
           ) : (
-            <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-[4/3]">
-              <User className="w-1/2 h-1/2 text-gray-500" />
+            <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
+              <User className="w-1/2 h-1/2 text-gray-600" />
             </div>
           )}
         </Link>
       ) : (
         <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
-          <div className="w-full h-full bg-gray-700 flex items-center justify-center aspect-square">
-            <User className="w-1/2 h-1/2 text-gray-500" />
+          <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
+            <User className="w-1/2 h-1/2 text-gray-600" />
           </div>
         </div>
       )}

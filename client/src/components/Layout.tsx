@@ -64,7 +64,7 @@ const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
   };
 
   return (
-    <header className="bg-gray-900 border-b border-gray-800 backdrop-blur-sm sticky top-0 z-50">
+    <header className="bg-gray-900 border-b border-white backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center h-16">
           <nav className="flex space-x-2">

@@ -166,7 +166,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       )}
       
       {/* Square Image with Border */}
-      <div className={`${imageSizeClasses[size]} rounded overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
+      <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
         {dog?.image_url ? (
           <img
             src={dog.image_url}
@@ -581,7 +581,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
   }, []);
 
   return (
-    <div className="bg-arbor rounded-lg p-8 w-full">
+    <div className="bg-arbor p-8 w-full">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-xl font-semibold text-white">Breeding Simulator - 6 Generation Pedigree</h2>
         <button

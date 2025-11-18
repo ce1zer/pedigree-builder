@@ -8,7 +8,6 @@ import { ArrowLeft, Edit, Users, TreePine, User, Download, Upload, Camera, Trash
 import Cropper from 'react-easy-crop';
 import { Dog, DogFormData } from '@/types';
 import { dogsApi } from '@/services/api';
-import { formatDate } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
 
@@ -1672,16 +1671,6 @@ const DogProfile: React.FC = () => {
             <PedigreeTree generations={pedigreeGenerations} imageCacheBuster={imageCacheBuster} />
           )}
 
-          {/* Metadata */}
-          <div className="card-spotify">
-            <h3 className="text-lg font-semibold text-white mb-4">Metadata</h3>
-            <div className="space-y-3 text-sm">
-              <div>
-                <span className="text-gray-400">Created:</span>
-                <span className="ml-2 text-white">{formatDate(dog.created_at)}</span>
-              </div>
-            </div>
-          </div>
         </div>
       )}
     </div>

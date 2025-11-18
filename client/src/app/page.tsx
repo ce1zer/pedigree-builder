@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { Plus, Edit, Users } from 'lucide-react';
 import { Dog } from '@/types';
 import { dogsApi } from '@/services/api';
-import { formatDate, getAge } from '@/utils/helpers';
 import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
@@ -159,9 +158,6 @@ const Dashboard: React.FC = () => {
                   )}
                   <p className="text-sm text-gray-400">
                     {dog.gender === 'male' ? 'Male' : 'Female'}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    Created: {formatDate(dog.created_at)}
                   </p>
                 </div>
               </div>

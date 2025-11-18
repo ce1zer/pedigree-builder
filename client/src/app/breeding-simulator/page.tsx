@@ -132,7 +132,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   };
 
   const isUnknown = !dog;
-  const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-white';
+  const imageBorderColor = isUnknown ? 'border-gray-600' : 'border-supabase';
 
   // For large and medium sizes (1st and 2nd generation), use vertical layout (image on top, text below)
   // For small (3rd generation): father's side = text left, mother's side = text right
@@ -179,14 +179,14 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
             />
           ) : (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
-              <User className="w-1/2 h-1/2 text-gray-600" />
+              <User className="w-1/2 h-1/2 text-gray-500" />
             </div>
           )}
         </Link>
       ) : (
         <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
           <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
-            <User className="w-1/2 h-1/2 text-gray-600" />
+            <User className="w-1/2 h-1/2 text-gray-500" />
           </div>
         </div>
       )}
@@ -978,7 +978,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                 placeholder="Search by name or kennel..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-white"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3ecf8e]"
                 autoFocus
               />
             </div>

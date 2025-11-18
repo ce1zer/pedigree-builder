@@ -1,37 +1,51 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   Spotify-Inspired Design System
+   Supabase-Inspired Design System
    ========================================================================== */
 
-/* CSS Custom Properties (Design Tokens) */
+/* CSS Custom Properties (Design Tokens) - Supabase Color Scheme */
 :root {
-  /* Color Palette */
-  --background: #121212;
-  --foreground: #ffffff;
-  --primary-button: #ffffff;
-  --primary-button-hover: #e5e5e5;
-  --card-bg: #181818;
-  --card-hover: #282828;
-  --border-color: #2a2a2a;
-  --text-secondary: #b3b3b3;
-  --text-muted: #6b7280;
+  /* Supabase Color Palette */
+  --background: hsl(240, 10%, 3.9%); /* #0a0d14 - Dark blue-grey background */
+  --foreground: hsl(0, 0%, 100%); /* White text */
+  --primary: hsl(142.1, 76.2%, 36.3%); /* #3ecf8e - Supabase green */
+  --primary-foreground: hsl(240, 10%, 3.9%); /* Dark text on green */
+  --primary-hover: hsl(142.1, 76.2%, 42%); /* Slightly lighter green on hover */
+  
+  /* Card Colors */
+  --card-bg: hsl(240, 10%, 3.9%); /* Same as background */
+  --card-hover: hsl(240, 10%, 6%); /* Slightly lighter on hover */
+  --card-foreground: hsl(0, 0%, 100%); /* White text on cards */
+  
+  /* Border Colors */
+  --border-color: hsl(240, 5.9%, 20%); /* Dark border */
+  --border-light: hsl(240, 5.9%, 30%); /* Lighter border */
+  
+  /* Text Colors */
+  --text-primary: hsl(0, 0%, 100%); /* White */
+  --text-secondary: hsl(240, 4.8%, 95.9%); /* Light grey */
+  --text-muted: hsl(240, 3.8%, 46.1%); /* Medium grey */
   
   /* Interactive States */
-  --button-secondary-bg: #2a2a2a;
-  --button-secondary-border: #404040;
-  --button-secondary-hover-bg: #404040;
-  --button-secondary-hover-border: #525252;
+  --button-secondary-bg: hsl(240, 5.9%, 20%);
+  --button-secondary-border: hsl(240, 5.9%, 30%);
+  --button-secondary-hover-bg: hsl(240, 5.9%, 25%);
+  --button-secondary-hover-border: hsl(240, 5.9%, 35%);
   
   /* Input States */
-  --input-bg: #2a2a2a;
-  --input-border: #404040;
-  --input-focus-border: #ffffff;
-  --input-focus-shadow: rgba(255, 255, 255, 0.2);
+  --input-bg: hsl(240, 5.9%, 15%);
+  --input-border: hsl(240, 5.9%, 25%);
+  --input-focus-border: hsl(142.1, 76.2%, 36.3%); /* Supabase green */
+  --input-focus-shadow: rgba(62, 207, 142, 0.2); /* Green shadow */
   
   /* Shadows */
   --shadow-elevated: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-  --shadow-elevated-hover: 0 25px 50px -12px rgba(255, 255, 255, 0.1);
+  --shadow-elevated-hover: 0 25px 50px -12px rgba(62, 207, 142, 0.1); /* Green tint */
+  
+  /* Legacy compatibility */
+  --primary-button: var(--primary);
+  --primary-button-hover: var(--primary-hover);
 }
 
 /* Tailwind Theme Configuration */
@@ -59,10 +73,10 @@ body {
    Button Components
    ========================================================================== */
 
-/* Primary Button - White */
+/* Primary Button - Supabase Green */
 .btn-spotify-primary {
-  background-color: var(--primary-button);
-  color: #000000;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   font-weight: 600;
   padding: 0.75rem 1.5rem;
   border-radius: 9999px;
@@ -77,7 +91,7 @@ body {
 }
 
 .btn-spotify-primary:hover:not(:disabled) {
-  background-color: var(--primary-button-hover);
+  background-color: var(--primary-hover);
   transform: scale(1.05);
 }
 
@@ -246,10 +260,10 @@ body {
    BullyDEX Pedigree Tree Styles
    ========================================================================== */
 
-/* Arbor Container - BullyDEX Style */
+/* Arbor Container - Supabase Style */
 .bg-arbor {
-  background-color: #0a0a0a;
-  border: 1px solid #1a1a1a;
+  background-color: hsl(240, 10%, 3.9%);
+  border: 1px solid hsl(240, 5.9%, 20%);
 }
 
 /* ==========================================================================
@@ -262,11 +276,50 @@ body {
   /* Replace #202937 (blue-grey) with pure grey */
 }
 
-/* Ensure all gray backgrounds use pure grey without blue tint */
+/* Supabase Color Overrides */
 .bg-gray-900 {
-  background-color: #171717 !important; /* Pure dark grey instead of #121827 */
+  background-color: hsl(240, 10%, 3.9%) !important; /* Supabase dark background */
 }
 
 .bg-gray-800 {
-  background-color: #262626 !important; /* Pure grey instead of #202937 */
+  background-color: hsl(240, 10%, 6%) !important; /* Slightly lighter for cards */
+}
+
+.bg-gray-700 {
+  background-color: hsl(240, 5.9%, 15%) !important; /* Input backgrounds */
+}
+
+.bg-gray-600 {
+  background-color: hsl(240, 5.9%, 25%) !important; /* Borders and hover states */
+}
+
+.text-gray-400 {
+  color: hsl(240, 3.8%, 46.1%) !important; /* Muted text */
+}
+
+.text-gray-500 {
+  color: hsl(240, 3.8%, 46.1%) !important; /* Muted text */
+}
+
+.text-gray-300 {
+  color: hsl(240, 4.8%, 95.9%) !important; /* Secondary text */
+}
+
+.border-gray-600 {
+  border-color: hsl(240, 5.9%, 25%) !important; /* Border color */
+}
+
+.border-gray-800 {
+  border-color: hsl(240, 5.9%, 20%) !important; /* Darker border */
+}
+
+/* Supabase Green Border */
+.border-supabase {
+  border-color: hsl(142.1, 76.2%, 36.3%) !important; /* Supabase green */
+}
+
+/* Supabase Green Focus Ring */
+.focus\:ring-supabase:focus {
+  --tw-ring-color: hsl(142.1, 76.2%, 36.3%) !important;
+  box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.2) !important;
 }

@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, User, Download, ChevronDown, X } from 'lucide-react';
+import { ArrowLeft, Download, ChevronDown, X } from 'lucide-react';
 import { Dog } from '@/types';
 import { dogsApi } from '@/services/api';
 import toast from 'react-hot-toast';
@@ -179,14 +179,22 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
             />
           ) : (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
-              <User className="w-1/2 h-1/2 text-gray-500" />
+              <img 
+                src="/placeholder.svg" 
+                alt="No image" 
+                className="w-3/4 h-3/4 object-contain opacity-60"
+              />
             </div>
           )}
         </Link>
       ) : (
         <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
           <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
-            <User className="w-1/2 h-1/2 text-gray-500" />
+            <img 
+              src="/placeholder.svg" 
+              alt="Unknown dog" 
+              className="w-3/4 h-3/4 object-contain opacity-60"
+            />
           </div>
         </div>
       )}

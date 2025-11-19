@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Edit, Users, TreePine, User, Download, Upload, Camera, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, Users, TreePine, Download, Upload, Camera, Trash2 } from 'lucide-react';
 import Cropper from 'react-easy-crop';
 import { Dog, DogFormData } from '@/types';
 import { dogsApi } from '@/services/api';
@@ -433,7 +433,11 @@ const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog, imageCacheBuster }) 
           />
         ) : (
           <div className={`${PHOTO_SIZE} bg-gray-800 rounded-xl flex items-center justify-center`}>
-            <User className={`${USER_ICON_SIZE} text-gray-500`} />
+            <img 
+              src="/placeholder.svg" 
+              alt="No image" 
+              className="w-3/4 h-3/4 object-contain opacity-60"
+            />
           </div>
         )}
       </div>
@@ -533,14 +537,22 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
             />
           ) : (
             <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
-              <User className="w-1/2 h-1/2 text-gray-500" />
+              <img 
+                src="/placeholder.svg" 
+                alt="No image" 
+                className="w-3/4 h-3/4 object-contain opacity-60"
+              />
             </div>
           )}
         </Link>
       ) : (
         <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
           <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
-            <User className="w-1/2 h-1/2 text-gray-500" />
+            <img 
+              src="/placeholder.svg" 
+              alt="Unknown dog" 
+              className="w-3/4 h-3/4 object-contain opacity-60"
+            />
           </div>
         </div>
       )}

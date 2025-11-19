@@ -483,9 +483,7 @@ const AddDog: React.FC = () => {
     try {
       setIsSubmitting(true);
       
-      console.log('Submitting dog data:', data);
       const response = await dogsApi.create(data);
-      console.log('API response:', response);
       
       if (response.success && response.data) {
         toast.success(`${data.dog_name} has been successfully added!`);

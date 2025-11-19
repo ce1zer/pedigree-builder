@@ -72,8 +72,6 @@ const uploadPhoto = async (photo: File, dogId: string): Promise<string | null> =
       .from(STORAGE_BUCKET)
       .getPublicUrl(filePath);
     
-    console.log('Photo uploaded to:', filePath, 'Public URL:', publicUrl);
-    
     return publicUrl;
   } catch (error) {
     console.error('Photo upload error:', error);
@@ -155,24 +153,15 @@ export async function PUT(
 
     // Handle photo upload if provided
     let imageUrl = null;
-    console.log('Photo upload check:', {
-      hasPhoto: !!photo,
-      photoSize: photo?.size,
-      photoName: photo?.name,
-      photoType: photo?.type
-    });
     
     if (photo && photo.size > 0) {
       try {
         // Upload cropped photo to /dogs/{dogId}/photo.jpg
         imageUrl = await uploadPhoto(photo, id);
-        console.log('Cropped photo uploaded successfully to:', imageUrl);
       } catch (error) {
         console.error('Photo upload error:', error);
         throw new Error('Failed to upload photo: ' + (error instanceof Error ? error.message : 'Unknown error'));
       }
-    } else {
-      console.log('No photo provided or photo is empty');
     }
 
     // Prepare update data
@@ -188,9 +177,6 @@ export async function PUT(
     // Only update image_url if a new photo was uploaded
     if (imageUrl) {
       updateData.image_url = imageUrl;
-      console.log('Updating image_url to:', imageUrl);
-    } else {
-      console.log('No image URL to update - keeping existing image');
     }
 
     const { data, error } = await supabase

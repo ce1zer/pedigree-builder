@@ -115,14 +115,8 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
     }
 
     try {
-      console.log('Starting crop process...');
-      
       // Get cropped image as Blob
       const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
-      console.log('Cropped image blob:', {
-        size: croppedImageBlob.size,
-        type: croppedImageBlob.type
-      });
       
       // Verify the blob is valid
       if (croppedImageBlob.size === 0) {
@@ -135,20 +129,12 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
         lastModified: Date.now()
       });
       
-      console.log('Created file from cropped blob:', {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        lastModified: file.lastModified
-      });
-      
       // Verify the file is valid
       if (file.size === 0) {
         throw new Error('Cropped image file is empty');
       }
       
       // Pass the cropped file to the parent component
-      console.log('Calling onPhotoChange with cropped file');
       onPhotoChange(file);
       
       // Reset crop state
@@ -197,8 +183,6 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
         ? `${photoPreview}&_crop=${Date.now()}` 
         : `${photoPreview}?_crop=${Date.now()}`;
       
-      console.log('Loading existing photo for cropping:', urlWithCacheBust);
-      
       const response = await fetch(urlWithCacheBust, {
         mode: 'cors',
         cache: 'no-cache'
@@ -213,12 +197,9 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
         throw new Error('Fetched image is empty');
       }
       
-      console.log('Fetched image blob:', { size: blob.size, type: blob.type });
-      
       const reader = new FileReader();
       reader.onload = () => {
         const dataUrl = reader.result as string;
-        console.log('Image loaded as data URL, opening crop modal');
         setImageSrc(dataUrl);
         setShowCrop(true);
       };
@@ -1351,30 +1332,12 @@ const DogProfile: React.FC = () => {
         photo: photoToUpload,
       };
       
-      // Debug: Log photo information
-      console.log('Submitting form data:', {
-        ...formData,
-        photo: formData.photo ? `File: ${formData.photo.name} (${formData.photo.size} bytes), type: ${formData.photo.type}` : 'No photo',
-        hasPhoto: !!formData.photo,
-        photoFile: !!photoFile,
-        currentPhoto: !!currentPhoto,
-        dataPhoto: !!data.photo,
-      });
-      
       // Ensure we have a photo file to upload
       if (!formData.photo) {
         console.warn('No photo file found in form data - form will be submitted without photo');
-      } else {
-        console.log('Photo file found, will be uploaded:', formData.photo.name, formData.photo.size, 'bytes');
       }
       
       const response = await dogsApi.update(id!, formData);
-      
-      console.log('Update response:', {
-        success: response.success,
-        image_url: response.data?.image_url,
-        error: response.error
-      });
       
       if (response.success) {
         toast.success('Dog profile updated successfully!');
@@ -1398,8 +1361,6 @@ const DogProfile: React.FC = () => {
           // Update dog state once with full response data
           // This will trigger the useEffect to rebuild pedigree automatically
           setDog(updatedDog);
-          
-          console.log('Dog updated with new image:', updatedDog.image_url);
         }
       } else {
         toast.error(response.error || 'Error updating dog profile');

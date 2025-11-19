@@ -42,9 +42,7 @@ export const dogsApi = {
    * Retrieve all dogs with their parent information
    */
   getAll: async (): Promise<ApiResponse<Dog[]>> => {
-    console.log('Making API call to:', API_BASE_URL + '/dogs');
     const response = await api.get('/dogs');
-    console.log('Raw API response:', response);
     return handleApiResponse(response);
   },
 
@@ -105,6 +103,3 @@ export const dogsApi = {
     return handleApiResponse(response);
   },
 };
-
-// Export the axios instance for direct use if needed
-export default api;

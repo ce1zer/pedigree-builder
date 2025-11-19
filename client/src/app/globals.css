@@ -42,10 +42,6 @@
   /* Shadows */
   --shadow-elevated: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   --shadow-elevated-hover: 0 25px 50px -12px rgba(62, 207, 142, 0.1); /* Green tint */
-  
-  /* Legacy compatibility */
-  --primary-button: var(--primary);
-  --primary-button-hover: var(--primary-hover);
 }
 
 /* Tailwind Theme Configuration */
@@ -216,47 +212,6 @@ body {
 }
 
 /* ==========================================================================
-   Utility Classes
-   ========================================================================== */
-
-/* Focus Management */
-.focus-spotify:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--input-focus-shadow);
-}
-
-/* Smooth Transitions */
-.transition-spotify {
-  transition: all 0.2s ease;
-}
-
-/* Text Colors */
-.text-spotify-primary {
-  color: var(--foreground);
-}
-
-.text-spotify-secondary {
-  color: var(--text-secondary);
-}
-
-.text-spotify-muted {
-  color: var(--text-muted);
-}
-
-/* Background Colors */
-.bg-spotify-primary {
-  background-color: var(--background);
-}
-
-.bg-spotify-card {
-  background-color: var(--card-bg);
-}
-
-.bg-spotify-card-hover {
-  background-color: var(--card-hover);
-}
-
-/* ==========================================================================
    BullyDEX Pedigree Tree Styles
    ========================================================================== */
 
@@ -267,14 +222,8 @@ body {
 }
 
 /* ==========================================================================
-   Color Overrides - Remove Blue Tints
+   Color Overrides
    ========================================================================== */
-
-/* Override any blue-tinted grays with pure grey tones */
-* {
-  /* Replace #121827 (dark blue-grey) with pure dark grey */
-  /* Replace #202937 (blue-grey) with pure grey */
-}
 
 /* Supabase Color Overrides */
 .bg-gray-900 {
@@ -311,15 +260,4 @@ body {
 
 .border-gray-800 {
   border-color: hsl(240, 5.9%, 20%) !important; /* Darker border */
-}
-
-/* Supabase Green Border */
-.border-supabase {
-  border-color: hsl(142.1, 76.2%, 36.3%) !important; /* Supabase green */
-}
-
-/* Supabase Green Focus Ring */
-.focus\:ring-supabase:focus {
-  --tw-ring-color: hsl(142.1, 76.2%, 36.3%) !important;
-  box-shadow: 0 0 0 2px rgba(62, 207, 142, 0.2) !important;
 }

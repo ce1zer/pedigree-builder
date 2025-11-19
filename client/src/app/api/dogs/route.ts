@@ -198,8 +198,6 @@ export async function POST(request: NextRequest) {
       image_url: imageUrl
     };
     
-    console.log('Inserting dog data:', { ...insertData, image_url: imageUrl ? '[URL]' : null });
-    
     // Create new dog record
     const { data, error } = await supabase
       .from('dogs')

@@ -163,18 +163,18 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {/* For small size on father's side (3rd generation), text comes first (left side) */}
       {isSmallWithTextLeft && (
         <div className="flex-1 min-w-0 flex flex-col justify-center text-right">
-          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight`}>
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue`}>
             {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
           </p>
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-0.5`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-0.5 font-bebas-neue`}
             >
               {dog.dog_name}
             </Link>
           ) : (
-            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-0.5`}>
+            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-0.5 font-bebas-neue`}>
               UNKNOWN
             </p>
           )}
@@ -210,18 +210,18 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {/* Dog Info - For large and medium sizes (vertical layout) and small size on mother's side (text right) */}
       {(size === 'large' || size === 'medium' || (size === 'small' && side === 'mother')) && (
         <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight`}>
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue`}>
             {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
           </p>
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-0.5`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-0.5 font-bebas-neue`}
             >
               {dog.dog_name}
             </Link>
           ) : (
-            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-0.5`}>
+            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-0.5 font-bebas-neue`}>
               UNKNOWN
             </p>
           )}
@@ -640,22 +640,22 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         {/* Generation Labels - 6 columns */}
         <div className="grid grid-cols-6 gap-x-[0.2rem] mb-8">
           <div className="text-left">
-            <p className="text-sm text-white uppercase font-bold tracking-wider">Father 3rd gen</p>
+            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Father 3rd gen</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider">Father 2nd gen</p>
+            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Father 2nd gen</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider">Father</p>
+            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Father</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider">Mother</p>
+            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Mother</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider">Mother 2nd gen</p>
+            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 2nd gen</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider">Mother 3rd gen</p>
+            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 3rd gen</p>
           </div>
         </div>
 

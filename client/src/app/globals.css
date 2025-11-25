@@ -49,6 +49,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-bebas-neue: var(--font-bebas-neue);
 }
 
 /* ==========================================================================
@@ -219,6 +220,11 @@ body {
 .bg-arbor {
   background-color: #121212;
   border: 1px solid hsl(240, 5.9%, 20%);
+}
+
+/* Bebas Neue Font for Pedigree Trees */
+.font-bebas-neue {
+  font-family: var(--font-bebas-neue), sans-serif;
 }
 
 /* ==========================================================================

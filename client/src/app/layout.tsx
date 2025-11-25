@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import Layout from "@/components/Layout";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
+const bebasNeue = Bebas_Neue({ 
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-bebas-neue"
+});
 
 export const metadata: Metadata = {
   title: "PedigreeBuilder - Dog Pedigrees",
@@ -18,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${bebasNeue.variable}`}>
         <Layout>
           {children}
         </Layout>

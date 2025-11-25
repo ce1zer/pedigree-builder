@@ -563,18 +563,18 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
       
       {/* Dog Info - Vertical Layout for text content */}
       <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-        <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight`}>
+        <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue`}>
           {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
         </p>
         {dog ? (
           <Link 
             href={`/dogs/${dog.id}`}
-            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-1`}
+            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-1 font-bebas-neue`}
           >
             {dog.dog_name}
           </Link>
         ) : (
-          <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-1`}>
+          <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-1 font-bebas-neue`}>
             UNKNOWN
           </p>
         )}
@@ -592,11 +592,11 @@ const MainDogDisplay: React.FC<MainDogDisplayProps> = ({ dog }) => {
   return (
     <div className="flex flex-col items-center mb-8">
       {/* Main Dog Name - Large */}
-      <h2 className="text-6xl font-bold text-white uppercase mb-2 tracking-wide">
+      <h2 className="text-6xl font-bold text-white uppercase mb-2 tracking-wide font-bebas-neue">
         {dog.dog_name}
       </h2>
       {/* Kennel Name */}
-      <p className="text-xl text-[#717179] uppercase font-medium tracking-wider">
+      <p className="text-xl text-[#717179] uppercase font-medium tracking-wider font-bebas-neue">
         {dog.primary_kennel}
       </p>
     </div>
@@ -1101,13 +1101,13 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
         {/* Generation Labels */}
         <div className="grid grid-cols-3 gap-x-8 mb-8">
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider">1st generation</p>
+            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">1st generation</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider">2nd generation</p>
+            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">2nd generation</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider">3rd generation</p>
+            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">3rd generation</p>
           </div>
         </div>
 

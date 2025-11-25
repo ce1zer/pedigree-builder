@@ -512,16 +512,16 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
 
   const textSizeClasses = {
     large: {
-      kennel: 'text-sm',
-      name: 'text-lg'
+      kennel: 'text-[12.5pt]',
+      name: 'text-[15.5pt]'
     },
     medium: {
-      kennel: 'text-xs',
-      name: 'text-sm'
+      kennel: 'text-[11pt]',
+      name: 'text-[12.5pt]'
     },
     small: {
-      kennel: 'text-[9px]',
-      name: 'text-[12px]'
+      kennel: 'text-[8.75pt]',
+      name: 'text-[11pt]'
     }
   };
 
@@ -1101,13 +1101,13 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
         {/* Generation Labels */}
         <div className="grid grid-cols-3 gap-x-8 mb-8">
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">1st generation</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">1st generation</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">2nd generation</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">2nd generation</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">3rd generation</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">3rd generation</p>
           </div>
         </div>
 

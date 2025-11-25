@@ -134,16 +134,16 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
 
   const textSizeClasses = {
     large: {
-      kennel: 'text-sm',
-      name: 'text-lg'
+      kennel: 'text-[12.5pt]',
+      name: 'text-[15.5pt]'
     },
     medium: {
-      kennel: 'text-[8pt]',
-      name: 'text-[10pt]'
+      kennel: 'text-[10pt]',
+      name: 'text-[12pt]'
     },
     small: {
-      kennel: 'text-[8pt]',
-      name: 'text-[12px]'
+      kennel: 'text-[10pt]',
+      name: 'text-[11pt]'
     }
   };
 
@@ -640,22 +640,22 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         {/* Generation Labels - 6 columns */}
         <div className="grid grid-cols-6 gap-x-[0.2rem] mb-8">
           <div className="text-left">
-            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Father 3rd gen</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father 3rd gen</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Father 2nd gen</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father 2nd gen</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Father</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Mother</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 2nd gen</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 2nd gen</p>
           </div>
           <div className="text-center">
-            <p className="text-sm text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 3rd gen</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 3rd gen</p>
           </div>
         </div>
 

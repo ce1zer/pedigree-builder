@@ -415,6 +415,9 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           const letterSpacing = computed.letterSpacing;
           const whiteSpace = computed.whiteSpace;
           const textOverflow = computed.textOverflow;
+          const textDecoration = computed.textDecoration;
+          const textDecorationLine = computed.textDecorationLine;
+          const verticalAlign = computed.verticalAlign;
           const aspectRatio = computed.aspectRatio;
           const boxSizing = computed.boxSizing;
           const overflow = computed.overflow;
@@ -484,8 +487,9 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           if (textTransform) setStyleIfNotInline('text-transform', textTransform);
           if (lineHeight) setStyleIfNotInline('line-height', lineHeight);
           if (letterSpacing) setStyleIfNotInline('letter-spacing', letterSpacing);
-          if (whiteSpace) setStyleIfNotInline('white-space', whiteSpace);
-          if (textOverflow) setStyleIfNotInline('text-overflow', textOverflow);
+          if (textDecoration) setStyleIfNotInline('text-decoration', textDecoration);
+          if (textDecorationLine) setStyleIfNotInline('text-decoration-line', textDecorationLine);
+          if (verticalAlign) setStyleIfNotInline('vertical-align', verticalAlign);
           if (aspectRatio) setStyleIfNotInline('aspect-ratio', aspectRatio);
           if (boxSizing) setStyleIfNotInline('box-sizing', boxSizing);
           if (objectFit) setStyleIfNotInline('object-fit', objectFit);
@@ -506,17 +510,27 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             }
           }
           
-          // For text elements, ensure overflow is visible to show all text
+          // For text elements, preserve exact layout and alignment
           if (tagName === 'p' || tagName === 'a' || tagName === 'span' || (tagName === 'div' && cloneEl.textContent?.trim())) {
-            if (overflow === 'hidden' || overflowX === 'hidden' || overflowY === 'hidden') {
+            // Preserve white-space to maintain exact text layout (keep nowrap if set)
+            if (whiteSpace) setStyleIfNotInline('white-space', whiteSpace);
+            // Preserve text-overflow to maintain exact text behavior
+            if (textOverflow) setStyleIfNotInline('text-overflow', textOverflow);
+            // Only make overflow visible if it's hidden, but preserve other overflow settings
+            if (overflow === 'hidden') {
               cloneEl.style.setProperty('overflow', 'visible');
-              cloneEl.style.setProperty('overflow-x', 'visible');
-              cloneEl.style.setProperty('overflow-y', 'visible');
+            } else if (overflow) {
+              setStyleIfNotInline('overflow', overflow);
             }
-            // Remove text truncation for export - check computed styles
-            if (whiteSpace === 'nowrap' || textOverflow === 'ellipsis') {
-              cloneEl.style.setProperty('white-space', 'normal');
-              cloneEl.style.setProperty('text-overflow', 'clip');
+            if (overflowX === 'hidden') {
+              cloneEl.style.setProperty('overflow-x', 'visible');
+            } else if (overflowX) {
+              setStyleIfNotInline('overflow-x', overflowX);
+            }
+            if (overflowY === 'hidden') {
+              cloneEl.style.setProperty('overflow-y', 'visible');
+            } else if (overflowY) {
+              setStyleIfNotInline('overflow-y', overflowY);
             }
           } else {
             if (overflow) setStyleIfNotInline('overflow', overflow);
@@ -539,14 +553,14 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             }
           }
           
-          if (computed.borderColor && computed.borderColor !== 'rgba(0, 0, 0, 0)') {
-            const borderStyle = computed.borderStyle;
-            if (borderStyle && borderStyle !== 'none') {
-              if (cloneEl.querySelector('img') || cloneEl.textContent?.trim()) {
-                cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
-              } else {
-                cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
-              }
+          // Preserve border color exactly as rendered
+          const borderColor = computed.borderColor;
+          if (borderColor && borderColor !== 'rgba(0, 0, 0, 0)' && borderStyle && borderStyle !== 'none') {
+            // Convert rgba to rgb for consistency, but preserve the actual color
+            if (borderColor.includes('rgb')) {
+              cloneEl.style.setProperty('border-color', borderColor);
+            } else {
+              cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
             }
           }
           
@@ -575,6 +589,15 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           firstChild.remove();
         }
       }
+      
+      // Apply computed styles to the root clone to ensure exact layout match
+      const rootComputed = window.getComputedStyle(pedigreeRef.current);
+      isolatedClone.style.width = rootComputed.width;
+      isolatedClone.style.height = rootComputed.height;
+      isolatedClone.style.maxWidth = rootComputed.maxWidth;
+      isolatedClone.style.padding = rootComputed.padding;
+      isolatedClone.style.margin = rootComputed.margin;
+      isolatedClone.style.backgroundColor = 'transparent';
       
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';

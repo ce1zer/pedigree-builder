@@ -803,6 +803,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           const letterSpacing = computed.letterSpacing;
           const whiteSpace = computed.whiteSpace;
           const textOverflow = computed.textOverflow;
+          const textDecoration = computed.textDecoration;
+          const textDecorationLine = computed.textDecorationLine;
+          const verticalAlign = computed.verticalAlign;
           const visibility = computed.visibility;
           const opacity = computed.opacity;
           
@@ -874,8 +877,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           if (objectPosition) setStyleIfNotInline('object-position', objectPosition);
           if (lineHeight) setStyleIfNotInline('line-height', lineHeight);
           if (letterSpacing) setStyleIfNotInline('letter-spacing', letterSpacing);
-          if (whiteSpace) setStyleIfNotInline('white-space', whiteSpace);
-          if (textOverflow) setStyleIfNotInline('text-overflow', textOverflow);
+          if (textDecoration) setStyleIfNotInline('text-decoration', textDecoration);
+          if (textDecorationLine) setStyleIfNotInline('text-decoration-line', textDecorationLine);
+          if (verticalAlign) setStyleIfNotInline('vertical-align', verticalAlign);
           if (visibility) setStyleIfNotInline('visibility', visibility);
           if (opacity) setStyleIfNotInline('opacity', opacity);
           
@@ -922,16 +926,30 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
             cloneEl.style.setProperty('opacity', '1');
           }
           
-          // For text elements, ensure visibility and proper rendering
+          // For text elements, preserve exact layout and alignment
           if (tagName === 'p' || tagName === 'span' || tagName === 'a' || tagName === 'div' || tagName === 'h1' || tagName === 'h2' || tagName === 'h3') {
             // Ensure text is visible
             cloneEl.style.setProperty('visibility', 'visible');
             cloneEl.style.setProperty('opacity', '1');
-            // Remove any text truncation
-            if (whiteSpace === 'nowrap' || textOverflow === 'ellipsis') {
-              cloneEl.style.setProperty('white-space', 'normal');
-              cloneEl.style.setProperty('text-overflow', 'clip');
+            // Preserve white-space to maintain exact text layout (keep nowrap if set)
+            if (whiteSpace) setStyleIfNotInline('white-space', whiteSpace);
+            // Preserve text-overflow to maintain exact text behavior
+            if (textOverflow) setStyleIfNotInline('text-overflow', textOverflow);
+            // Only make overflow visible if it's hidden, but preserve other overflow settings
+            if (overflow === 'hidden') {
               cloneEl.style.setProperty('overflow', 'visible');
+            } else if (overflow) {
+              setStyleIfNotInline('overflow', overflow);
+            }
+            if (overflowX === 'hidden') {
+              cloneEl.style.setProperty('overflow-x', 'visible');
+            } else if (overflowX) {
+              setStyleIfNotInline('overflow-x', overflowX);
+            }
+            if (overflowY === 'hidden') {
+              cloneEl.style.setProperty('overflow-y', 'visible');
+            } else if (overflowY) {
+              setStyleIfNotInline('overflow-y', overflowY);
             }
             // Ensure text color is set
             if (computed.color && computed.color !== 'rgba(0, 0, 0, 0)') {
@@ -1009,9 +1027,20 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       // Wait for all images to load
       await Promise.all(imagePromises);
       
-      // Create temporary container with exact dimensions
+      // Apply computed styles to the root clone to ensure exact layout match
+      const rootComputed = window.getComputedStyle(pedigreeRef.current);
       const originalWidth = pedigreeRef.current.offsetWidth;
       const originalHeight = pedigreeRef.current.offsetHeight;
+      
+      // Apply all computed styles to root clone for exact match
+      isolatedClone.style.width = rootComputed.width;
+      isolatedClone.style.height = rootComputed.height;
+      isolatedClone.style.maxWidth = rootComputed.maxWidth;
+      isolatedClone.style.maxHeight = rootComputed.maxHeight;
+      isolatedClone.style.padding = rootComputed.padding;
+      isolatedClone.style.margin = rootComputed.margin;
+      isolatedClone.style.backgroundColor = 'transparent';
+      isolatedClone.style.display = rootComputed.display;
       
       const tempContainer = document.createElement('div');
       tempContainer.style.position = 'absolute';
@@ -1021,12 +1050,6 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       tempContainer.style.height = originalHeight + 'px';
       tempContainer.style.backgroundColor = 'transparent';
       tempContainer.style.overflow = 'visible';
-      
-      // Ensure the clone maintains the exact dimensions
-      isolatedClone.style.width = originalWidth + 'px';
-      isolatedClone.style.height = originalHeight + 'px';
-      isolatedClone.style.maxWidth = originalWidth + 'px';
-      isolatedClone.style.maxHeight = originalHeight + 'px';
       
       tempContainer.appendChild(isolatedClone);
       document.body.appendChild(tempContainer);

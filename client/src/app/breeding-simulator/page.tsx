@@ -134,49 +134,47 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
 
   const textSizeClasses = {
     large: {
-      kennel: 'text-[14.5pt]',
-      name: 'text-[17.5pt]'
+      kennel: 'text-[12.5pt]',
+      name: 'text-[15.5pt]'
     },
     medium: {
-      kennel: 'text-[12pt]',
-      name: 'text-[14pt]'
+      kennel: 'text-[10pt]',
+      name: 'text-[12pt]'
     },
     small: {
-      kennel: 'text-[12pt]',
-      name: 'text-[13pt]'
+      kennel: 'text-[10pt]',
+      name: 'text-[11pt]'
     }
   };
 
   const isUnknown = !dog;
   const imageBorderColor = 'border-white';
 
-  // For large size (1st generation), text is centered on the image
-  // For medium size (2nd generation), use vertical layout (image on top, text below)
+  // For large and medium sizes (1st and 2nd generation), use vertical layout (image on top, text below)
   // For small (3rd generation): father's side = text left, mother's side = text right
-  const isLargeSize = size === 'large';
-  const isVerticalLayout = size === 'medium';
+  const isVerticalLayout = size === 'large' || size === 'medium';
   const isSmallWithTextLeft = size === 'small' && side === 'father';
   
   // Reduce gap for medium size (2nd gen) to prevent overlap, but keep centered alignment
   const gapClass = size === 'medium' ? 'gap-1' : 'gap-3';
   
   return (
-    <div className={`${sizeClasses[size]} flex ${isLargeSize ? 'relative' : isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass}`}>
+    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass}`}>
       {/* For small size on father's side (3rd generation), text comes first (left side) */}
       {isSmallWithTextLeft && (
         <div className="flex-1 min-w-0 flex flex-col justify-center text-right">
-          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue whitespace-nowrap`}>
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue`}>
             {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
           </p>
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-0.5 font-bebas-neue whitespace-nowrap`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-0.5 font-bebas-neue`}
             >
               {dog.dog_name}
             </Link>
           ) : (
-            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-0.5 font-bebas-neue whitespace-nowrap`}>
+            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-0.5 font-bebas-neue`}>
               UNKNOWN
             </p>
           )}
@@ -187,7 +185,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {dog ? (
         <Link 
           href={`/dogs/${dog.id}`} 
-          className={`${imageSizeClasses[size]} ${isLargeSize ? 'w-full' : ''} overflow-hidden ${isVerticalLayout || isLargeSize ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2 hover:underline block ${isLargeSize ? 'relative' : ''}`}
+          className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2 hover:underline block`}
         >
           {dog?.image_url ? (
             <img
@@ -200,63 +198,30 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
               <PlaceholderSVG />
             </div>
           )}
-          {/* Text centered on image for large size (1st generation) */}
-          {isLargeSize && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2">
-              <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue whitespace-nowrap`} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
-                {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
-              </p>
-              {dog ? (
-                <Link 
-                  href={`/dogs/${dog.id}`}
-                  className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline mt-0.5 font-bebas-neue whitespace-nowrap`}
-                  style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {dog.dog_name}
-                </Link>
-              ) : (
-                <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-0.5 font-bebas-neue whitespace-nowrap`} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
-                  UNKNOWN
-                </p>
-              )}
-            </div>
-          )}
         </Link>
       ) : (
-        <div className={`${imageSizeClasses[size]} ${isLargeSize ? 'w-full' : ''} overflow-hidden ${isVerticalLayout || isLargeSize ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2 ${isLargeSize ? 'relative' : ''}`}>
+        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
           <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
             <PlaceholderSVG />
           </div>
-          {/* Text centered on image for large size (1st generation) */}
-          {isLargeSize && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2">
-              <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue whitespace-nowrap`} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
-                UNKNOWN
-              </p>
-              <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-0.5 font-bebas-neue whitespace-nowrap`} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
-                UNKNOWN
-              </p>
-            </div>
-          )}
         </div>
       )}
       
-      {/* Dog Info - For medium size (vertical layout) and small size on mother's side (text right) */}
-      {(isVerticalLayout || (size === 'small' && side === 'mother')) && (
+      {/* Dog Info - For large and medium sizes (vertical layout) and small size on mother's side (text right) */}
+      {(size === 'large' || size === 'medium' || (size === 'small' && side === 'mother')) && (
         <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue whitespace-nowrap`}>
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue`}>
             {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
           </p>
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-0.5 font-bebas-neue whitespace-nowrap`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-0.5 font-bebas-neue`}
             >
               {dog.dog_name}
             </Link>
           ) : (
-            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-0.5 font-bebas-neue whitespace-nowrap`}>
+            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-0.5 font-bebas-neue`}>
               UNKNOWN
             </p>
           )}
@@ -675,22 +640,22 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         {/* Generation Labels - 6 columns */}
         <div className="grid grid-cols-6 gap-x-[0.2rem] mb-8">
           <div className="text-left">
-            <p className="text-[14.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father 3rd gen</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father 3rd gen</p>
           </div>
           <div className="text-center">
-            <p className="text-[14.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father 2nd gen</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father 2nd gen</p>
           </div>
           <div className="text-center">
-            <p className="text-[14.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father</p>
           </div>
           <div className="text-center">
-            <p className="text-[14.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother</p>
           </div>
           <div className="text-center">
-            <p className="text-[14.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 2nd gen</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 2nd gen</p>
           </div>
           <div className="text-center">
-            <p className="text-[14.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 3rd gen</p>
+            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 3rd gen</p>
           </div>
         </div>
 

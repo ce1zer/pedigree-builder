@@ -512,33 +512,33 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
 
   const textSizeClasses = {
     large: {
-      kennel: 'text-[12.5pt]',
-      name: 'text-[15.5pt]'
+      kennel: 'text-[14.5pt]',
+      name: 'text-[17.5pt]'
     },
     medium: {
-      kennel: 'text-[11pt]',
-      name: 'text-[12.5pt]'
+      kennel: 'text-[13pt]',
+      name: 'text-[14.5pt]'
     },
     small: {
-      kennel: 'text-[8.75pt]',
-      name: 'text-[11pt]'
+      kennel: 'text-[10.75pt]',
+      name: 'text-[13pt]'
     }
   };
 
   const isUnknown = !dog;
   const imageBorderColor = 'border-white';
 
-  // For large size (1st generation), use vertical layout (image on top, text below)
+  // For large size (1st generation), text is centered on the image
   // For medium and small sizes (2nd and 3rd generation), use horizontal layout (image left, text right)
-  const isVerticalLayout = size === 'large';
+  const isLargeSize = size === 'large';
   
   return (
-    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} gap-3`}>
+    <div className={`${sizeClasses[size]} flex ${isLargeSize ? 'relative' : 'items-center'} gap-3`}>
       {/* Square Image with Border - Clickable if dog exists */}
       {dog ? (
         <Link 
           href={`/dogs/${dog.id}`} 
-          className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2 hover:underline block`}
+          className={`${imageSizeClasses[size]} ${isLargeSize ? 'w-full' : ''} overflow-hidden flex-shrink-0 ${imageBorderColor} border-2 hover:underline block ${isLargeSize ? 'relative' : ''}`}
         >
           {getImageUrl(dog?.image_url) ? (
             <img
@@ -552,33 +552,68 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
               <PlaceholderSVG />
             </div>
           )}
+          {/* Text centered on image for large size (1st generation) */}
+          {isLargeSize && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2">
+              <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue whitespace-nowrap`} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
+                {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
+              </p>
+              {dog ? (
+                <Link 
+                  href={`/dogs/${dog.id}`}
+                  className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline mt-1 font-bebas-neue whitespace-nowrap`}
+                  style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {dog.dog_name}
+                </Link>
+              ) : (
+                <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-1 font-bebas-neue whitespace-nowrap`} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
+                  UNKNOWN
+                </p>
+              )}
+            </div>
+          )}
         </Link>
       ) : (
-        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
+        <div className={`${imageSizeClasses[size]} ${isLargeSize ? 'w-full' : ''} overflow-hidden flex-shrink-0 ${imageBorderColor} border-2 ${isLargeSize ? 'relative' : ''}`}>
           <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
             <PlaceholderSVG />
           </div>
+          {/* Text centered on image for large size (1st generation) */}
+          {isLargeSize && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2">
+              <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue whitespace-nowrap`} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
+                UNKNOWN
+              </p>
+              <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-1 font-bebas-neue whitespace-nowrap`} style={{ textShadow: '0 1px 2px rgba(0,0,0,0.8)' }}>
+                UNKNOWN
+              </p>
+            </div>
+          )}
         </div>
       )}
       
-      {/* Dog Info - Vertical Layout for text content */}
-      <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-        <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue`}>
-          {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
-        </p>
-        {dog ? (
-          <Link 
-            href={`/dogs/${dog.id}`}
-            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-1 font-bebas-neue`}
-          >
-            {dog.dog_name}
-          </Link>
-        ) : (
-          <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-1 font-bebas-neue`}>
-            UNKNOWN
+      {/* Dog Info - Horizontal Layout for medium and small sizes (2nd and 3rd generation) */}
+      {!isLargeSize && (
+        <div className="flex-1 min-w-0 flex flex-col justify-center">
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue whitespace-nowrap`}>
+            {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
           </p>
-        )}
-      </div>
+          {dog ? (
+            <Link 
+              href={`/dogs/${dog.id}`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-1 font-bebas-neue whitespace-nowrap`}
+            >
+              {dog.dog_name}
+            </Link>
+          ) : (
+            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-1 font-bebas-neue whitespace-nowrap`}>
+              UNKNOWN
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -1101,13 +1136,13 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
         {/* Generation Labels */}
         <div className="grid grid-cols-3 gap-x-8 mb-8">
           <div className="text-center">
-            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">1st generation</p>
+            <p className="text-[14.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">1st generation</p>
           </div>
           <div className="text-center">
-            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">2nd generation</p>
+            <p className="text-[14.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">2nd generation</p>
           </div>
           <div className="text-center">
-            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">3rd generation</p>
+            <p className="text-[14.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">3rd generation</p>
           </div>
         </div>
 

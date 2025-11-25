@@ -531,8 +531,8 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
   // For large size (1st generation), use vertical layout (image on top, text below)
   // For medium and small sizes (2nd and 3rd generation), use horizontal layout (image left, text right)
   const isVerticalLayout = size === 'large';
-  // Increase gap for large size (1st gen) by 25%: gap-1.5 (6px) -> gap-[7.5px] (7.5px)
-  const gapClass = size === 'large' ? 'gap-[7.5px]' : 'gap-3';
+  // Increase gap for large size (1st gen) by 50%: gap-[7.5px] (7.5px) -> gap-[11.25px] (11.25px)
+  const gapClass = size === 'large' ? 'gap-[11.25px]' : 'gap-3';
   
   return (
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass}`}>

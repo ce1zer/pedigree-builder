@@ -767,7 +767,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           const marginRight = computed.marginRight;
           const marginBottom = computed.marginBottom;
           const marginLeft = computed.marginLeft;
-          const gap = computed.gap;
+          const gap = computed.gap; // Includes updated spacing: gap-[11.25px] for 1st gen
           const columnGap = computed.columnGap;
           const rowGap = computed.rowGap;
           const gridTemplateColumns = computed.gridTemplateColumns;
@@ -836,7 +836,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           if (paddingBottom) setStyleIfNotInline('padding-bottom', paddingBottom);
           if (paddingLeft) setStyleIfNotInline('padding-left', paddingLeft);
           if (margin) setStyleIfNotInline('margin', margin);
-          if (marginTop) setStyleIfNotInline('margin-top', marginTop);
+          if (marginTop) setStyleIfNotInline('margin-top', marginTop); // Includes updated spacing: mt-[2px] for kennel-dog name spacing
           if (marginRight) setStyleIfNotInline('margin-right', marginRight);
           if (marginBottom) setStyleIfNotInline('margin-bottom', marginBottom);
           if (marginLeft) setStyleIfNotInline('margin-left', marginLeft);

@@ -843,7 +843,46 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           if (marginRight) setStyleIfNotInline('margin-right', marginRight);
           if (marginBottom) setStyleIfNotInline('margin-bottom', marginBottom);
           if (marginLeft) setStyleIfNotInline('margin-left', marginLeft);
-          if (gap) setStyleIfNotInline('gap', gap);
+          // Reduce gap by 50% for 1st generation (large size) flex containers in export
+          if (gap) {
+            // Check if this is a 1st generation container (flex-direction: column with gap around 11.25px)
+            const isFirstGenContainer = flexDirection === 'column';
+            if (isFirstGenContainer) {
+              const reduceGap = (value: string): string => {
+                if (!value || value === '0' || value === '0px') return value;
+                // Try to parse as pixel value
+                const pxMatch = value.match(/^([\d.]+)px$/);
+                if (pxMatch) {
+                  const num = parseFloat(pxMatch[1]);
+                  // If gap is around 11.25px (1st generation: 10.5-12px range, but not exactly 12px for 3rd gen)
+                  // Target specifically 1st generation gap of 11.25px
+                  if (num >= 10.5 && num < 12) {
+                    return `${num * 0.5}px`;
+                  }
+                }
+                // Try to parse as rem/em and convert (assuming 16px base)
+                const remMatch = value.match(/^([\d.]+)(rem|em)$/);
+                if (remMatch) {
+                  const num = parseFloat(remMatch[1]);
+                  const unit = remMatch[2];
+                  const pxEquivalent = num * 16;
+                  // If equivalent to 1st generation gap (10.5-12px, but not 12px), reduce by 50%
+                  if (pxEquivalent >= 10.5 && pxEquivalent < 12) {
+                    return `${num * 0.5}${unit}`;
+                  }
+                }
+                return value;
+              };
+              const reducedGap = reduceGap(gap);
+              if (reducedGap !== gap) {
+                cloneEl.style.setProperty('gap', reducedGap);
+              } else {
+                setStyleIfNotInline('gap', gap);
+              }
+            } else {
+              setStyleIfNotInline('gap', gap);
+            }
+          }
           if (columnGap) setStyleIfNotInline('column-gap', columnGap);
           if (rowGap) setStyleIfNotInline('row-gap', rowGap);
           if (gridTemplateColumns) setStyleIfNotInline('grid-template-columns', gridTemplateColumns);

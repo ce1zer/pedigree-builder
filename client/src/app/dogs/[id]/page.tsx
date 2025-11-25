@@ -520,8 +520,8 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
       name: 'text-[12.5pt]'
     },
     small: {
-      kennel: 'text-[8.75pt]',
-      name: 'text-[11pt]'
+      kennel: 'text-[10.75pt]',
+      name: 'text-[13pt]'
     }
   };
 

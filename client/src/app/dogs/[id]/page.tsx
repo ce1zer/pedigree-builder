@@ -531,8 +531,8 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
   // For large size (1st generation), use vertical layout (image on top, text below)
   // For medium and small sizes (2nd and 3rd generation), use horizontal layout (image left, text right)
   const isVerticalLayout = size === 'large';
-  // Reduce gap for large size (1st gen) by 50%: gap-3 (12px) -> gap-1.5 (6px)
-  const gapClass = size === 'large' ? 'gap-1.5' : 'gap-3';
+  // Increase gap for large size (1st gen) by 25%: gap-1.5 (6px) -> gap-[7.5px] (7.5px)
+  const gapClass = size === 'large' ? 'gap-[7.5px]' : 'gap-3';
   
   return (
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass}`}>
@@ -571,12 +571,12 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
         {dog ? (
           <Link 
             href={`/dogs/${dog.id}`}
-            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-1 font-bebas-neue`}
+            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-[2px] font-bebas-neue`}
           >
             {dog.dog_name}
           </Link>
         ) : (
-          <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-1 font-bebas-neue`}>
+          <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-[2px] font-bebas-neue`}>
             UNKNOWN
           </p>
         )}

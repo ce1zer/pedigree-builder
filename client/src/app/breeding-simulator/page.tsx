@@ -406,6 +406,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           const borderWidth = computed.borderWidth;
           const borderStyle = computed.borderStyle;
           const fontSize = computed.fontSize;
+          const fontFamily = computed.fontFamily;
           const fontWeight = computed.fontWeight;
           const textAlign = computed.textAlign;
           const textTransform = computed.textTransform;
@@ -476,6 +477,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           if (borderWidth) setStyleIfNotInline('border-width', borderWidth);
           if (borderStyle) setStyleIfNotInline('border-style', borderStyle);
           if (fontSize) setStyleIfNotInline('font-size', fontSize);
+          if (fontFamily) setStyleIfNotInline('font-family', fontFamily);
           if (fontWeight) setStyleIfNotInline('font-weight', fontWeight);
           if (textAlign) setStyleIfNotInline('text-align', textAlign);
           if (textTransform) setStyleIfNotInline('text-transform', textTransform);

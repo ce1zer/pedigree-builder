@@ -512,6 +512,30 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           
           // For text elements, preserve exact layout and alignment
           if (tagName === 'p' || tagName === 'a' || tagName === 'span' || (tagName === 'div' && cloneEl.textContent?.trim())) {
+            // Reduce top spacing by 50% for text elements in export
+            const reduceTopSpacing = (value: string): string => {
+              if (!value || value === '0' || value === '0px') return value;
+              const match = value.match(/^([\d.]+)(px|rem|em|pt)$/);
+              if (match) {
+                const num = parseFloat(match[1]);
+                const unit = match[2];
+                return `${num * 0.5}${unit}`;
+              }
+              return value;
+            };
+            
+            // Reduce margin-top by 50%
+            if (marginTop && marginTop !== '0px') {
+              const reducedMarginTop = reduceTopSpacing(marginTop);
+              cloneEl.style.setProperty('margin-top', reducedMarginTop);
+            }
+            
+            // Reduce padding-top by 50%
+            if (paddingTop && paddingTop !== '0px') {
+              const reducedPaddingTop = reduceTopSpacing(paddingTop);
+              cloneEl.style.setProperty('padding-top', reducedPaddingTop);
+            }
+            
             // Preserve white-space to maintain exact text layout (keep nowrap if set)
             if (whiteSpace) setStyleIfNotInline('white-space', whiteSpace);
             // Preserve text-overflow to maintain exact text behavior

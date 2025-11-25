@@ -156,7 +156,8 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   const isSmallWithTextLeft = size === 'small' && side === 'father';
   
   // Reduce gap for medium size (2nd gen) to prevent overlap, but keep centered alignment
-  const gapClass = size === 'medium' ? 'gap-1' : 'gap-3';
+  // Reduce gap for large size (1st gen) by 50%: gap-3 (12px) -> gap-1.5 (6px)
+  const gapClass = size === 'large' ? 'gap-1.5' : size === 'medium' ? 'gap-1' : 'gap-3';
   
   return (
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass}`}>

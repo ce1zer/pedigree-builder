@@ -13,7 +13,6 @@
     "axios": "^1.12.2",
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.546.0",
-    "multer": "^2.0.2",
     "next": "16.0.0",
     "puppeteer": "^24.26.1",
     "react": "19.2.0",
@@ -22,7 +21,7 @@
     "react-hook-form": "^7.65.0",
     "react-hot-toast": "^2.6.0",
     "sharp": "^0.34.4",
-    "uuid": "^13.0.0"
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

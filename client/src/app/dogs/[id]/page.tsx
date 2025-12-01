@@ -324,12 +324,14 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
 
             <div className="mt-6 flex justify-end space-x-4">
               <button
+                type="button"
                 onClick={handleCancelCrop}
                 className="btn-spotify-secondary"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleCrop}
                 className="btn-spotify-primary"
               >

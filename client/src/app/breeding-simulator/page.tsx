@@ -136,8 +136,8 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   };
 
   const imageSizeClasses = {
-    large: 'w-full', // Will use scale transform for 10% increase
-    medium: 'w-[57.75%] aspect-[4/3]', // Increased by 10%: 52.5% -> 57.75%
+    large: 'w-full', // Increased by 50%: w-2/3 (66.67%) -> w-full (100%), height increased by 15% via aspect ratio
+    medium: 'w-[52.5%] aspect-[4/3]', // Increased by 50%: w-[35%] -> w-[52.5%]
     small: 'w-[37.5%] aspect-[4/3]' // Increased by 50%: w-1/4 (25%) -> w-[37.5%]
   };
 
@@ -203,7 +203,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {dog ? (
         <Link 
           href={`/dogs/${dog.id}`} 
-          className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2 hover:underline block ${size === 'large' || size === 'medium' ? 'scale-110' : ''}`}
+          className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2 hover:underline block`}
         >
           {dog?.image_url ? (
             <img
@@ -218,7 +218,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           )}
         </Link>
       ) : (
-        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2 ${size === 'large' || size === 'medium' ? 'scale-110' : ''}`}>
+        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2`}>
           <div className={`w-full h-full bg-gray-800 flex items-center justify-center ${size === 'large' ? 'aspect-[4/3.45]' : 'aspect-[4/3]'}`}>
             <PlaceholderSVG />
           </div>
@@ -759,56 +759,56 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
           <div className="flex flex-col" style={{ height: '100%' }}>
             {/* Father's Father's Father's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={fffFather} size="small" side="father" />
               </div>
             </div>
             
             {/* Father's Father's Father's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={fffMother} size="small" side="father" />
               </div>
             </div>
             
             {/* Father's Father's Mother's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={ffmFather} size="small" side="father" />
               </div>
             </div>
             
             {/* Father's Father's Mother's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={ffmMother} size="small" side="father" />
               </div>
             </div>
             
             {/* Father's Mother's Father's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={fmfFather} size="small" side="father" />
               </div>
             </div>
             
             {/* Father's Mother's Father's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={fmfMother} size="small" side="father" />
               </div>
             </div>
             
             {/* Father's Mother's Mother's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={fmmFather} size="small" side="father" />
               </div>
             </div>
             
             {/* Father's Mother's Mother's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={fmmMother} size="small" side="father" />
               </div>
             </div>
@@ -940,56 +940,56 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
             
             {/* Mother's Father's Father's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={mffFather} size="small" side="mother" />
               </div>
             </div>
             
             {/* Mother's Father's Father's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={mffMother} size="small" side="mother" />
               </div>
             </div>
             
             {/* Mother's Father's Mother's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={mfmFather} size="small" side="mother" />
               </div>
             </div>
             
             {/* Mother's Father's Mother's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={mfmMother} size="small" side="mother" />
               </div>
             </div>
             
             {/* Mother's Mother's Father's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={mmfFather} size="small" side="mother" />
               </div>
             </div>
             
             {/* Mother's Mother's Father's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={mmfMother} size="small" side="mother" />
               </div>
             </div>
             
             {/* Mother's Mother's Mother's Father - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={mmmFather} size="small" side="mother" />
               </div>
             </div>
             
             {/* Mother's Mother's Mother's Mother - 12.5% of total height */}
             <div className="relative" style={{ height: '12.5%' }}>
-              <div className="h-full flex items-center justify-center py-0.5">
+              <div className="h-full flex items-center justify-center py-1">
                 <PedigreeNode dog={mmmMother} size="small" side="mother" />
               </div>
             </div>

@@ -136,7 +136,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   };
 
   const imageSizeClasses = {
-    large: 'w-full aspect-[4/3]', // Increased by 50%: w-2/3 (66.67%) -> w-full (100%)
+    large: 'w-full', // Increased by 50%: w-2/3 (66.67%) -> w-full (100%), height increased by 15% via aspect ratio
     medium: 'w-[52.5%] aspect-[4/3]', // Increased by 50%: w-[35%] -> w-[52.5%]
     small: 'w-[37.5%] aspect-[4/3]' // Increased by 50%: w-1/4 (25%) -> w-[37.5%]
   };
@@ -164,9 +164,8 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   const isVerticalLayout = size === 'large' || size === 'medium';
   const isSmallWithTextLeft = size === 'small' && side === 'father';
   
-  // Reduce gap for medium size (2nd gen) to prevent overlap, but keep centered alignment
-  // Increase gap for large size (1st gen) by 50%: gap-[7.5px] (7.5px) -> gap-[11.25px] (11.25px)
-  const gapClass = size === 'large' ? 'gap-[11.25px]' : size === 'medium' ? 'gap-1' : 'gap-3';
+  // Reduced gap for 1st and 2nd generation to bring text closer to images
+  const gapClass = size === 'large' ? 'gap-[5px]' : size === 'medium' ? 'gap-[2px]' : 'gap-3';
   
   return (
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass}`}>
@@ -210,17 +209,17 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
             <img
               src={dog.image_url}
               alt={dog.dog_name || 'Unknown'}
-              className="w-full h-full object-cover aspect-[4/3]"
+              className={`w-full h-full object-cover ${size === 'large' ? 'aspect-[4/3.45]' : 'aspect-[4/3]'}`}
             />
           ) : (
-            <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
+            <div className={`w-full h-full bg-gray-800 flex items-center justify-center ${size === 'large' ? 'aspect-[4/3.45]' : 'aspect-[4/3]'}`}>
               <PlaceholderSVG />
             </div>
           )}
         </Link>
       ) : (
         <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
-          <div className="w-full h-full bg-gray-800 flex items-center justify-center aspect-[4/3]">
+          <div className={`w-full h-full bg-gray-800 flex items-center justify-center ${size === 'large' ? 'aspect-[4/3.45]' : 'aspect-[4/3]'}`}>
             <PlaceholderSVG />
           </div>
         </div>

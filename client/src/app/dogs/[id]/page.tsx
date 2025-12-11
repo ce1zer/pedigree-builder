@@ -4,12 +4,14 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
-import { ArrowLeft, Edit, Users, TreePine, Download, Upload, Camera, Trash2 } from 'lucide-react';
+import { ArrowLeft, Edit, Users, TreePine, Download, Upload, Camera, Trash2, ChevronDown, X, Save } from 'lucide-react';
 import Cropper from 'react-easy-crop';
-import { Dog, DogFormData } from '@/types';
+import { Dog, DogFormData, Kennel } from '@/types';
 import { dogsApi } from '@/services/api';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
+import { CreatableSelect } from '@/components/CreatableSelect';
+import { formatDogDisplayName } from '@/utils/dogNameFormatter';
 
 // Constants
 const ICON_SIZE = 'h-5 w-5';
@@ -461,7 +463,7 @@ const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog, imageCacheBuster }) 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="text-sm font-semibold text-gray-400">Dog Name</label>
-            <p className="text-lg text-white font-medium">{dog.dog_name}</p>
+            <p className="text-lg text-white font-medium">{formatDogDisplayName(dog)}</p>
           </div>
           
           <div>
@@ -473,13 +475,21 @@ const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog, imageCacheBuster }) 
           
           <div>
             <label className="text-sm font-semibold text-gray-400">Primary Kennel</label>
-            <p className="text-lg text-white">{dog.primary_kennel}</p>
+            <p className="text-lg text-white">
+              {typeof dog.primary_kennel === 'object' && dog.primary_kennel?.name 
+                ? dog.primary_kennel.name 
+                : (typeof dog.primary_kennel === 'string' ? dog.primary_kennel : dog.primary_kennel_name || 'N/A')}
+            </p>
           </div>
           
-          {dog.secondary_kennel && (
+          {(dog.secondary_kennel || dog.secondary_kennel_name) && (
             <div>
               <label className="text-sm font-semibold text-gray-400">Secondary Kennel</label>
-              <p className="text-lg text-white">{dog.secondary_kennel}</p>
+              <p className="text-lg text-white">
+                {typeof dog.secondary_kennel === 'object' && dog.secondary_kennel?.name 
+                  ? dog.secondary_kennel.name 
+                  : (typeof dog.secondary_kennel === 'string' ? dog.secondary_kennel : dog.secondary_kennel_name || '')}
+              </p>
             </div>
           )}
         </div>
@@ -487,6 +497,172 @@ const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog, imageCacheBuster }) 
     </div>
   </div>
 );
+
+// Searchable Dropdown Component
+interface SearchableDropdownProps {
+  options: Dog[];
+  value: Dog | null;
+  onChange: (dog: Dog | null) => void;
+  placeholder: string;
+  label: string;
+}
+
+const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
+  options,
+  value,
+  onChange,
+  placeholder,
+  label
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Filter options based on search term
+  const filteredOptions = options.filter(dog => {
+    const primaryKennelName = typeof dog.primary_kennel === 'object' && dog.primary_kennel?.name 
+      ? dog.primary_kennel.name 
+      : (typeof dog.primary_kennel === 'string' ? dog.primary_kennel : dog.primary_kennel_name || '');
+    return (
+      dog.dog_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      primaryKennelName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
+
+  // Reset selected index when filtered options change
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [filteredOptions.length, searchTerm]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+        setSearchTerm('');
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSelect = (dog: Dog) => {
+    onChange(dog);
+    setIsOpen(false);
+    setSearchTerm('');
+  };
+
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange(null);
+    setSearchTerm('');
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <label className="block text-sm font-semibold text-gray-300 mb-1.5">
+        {label}
+      </label>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="input-spotify w-full text-left flex items-center justify-between pr-8"
+        >
+          <span className={value ? 'text-white' : 'text-gray-400'}>
+            {value ? `${value.dog_name}${(() => {
+              const kennelName = typeof value.primary_kennel === 'object' && value.primary_kennel?.name 
+                ? value.primary_kennel.name 
+                : (typeof value.primary_kennel === 'string' ? value.primary_kennel : value.primary_kennel_name || '');
+              return kennelName ? ` (${kennelName})` : '';
+            })()}` : placeholder}
+          </span>
+          <div className="flex items-center space-x-2">
+            {value && (
+              <button
+                type="button"
+                onClick={handleClear}
+                className="p-1 hover:bg-gray-700 rounded"
+              >
+                <X className="h-4 w-4 text-gray-400 hover:text-white" />
+              </button>
+            )}
+            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          </div>
+        </button>
+
+        {isOpen && (
+          <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-hidden">
+            <div className="p-2 border-b border-gray-700">
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search by name or kennel..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setSelectedIndex(prev => 
+                      prev < filteredOptions.length - 1 ? prev + 1 : prev
+                    );
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setSelectedIndex(prev => (prev > -1 ? prev - 1 : -1));
+                  } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (filteredOptions.length > 0 && selectedIndex >= 0 && selectedIndex < filteredOptions.length) {
+                      handleSelect(filteredOptions[selectedIndex]);
+                    }
+                  } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    setIsOpen(false);
+                    setSearchTerm('');
+                  }
+                }}
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3ecf8e]"
+                autoFocus
+              />
+            </div>
+            <div className="overflow-y-auto max-h-48">
+              {filteredOptions.length === 0 ? (
+                <div className="px-4 py-3 text-gray-400 text-sm">No dogs found</div>
+              ) : (
+                filteredOptions.map((dog, index) => (
+                  <button
+                    key={dog.id}
+                    type="button"
+                    onClick={() => handleSelect(dog)}
+                    className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors ${
+                      index === selectedIndex
+                        ? 'bg-gray-700 ring-2 ring-[#3ecf8e] ring-inset'
+                        : ''
+                    } ${
+                      value?.id === dog.id ? 'bg-gray-600 hover:bg-gray-700' : ''
+                    }`}
+                  >
+                    <div className="text-white font-medium">{dog.dog_name}</div>
+                    {(() => {
+                      const kennelName = typeof dog.primary_kennel === 'object' && dog.primary_kennel?.name 
+                        ? dog.primary_kennel.name 
+                        : (typeof dog.primary_kennel === 'string' ? dog.primary_kennel : dog.primary_kennel_name || '');
+                      return kennelName ? (
+                        <div className="text-sm text-gray-400">{kennelName}</div>
+                      ) : null;
+                    })()}
+                  </button>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
 
 // Pedigree Node Component - Matches SVG design
 interface PedigreeNodeProps {
@@ -567,18 +743,30 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
       
       {/* Dog Info - Vertical Layout for text content */}
       <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-        <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue`}>
-          {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
+        <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>
+            {isUnknown ? 'UNKNOWN' : (() => {
+              const championPrefix = dog?.champion === 'ch' ? 'Ch. ' 
+                : dog?.champion === 'dual_ch' ? 'Dual Ch. '
+                : dog?.champion === 'gr_ch' ? 'Gr. Ch. '
+                : dog?.champion === 'dual_gr_ch' ? 'Dual Gr. Ch. '
+                : dog?.champion === 'nw_gr_ch' ? 'NW. Gr. Ch. '
+                : dog?.champion === 'inw_gr_ch' ? 'INW. Gr. Ch. '
+                : '';
+              const kennelName = typeof dog.primary_kennel === 'object' && dog.primary_kennel?.name 
+                ? dog.primary_kennel.name 
+                : (typeof dog.primary_kennel === 'string' ? dog.primary_kennel : dog.primary_kennel_name || '');
+              return championPrefix + kennelName;
+            })()}
         </p>
         {dog ? (
           <Link 
             href={`/dogs/${dog.id}`}
-            className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-[2px] font-bebas-neue`}
+            className={`${textSizeClasses[size].name} text-white uppercase tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-[2px] font-bebas-neue`}
           >
             {dog.dog_name}
           </Link>
         ) : (
-          <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-[2px] font-bebas-neue`}>
+          <p className={`${textSizeClasses[size].name} text-white uppercase tracking-wide leading-tight mt-[2px] font-bebas-neue`}>
             UNKNOWN
           </p>
         )}
@@ -597,12 +785,8 @@ const MainDogDisplay: React.FC<MainDogDisplayProps> = ({ dog }) => {
     <div className="flex flex-col items-center mb-8">
       {/* Main Dog Name - Large */}
       <h2 className="text-6xl font-bold text-white uppercase mb-2 tracking-wide font-bebas-neue">
-        {dog.dog_name}
+        {formatDogDisplayName(dog)}
       </h2>
-      {/* Kennel Name */}
-      <p className="text-xl text-[#717179] uppercase font-medium tracking-wider font-bebas-neue">
-        {dog.primary_kennel}
-      </p>
     </div>
   );
 };
@@ -906,7 +1090,6 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           if (borderStyle) setStyleIfNotInline('border-style', borderStyle);
           if (fontSize) setStyleIfNotInline('font-size', fontSize);
           if (fontFamily) setStyleIfNotInline('font-family', fontFamily);
-          if (fontWeight) setStyleIfNotInline('font-weight', fontWeight);
           if (textAlign) setStyleIfNotInline('text-align', textAlign);
           if (textTransform) setStyleIfNotInline('text-transform', textTransform);
           if (aspectRatio) setStyleIfNotInline('aspect-ratio', aspectRatio);
@@ -926,6 +1109,13 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           
           // Force simple RGB colors - don't care about exact colors
           const tagName = cloneEl.tagName.toLowerCase();
+          
+          // Force regular font weight for all pedigree tree text
+          if (tagName === 'p' || tagName === 'a' || tagName === 'span') {
+            cloneEl.style.setProperty('font-weight', '400');
+          } else if (fontWeight) {
+            setStyleIfNotInline('font-weight', fontWeight);
+          }
           
           // For images, ensure proper rendering
           if (tagName === 'img') {
@@ -1142,6 +1332,22 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
                 htmlImg.style.aspectRatio = `${htmlImg.width} / ${htmlImg.height}`;
               }
             });
+            
+            // Force regular font weight for all pedigree tree text
+            const style = clonedDoc.createElement('style');
+            style.textContent = `
+              /* Force regular font weight for all pedigree tree text */
+              p, a, span {
+                font-weight: 400 !important;
+              }
+            `;
+            clonedDoc.head.appendChild(style);
+            
+            // Also directly set font-weight on all text elements in the cloned document
+            const allTextElements = clonedDoc.querySelectorAll('p, a, span');
+            allTextElements.forEach((el) => {
+              (el as HTMLElement).style.setProperty('font-weight', '400', 'important');
+            });
           },
         });
 
@@ -1176,7 +1382,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
   }, []);
 
   return (
-    <div className="bg-arbor p-8 w-full">
+    <div className="card-spotify w-full">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-xl font-semibold text-white">3-Generation Pedigree</h2>
         <button
@@ -1348,6 +1554,10 @@ const DogProfile: React.FC = () => {
 
   const selectedGender = watch('gender');
   const photoFile = watch('photo');
+  const [selectedPrimaryKennel, setSelectedPrimaryKennel] = useState<Kennel | null>(null);
+  const [selectedSecondaryKennel, setSelectedSecondaryKennel] = useState<Kennel | null>(null);
+  const [selectedFather, setSelectedFather] = useState<Dog | null>(null);
+  const [selectedMother, setSelectedMother] = useState<Dog | null>(null);
 
   // Handle photo file selection (now receives cropped file)
   const handlePhotoChange = useCallback((file: File) => {
@@ -1370,11 +1580,37 @@ const DogProfile: React.FC = () => {
       if (response.success && response.data) {
         setDog(response.data);
         setValue('dog_name', response.data.dog_name);
-        setValue('primary_kennel', response.data.primary_kennel);
-        setValue('secondary_kennel', response.data.secondary_kennel || '');
+        setValue('champion', response.data.champion || 'none');
         setValue('gender', response.data.gender);
         setValue('father_id', response.data.father_id || '');
         setValue('mother_id', response.data.mother_id || '');
+        
+        // Set kennel states
+        if (response.data.primary_kennel && typeof response.data.primary_kennel === 'object') {
+          setSelectedPrimaryKennel(response.data.primary_kennel);
+          setValue('primary_kennel_id', response.data.primary_kennel.id);
+        } else {
+          // Explicitly set to null if no primary kennel
+          setSelectedPrimaryKennel(null);
+          setValue('primary_kennel_id', undefined);
+        }
+        if (response.data.secondary_kennel && typeof response.data.secondary_kennel === 'object') {
+          setSelectedSecondaryKennel(response.data.secondary_kennel);
+          setValue('secondary_kennel_id', response.data.secondary_kennel.id);
+        } else {
+          // Explicitly set to null if no secondary kennel
+          setSelectedSecondaryKennel(null);
+          setValue('secondary_kennel_id', undefined);
+        }
+        
+        // Set parent states
+        if (response.data.father) {
+          setSelectedFather(response.data.father);
+        }
+        if (response.data.mother) {
+          setSelectedMother(response.data.mother);
+        }
+        
         // Set photo preview if image exists
         if (response.data.image_url) {
           setPhotoPreview(response.data.image_url);
@@ -1470,6 +1706,18 @@ const DogProfile: React.FC = () => {
           // Update dog state once with full response data
           // This will trigger the useEffect to rebuild pedigree automatically
           setDog(updatedDog);
+          
+          // Update kennel states from response (if kennels are included in response)
+          if (updatedDog.primary_kennel && typeof updatedDog.primary_kennel === 'object') {
+            setSelectedPrimaryKennel(updatedDog.primary_kennel);
+          } else {
+            setSelectedPrimaryKennel(null);
+          }
+          if (updatedDog.secondary_kennel && typeof updatedDog.secondary_kennel === 'object') {
+            setSelectedSecondaryKennel(updatedDog.secondary_kennel);
+          } else {
+            setSelectedSecondaryKennel(null);
+          }
         }
       } else {
         toast.error(response.error || 'Error updating dog profile');
@@ -1560,20 +1808,41 @@ const DogProfile: React.FC = () => {
             <ArrowLeft className={ICON_SIZE} />
           </button>
           <div>
-            <h1 className="text-4xl font-bold text-white">{dog.dog_name}</h1>
-            <p className="text-gray-400 mt-2 text-lg">{dog.primary_kennel}</p>
+            <h1 className="text-2xl font-bold text-white">{formatDogDisplayName(dog)}</h1>
           </div>
         </div>
         
         <div className="flex space-x-3">
-          <button
-            onClick={() => setIsEditing(!isEditing)}
-            className="btn-spotify-secondary inline-flex items-center space-x-2"
-            disabled={isDeleting}
-          >
-            <Edit className={SMALL_ICON_SIZE} />
-            <span>{isEditing ? 'Cancel' : 'Edit'}</span>
-          </button>
+          {!isEditing && (
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className="btn-spotify-secondary inline-flex items-center space-x-2"
+              disabled={isDeleting}
+            >
+              <Edit className={SMALL_ICON_SIZE} />
+              <span>Edit</span>
+            </button>
+          )}
+          {isEditing && (
+            <>
+              <button
+                onClick={() => setIsEditing(false)}
+                className="btn-spotify-secondary inline-flex items-center space-x-2"
+                disabled={isSubmitting}
+              >
+                <span>Cancel</span>
+              </button>
+              <button
+                type="submit"
+                form="edit-dog-form"
+                className="btn-spotify-primary inline-flex items-center space-x-2"
+                disabled={isSubmitting}
+              >
+                <Save className={SMALL_ICON_SIZE} />
+                <span>{isSubmitting ? 'Saving...' : 'Save'}</span>
+              </button>
+            </>
+          )}
           <button
             onClick={handleDelete}
             className="btn-spotify-secondary inline-flex items-center space-x-2 text-red-400 hover:text-red-300"
@@ -1587,7 +1856,7 @@ const DogProfile: React.FC = () => {
 
       {isEditing ? (
         /* Edit Form */
-        <form onSubmit={handleSubmit(handleUpdate)} className="space-y-8">
+        <form id="edit-dog-form" onSubmit={handleSubmit(handleUpdate)} className="space-y-8">
           {/* Photo Upload Section */}
           <PhotoUpload 
             photoPreview={photoPreview} 
@@ -1616,34 +1885,48 @@ const DogProfile: React.FC = () => {
                 )}
               </div>
 
-              {/* Primary Kennel */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-3">
-                  Primary Kennel *
-                </label>
-                <input
-                  type="text"
-                  {...register('primary_kennel', { 
-                    required: 'Primary kennel is required',
-                    minLength: { value: 2, message: 'Primary kennel must be at least 2 characters' }
-                  })}
-                  className="input-spotify w-full"
+              {/* Kennels - Side by Side */}
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Primary Kennel */}
+                <CreatableSelect
+                  value={selectedPrimaryKennel}
+                  onChange={(kennel) => {
+                    setSelectedPrimaryKennel(kennel);
+                    setValue('primary_kennel_id', kennel?.id || undefined);
+                  }}
+                  placeholder="Select or type to create primary kennel..."
+                  label="Primary Kennel"
                 />
-                {errors.primary_kennel && (
-                  <p className="mt-2 text-sm text-red-400">{errors.primary_kennel.message}</p>
-                )}
+
+                {/* Secondary Kennel */}
+                <CreatableSelect
+                  value={selectedSecondaryKennel}
+                  onChange={(kennel) => {
+                    setSelectedSecondaryKennel(kennel);
+                    setValue('secondary_kennel_id', kennel?.id || undefined);
+                  }}
+                  placeholder="Select or type to create secondary kennel..."
+                  label="Secondary Kennel"
+                />
               </div>
 
-              {/* Secondary Kennel */}
+              {/* Champion */}
               <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-3">
-                  Secondary Kennel
+                <label className="block text-sm font-semibold text-gray-300 mb-1.5">
+                  Champion
                 </label>
-                <input
-                  type="text"
-                  {...register('secondary_kennel')}
+                <select
+                  {...register('champion')}
                   className="input-spotify w-full"
-                />
+                >
+                  <option value="none">None</option>
+                  <option value="ch">Ch.</option>
+                  <option value="dual_ch">Dual Ch.</option>
+                  <option value="gr_ch">Gr. Ch.</option>
+                  <option value="dual_gr_ch">Dual Gr. Ch.</option>
+                  <option value="nw_gr_ch">NW. Gr. Ch.</option>
+                  <option value="inw_gr_ch">INW. Gr. Ch.</option>
+                </select>
               </div>
 
               {/* Gender */}
@@ -1651,75 +1934,57 @@ const DogProfile: React.FC = () => {
                 <label className="block text-sm font-semibold text-gray-300 mb-3">
                   Gender *
                 </label>
-                <select
-                  {...register('gender', { required: 'Gender is required' })}
-                  className="input-spotify w-full"
-                >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
+                <div className="flex items-center space-x-6">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      value="male" 
+                      {...register('gender', { required: 'Gender is required' })} 
+                      className="custom-radio" 
+                    />
+                    <span className="text-white">Male</span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input 
+                      type="radio" 
+                      value="female" 
+                      {...register('gender', { required: 'Gender is required' })} 
+                      className="custom-radio" 
+                    />
+                    <span className="text-white">Female</span>
+                  </label>
+                </div>
                 {errors.gender && (
                   <p className="mt-2 text-sm text-red-400">{errors.gender.message}</p>
                 )}
               </div>
 
-              {/* Father */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-3">
-                  Father
-                </label>
-                <select
-                  {...register('father_id')}
-                  className="input-spotify w-full"
-                >
-                  <option value="">No father selected</option>
-                  {availableDogs
-                    .filter(d => d.gender === 'male')
-                    .map(d => (
-                      <option key={d.id} value={d.id}>
-                        {d.dog_name} ({d.primary_kennel})
-                      </option>
-                    ))}
-                </select>
-              </div>
+              {/* Parents - Side by Side */}
+              <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Father Selection */}
+                <SearchableDropdown
+                  options={availableDogs.filter(d => d.gender === 'male' && d.id !== id)}
+                  value={selectedFather}
+                  onChange={(dog) => {
+                    setSelectedFather(dog);
+                    setValue('father_id', dog?.id || '');
+                  }}
+                  placeholder="No father selected"
+                  label="Father"
+                />
 
-              {/* Mother */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-300 mb-3">
-                  Mother
-                </label>
-                <select
-                  {...register('mother_id')}
-                  className="input-spotify w-full"
-                >
-                  <option value="">No mother selected</option>
-                  {availableDogs
-                    .filter(d => d.gender === 'female')
-                    .map(d => (
-                      <option key={d.id} value={d.id}>
-                        {d.dog_name} ({d.primary_kennel})
-                      </option>
-                    ))}
-                </select>
+                {/* Mother Selection */}
+                <SearchableDropdown
+                  options={availableDogs.filter(d => d.gender === 'female' && d.id !== id)}
+                  value={selectedMother}
+                  onChange={(dog) => {
+                    setSelectedMother(dog);
+                    setValue('mother_id', dog?.id || '');
+                  }}
+                  placeholder="No mother selected"
+                  label="Mother"
+                />
               </div>
-            </div>
-
-            <div className="mt-8 flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                className="btn-spotify-secondary"
-                disabled={isSubmitting}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn-spotify-primary"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
-              </button>
             </div>
           </div>
         </form>

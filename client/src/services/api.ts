@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { Dog, DogFormData, ApiResponse } from '../types';
+import { Dog, DogFormData, ApiResponse, Kennel } from '../types';
 
 // API configuration
 const API_BASE_URL = '/api';
@@ -22,8 +22,9 @@ const createDogFormData = (dogData: DogFormData): FormData => {
   const formData = new FormData();
   formData.append('dogData', JSON.stringify({
     dog_name: dogData.dog_name,
-    primary_kennel: dogData.primary_kennel,
-    secondary_kennel: dogData.secondary_kennel,
+    champion: dogData.champion || 'none',
+    primary_kennel_id: dogData.primary_kennel_id || null,
+    secondary_kennel_id: dogData.secondary_kennel_id || null,
     gender: dogData.gender,
     father_id: dogData.father_id,
     mother_id: dogData.mother_id,
@@ -42,7 +43,11 @@ export const dogsApi = {
    * Retrieve all dogs with their parent information
    */
   getAll: async (): Promise<ApiResponse<Dog[]>> => {
-    const response = await api.get('/dogs');
+    const response = await api.get('/dogs', {
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
+    });
     return handleApiResponse(response);
   },
 
@@ -98,8 +103,54 @@ export const dogsApi = {
   search: async (query: string): Promise<ApiResponse<Dog[]>> => {
     const response = await api.get('/dogs/search', {
       params: { q: query },
+      headers: {
+        'Cache-Control': 'no-cache',
+      },
     });
     
+    return handleApiResponse(response);
+  },
+};
+
+// Kennels API service
+export const kennelsApi = {
+  /**
+   * Retrieve all kennels
+   */
+  getAll: async (): Promise<ApiResponse<Kennel[]>> => {
+    const response = await api.get('/kennels');
+    return handleApiResponse(response);
+  },
+
+  /**
+   * Retrieve a specific kennel by ID
+   */
+  getById: async (id: string): Promise<ApiResponse<Kennel>> => {
+    const response = await api.get(`/kennels/${id}`);
+    return handleApiResponse(response);
+  },
+
+  /**
+   * Create a new kennel
+   */
+  create: async (name: string): Promise<ApiResponse<Kennel>> => {
+    const response = await api.post('/kennels', { name });
+    return handleApiResponse(response);
+  },
+
+  /**
+   * Update an existing kennel
+   */
+  update: async (id: string, name: string): Promise<ApiResponse<Kennel>> => {
+    const response = await api.put(`/kennels/${id}`, { name });
+    return handleApiResponse(response);
+  },
+
+  /**
+   * Delete a kennel
+   */
+  delete: async (id: string): Promise<ApiResponse<void>> => {
+    const response = await api.delete(`/kennels/${id}`);
     return handleApiResponse(response);
   },
 };

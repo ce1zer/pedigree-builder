@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Force dynamic rendering - no caching
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // Supabase client configuration
 const supabase = createClient(
   process.env.SUPABASE_URL || 'https://placeholder.supabase.co',
@@ -39,15 +43,31 @@ export async function GET(request: NextRequest) {
 
     const searchTerm = `%${query.trim()}%`;
 
+    // Search in dogs table with kennel joins
+    // Note: This searches in both old text fields (for backward compatibility) and new kennel names
     const { data, error } = await supabase
       .from('dogs')
-      .select('*')
+      .select(`
+        *,
+        primary_kennel:primary_kennel_id(id, name),
+        secondary_kennel:secondary_kennel_id(id, name)
+      `)
       .or(`dog_name.ilike.${searchTerm},primary_kennel.ilike.${searchTerm},secondary_kennel.ilike.${searchTerm}`)
       .order('dog_name');
 
     if (error) throw error;
 
-    return createSuccessResponse(data);
+    // Return with no-cache headers
+    return NextResponse.json(
+      { success: true, data },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      }
+    );
   } catch (error: any) {
     return createErrorResponse(error.message);
   }

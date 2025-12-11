@@ -112,6 +112,15 @@ const buildPedigreeGenerations = async (rootDog: Dog): Promise<PedigreeGeneratio
   return generations;
 };
 
+// Helper function to get kennel name
+const getKennelName = (dog: Dog | null): string => {
+  if (!dog) return '';
+  if (typeof dog.primary_kennel === 'object' && dog.primary_kennel?.name) {
+    return dog.primary_kennel.name;
+  }
+  return typeof dog.primary_kennel === 'string' ? dog.primary_kennel : '';
+};
+
 // Pedigree Node Component
 interface PedigreeNodeProps {
   dog: Dog | null;
@@ -135,7 +144,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   const textSizeClasses = {
     large: {
       kennel: 'text-[16.5pt]',
-      name: 'text-[19.5pt]'
+      name: 'text-[23.5pt]' // Increased by 2pt from 21.5pt for 1st generation
     },
     medium: {
       kennel: 'text-[13pt]',
@@ -164,8 +173,17 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {/* For small size on father's side (3rd generation), text comes first (left side) */}
       {isSmallWithTextLeft && (
         <div className="flex-1 min-w-0 flex flex-col justify-center text-right">
-          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue`}>
-            {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>
+            {isUnknown ? 'UNKNOWN' : (() => {
+              const championPrefix = dog?.champion === 'ch' ? 'Ch. ' 
+                : dog?.champion === 'dual_ch' ? 'Dual Ch. '
+                : dog?.champion === 'gr_ch' ? 'Gr. Ch. '
+                : dog?.champion === 'dual_gr_ch' ? 'Dual Gr. Ch. '
+                : dog?.champion === 'nw_gr_ch' ? 'NW. Gr. Ch. '
+                : dog?.champion === 'inw_gr_ch' ? 'INW. Gr. Ch. '
+                : '';
+              return championPrefix + getKennelName(dog);
+            })()}
           </p>
           {dog ? (
             <Link 
@@ -211,8 +229,17 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {/* Dog Info - For large and medium sizes (vertical layout) and small size on mother's side (text right) */}
       {(size === 'large' || size === 'medium' || (size === 'small' && side === 'mother')) && (
         <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
-          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase font-medium tracking-wider leading-tight font-bebas-neue`}>
-            {isUnknown ? 'UNKNOWN' : (dog.primary_kennel || '')}
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>
+            {isUnknown ? 'UNKNOWN' : (() => {
+              const championPrefix = dog?.champion === 'ch' ? 'Ch. ' 
+                : dog?.champion === 'dual_ch' ? 'Dual Ch. '
+                : dog?.champion === 'gr_ch' ? 'Gr. Ch. '
+                : dog?.champion === 'dual_gr_ch' ? 'Dual Gr. Ch. '
+                : dog?.champion === 'nw_gr_ch' ? 'NW. Gr. Ch. '
+                : dog?.champion === 'inw_gr_ch' ? 'INW. Gr. Ch. '
+                : '';
+              return championPrefix + getKennelName(dog);
+            })()}
           </p>
           {dog ? (
             <Link 
@@ -1017,10 +1044,11 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Filter options based on search term
-  const filteredOptions = options.filter(dog =>
-    dog.dog_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dog.primary_kennel.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredOptions = options.filter(dog => {
+    const kennelName = getKennelName(dog);
+    return dog.dog_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      kennelName.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -1059,7 +1087,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
           className="input-spotify w-full text-left flex items-center justify-between pr-8"
         >
           <span className={value ? 'text-white' : 'text-gray-400'}>
-            {value ? `${value.dog_name} (${value.primary_kennel})` : placeholder}
+            {value ? `${value.dog_name} (${getKennelName(value)})` : placeholder}
           </span>
           <div className="flex items-center space-x-2">
             {value && (
@@ -1101,7 +1129,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                     }`}
                   >
                     <div className="text-white font-medium">{dog.dog_name}</div>
-                    <div className="text-sm text-gray-400">{dog.primary_kennel}</div>
+                    <div className="text-sm text-gray-400">{getKennelName(dog)}</div>
                   </button>
                 ))
               )}

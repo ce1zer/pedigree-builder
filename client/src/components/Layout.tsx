@@ -1,12 +1,26 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { Database, Plus, GitBranch } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { Database, Plus, GitBranch, Search, X } from 'lucide-react';
+import { Dog } from '@/types';
+import { dogsApi } from '@/services/api';
 
 // Constants
 const SMALL_ICON_SIZE = 'h-4 w-4';
+
+// Helper function to get kennel name from dog
+const getKennelName = (dog: Dog | null): string => {
+  if (!dog) return '';
+  if (dog.primary_kennel_name) return dog.primary_kennel_name;
+  if (typeof dog.primary_kennel === 'string') return dog.primary_kennel;
+  if (dog.primary_kennel && typeof dog.primary_kennel === 'object') {
+    const kennel = dog.primary_kennel as { name?: string };
+    return kennel.name || '';
+  }
+  return '';
+};
 
 // Navigation item interface
 interface NavItem {
@@ -15,7 +29,7 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
-// Navigation items configuration
+// Navigation items configuration (without Add Dog - it's now in the header)
 const NAV_ITEMS: NavItem[] = [
   {
     href: '/',
@@ -26,11 +40,6 @@ const NAV_ITEMS: NavItem[] = [
     href: '/breeding-simulator',
     label: 'Breeding Simulator',
     icon: <GitBranch className={SMALL_ICON_SIZE} />
-  },
-  {
-    href: '/dogs/new',
-    label: 'Add Dog',
-    icon: <Plus className={SMALL_ICON_SIZE} />
   }
 ];
 
@@ -54,6 +63,261 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive }) => (
   </Link>
 );
 
+// Search Bar Component (separated to use useSearchParams)
+const SearchBar: React.FC<{ pathname: string }> = ({ pathname }) => {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [dogs, setDogs] = useState<Dog[]>([]);
+  const [filteredDogs, setFilteredDogs] = useState<Dog[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const isActive = (path: string) => {
+    if (path === '/') {
+      return pathname === '/';
+    }
+    return pathname.startsWith(path);
+  };
+
+  // Function to load dogs (can be called manually or automatically)
+  const loadDogs = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await dogsApi.getAll();
+      if (response.success && response.data) {
+        setDogs(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load dogs for search:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Load all dogs for autocomplete (lazy load - only when user starts typing)
+  useEffect(() => {
+    // Only load dogs when user starts typing (lazy load)
+    if (searchQuery.trim().length === 0) {
+      return;
+    }
+    
+    // Debounce the API call to avoid loading on every keystroke
+    const timeoutId = setTimeout(async () => {
+      if (dogs.length === 0) { // Only load if not already loaded
+        await loadDogs();
+      }
+    }, 300); // Wait 300ms after user stops typing
+    
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, dogs.length, loadDogs]);
+
+  // Listen for dog creation events to optimistically add new dog
+  useEffect(() => {
+    const handleDogCreated = (event: Event) => {
+      const customEvent = event as CustomEvent<{ newDog: Dog }>;
+      const newDog = customEvent.detail?.newDog;
+      
+      if (newDog) {
+        // Optimistically add new dog immediately if list is already loaded
+        setDogs(prev => {
+          // Check if dog already exists (prevent duplicates)
+          const exists = prev.some(d => d.id === newDog.id);
+          if (exists) return prev;
+          return [...prev, newDog];
+        });
+        
+        // Also refresh in background to ensure we have latest data
+        loadDogs().catch(err => {
+          console.warn('Background refresh failed, but dog is already added:', err);
+        });
+      } else {
+        // Fallback: if no dog data, refresh the list
+        if (dogs.length > 0) {
+          loadDogs();
+        }
+      }
+    };
+
+    window.addEventListener('dog-created', handleDogCreated);
+    return () => {
+      window.removeEventListener('dog-created', handleDogCreated);
+    };
+  }, [dogs.length, loadDogs]);
+
+  // Filter dogs based on search query
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const filtered = dogs.filter(dog => {
+        const primaryKennelName = getKennelName(dog);
+        const query = searchQuery.toLowerCase();
+        return (
+          dog.dog_name?.toLowerCase().includes(query) ||
+          primaryKennelName.toLowerCase().includes(query)
+        );
+      });
+      setFilteredDogs(filtered);
+      setShowSuggestions(true);
+      setSelectedIndex(-1);
+    } else {
+      setFilteredDogs([]);
+      setShowSuggestions(false);
+    }
+  }, [searchQuery, dogs]);
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+
+    if (showSuggestions) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showSuggestions]);
+
+  // Handle keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!showSuggestions || filteredDogs.length === 0) {
+      if (e.key === 'Enter' && searchQuery.trim()) {
+        handleSearch();
+      }
+      return;
+    }
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedIndex(prev => 
+          prev < filteredDogs.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedIndex(prev => (prev > -1 ? prev - 1 : -1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < filteredDogs.length) {
+          handleDogSelect(filteredDogs[selectedIndex]);
+        } else {
+          handleSearch();
+        }
+        break;
+      case 'Escape':
+        e.preventDefault();
+        setShowSuggestions(false);
+        setSearchQuery('');
+        break;
+    }
+  };
+
+  // Handle search submission
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/?q=${encodeURIComponent(searchQuery.trim())}`);
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle dog selection from suggestions
+  const handleDogSelect = (dog: Dog) => {
+    router.push(`/dogs/${dog.id}`);
+    setShowSuggestions(false);
+    setSearchQuery('');
+  };
+
+  // Clear search
+  const handleClear = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSearchQuery('');
+    setShowSuggestions(false);
+    if (pathname === '/') {
+      router.push('/');
+    }
+  };
+
+  return (
+    <div className="relative w-full max-w-md" ref={searchRef}>
+      <div className="relative">
+        <input
+          ref={searchInputRef}
+          type="text"
+          placeholder="Search by name or kennel"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={handleKeyDown}
+          onFocus={() => {
+            if (filteredDogs.length > 0) {
+              setShowSuggestions(true);
+            }
+          }}
+          className="input-spotify w-full pl-4 pr-10"
+        />
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 z-10">
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={handleClear}
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+          <Search className="h-4 w-4 text-gray-400 pointer-events-none" />
+        </div>
+      </div>
+
+      {/* Suggestions Dropdown */}
+      {showSuggestions && filteredDogs.length > 0 && (
+        <div className="absolute z-50 w-full mt-1 bg-[#1e1e1e] border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-auto">
+          {filteredDogs.map((dog, index) => {
+            const kennelName = getKennelName(dog);
+            return (
+              <button
+                key={dog.id}
+                type="button"
+                onClick={() => handleDogSelect(dog)}
+                className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors ${
+                  index === selectedIndex
+                    ? 'bg-gray-700 ring-2 ring-[#3ecf8e] ring-inset'
+                    : ''
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  {dog.image_url ? (
+                    <img
+                      src={dog.image_url}
+                      alt={dog.dog_name}
+                      className="h-10 w-10 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 bg-gray-800 rounded-lg flex items-center justify-center">
+                      <Database className="h-5 w-5 text-gray-500" />
+                    </div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white font-medium truncate">{dog.dog_name}</div>
+                    {kennelName && (
+                      <div className="text-sm text-gray-400 truncate">{kennelName}</div>
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Header component
 const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
   const isActive = (path: string) => {
@@ -66,7 +330,8 @@ const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
   return (
     <header className="bg-[#121212] border-b border-gray-600 backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center h-16">
+        <div className="grid grid-cols-3 items-center h-16 gap-4">
+          {/* Left: Navigation */}
           <nav className="flex space-x-2">
             {NAV_ITEMS.map((item) => (
               <NavLink 
@@ -76,6 +341,24 @@ const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
               />
             ))}
           </nav>
+
+          {/* Center: Search Bar */}
+          <div className="flex justify-center">
+            <Suspense fallback={<div className="w-full max-w-md h-10 bg-gray-800 rounded-lg animate-pulse" />}>
+              <SearchBar pathname={pathname} />
+            </Suspense>
+          </div>
+
+          {/* Right: Add Dog Button */}
+          <div className="flex justify-end">
+            <Link
+              href="/dogs/new"
+              className="border-2 border-white text-white hover:bg-white hover:text-[#121212] px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 inline-flex items-center space-x-2"
+            >
+              <Plus className={SMALL_ICON_SIZE} />
+              <span>Add Dog</span>
+            </Link>
+          </div>
         </div>
       </div>
     </header>

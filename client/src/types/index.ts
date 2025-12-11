@@ -1,8 +1,19 @@
+export interface Kennel {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
 export interface Dog {
   id: string;
   dog_name: string;
-  primary_kennel: string;
-  secondary_kennel?: string;
+  champion?: 'none' | 'ch' | 'dual_ch' | 'gr_ch' | 'dual_gr_ch' | 'nw_gr_ch' | 'inw_gr_ch'; // Champion status
+  primary_kennel?: string | Kennel; // Legacy text field (deprecated) or joined Kennel object
+  secondary_kennel?: string | Kennel; // Legacy text field (deprecated) or joined Kennel object
+  primary_kennel_id?: string;
+  secondary_kennel_id?: string;
+  primary_kennel_name?: string; // For display purposes
+  secondary_kennel_name?: string; // For display purposes
   gender: 'male' | 'female';
   image_url?: string;
   father_id?: string;
@@ -14,8 +25,9 @@ export interface Dog {
 
 export interface DogFormData {
   dog_name: string;
-  primary_kennel: string;
-  secondary_kennel?: string;
+  champion?: 'none' | 'ch' | 'dual_ch' | 'gr_ch' | 'dual_gr_ch' | 'nw_gr_ch' | 'inw_gr_ch';
+  primary_kennel_id?: string;
+  secondary_kennel_id?: string;
   gender: 'male' | 'female';
   father_id?: string;
   mother_id?: string;

@@ -13,7 +13,7 @@
     "axios": "^1.12.2",
     "html2canvas": "^1.4.1",
     "lucide-react": "^0.546.0",
-    "next": "16.0.0",
+    "next": "^16.0.8",
     "puppeteer": "^24.26.1",
     "react": "19.2.0",
     "react-dom": "19.2.0",
@@ -29,7 +29,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.0.0",
+    "eslint-config-next": "^16.0.8",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

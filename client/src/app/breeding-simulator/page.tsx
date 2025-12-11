@@ -136,23 +136,23 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   };
 
   const imageSizeClasses = {
-    large: 'w-2/3 aspect-[4/3]',
-    medium: 'w-[35%] aspect-[4/3]',
-    small: 'w-1/4 aspect-[4/3]'
+    large: 'w-full aspect-[4/3]', // Increased by 50%: w-2/3 (66.67%) -> w-full (100%)
+    medium: 'w-[52.5%] aspect-[4/3]', // Increased by 50%: w-[35%] -> w-[52.5%]
+    small: 'w-[37.5%] aspect-[4/3]' // Increased by 50%: w-1/4 (25%) -> w-[37.5%]
   };
 
   const textSizeClasses = {
     large: {
-      kennel: 'text-[16.5pt]',
-      name: 'text-[23.5pt]' // Increased by 2pt from 21.5pt for 1st generation
+      kennel: 'text-[8.25pt]', // Reduced by 50%: 16.5pt -> 8.25pt
+      name: 'text-[11.75pt]' // Reduced by 50%: 23.5pt -> 11.75pt
     },
     medium: {
-      kennel: 'text-[13pt]',
-      name: 'text-[15pt]'
+      kennel: 'text-[6.5pt]', // Reduced by 50%: 13pt -> 6.5pt
+      name: 'text-[7.5pt]' // Reduced by 50%: 15pt -> 7.5pt
     },
     small: {
-      kennel: 'text-[12pt]',
-      name: 'text-[13pt]'
+      kennel: 'text-[6pt]', // Reduced by 50%: 12pt -> 6pt
+      name: 'text-[6.5pt]' // Reduced by 50%: 13pt -> 6.5pt
     }
   };
 
@@ -753,28 +753,6 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       </div>
       
       <div ref={pedigreeRef} data-pedigree-export>
-        {/* Generation Labels - 6 columns */}
-        <div className="grid grid-cols-6 gap-x-[0.2rem] mb-8">
-          <div className="text-left">
-            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father 3rd gen</p>
-          </div>
-          <div className="text-center">
-            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father 2nd gen</p>
-          </div>
-          <div className="text-center">
-            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Father</p>
-          </div>
-          <div className="text-center">
-            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother</p>
-          </div>
-          <div className="text-center">
-            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 2nd gen</p>
-          </div>
-          <div className="text-center">
-            <p className="text-[12.5pt] text-white uppercase font-bold tracking-wider font-bebas-neue">Mother 3rd gen</p>
-          </div>
-        </div>
-
         {/* 6 Column Mirrored Layout - Matching exact layout from original pedigree */}
         {/* Gap reduced by 70%: from 0.2rem to 0.06rem (~1px) */}
         <div className="pedigree-grid grid grid-cols-6 gap-x-[0.06rem] w-full items-start mx-auto" style={{ maxWidth: '1600px' }}>

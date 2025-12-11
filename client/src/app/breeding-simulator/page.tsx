@@ -136,8 +136,8 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   };
 
   const imageSizeClasses = {
-    large: 'w-full', // Increased by 50%: w-2/3 (66.67%) -> w-full (100%), height increased by 15% via aspect ratio
-    medium: 'w-[52.5%] aspect-[4/3]', // Increased by 50%: w-[35%] -> w-[52.5%]
+    large: 'w-full', // Will use scale transform for 10% increase
+    medium: 'w-[57.75%] aspect-[4/3]', // Increased by 10%: 52.5% -> 57.75%
     small: 'w-[37.5%] aspect-[4/3]' // Increased by 50%: w-1/4 (25%) -> w-[37.5%]
   };
 
@@ -203,7 +203,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {dog ? (
         <Link 
           href={`/dogs/${dog.id}`} 
-          className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2 hover:underline block`}
+          className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2 hover:underline block ${size === 'large' || size === 'medium' ? 'scale-110' : ''}`}
         >
           {dog?.image_url ? (
             <img
@@ -218,7 +218,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           )}
         </Link>
       ) : (
-        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2`}>
+        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2 ${size === 'large' || size === 'medium' ? 'scale-110' : ''}`}>
           <div className={`w-full h-full bg-gray-800 flex items-center justify-center ${size === 'large' ? 'aspect-[4/3.45]' : 'aspect-[4/3]'}`}>
             <PlaceholderSVG />
           </div>

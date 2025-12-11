@@ -1199,7 +1199,7 @@ const BreedingSimulator: React.FC = () => {
   }, [loadPedigrees]);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8">
+    <div className="mx-auto space-y-8" style={{ maxWidth: '960px' }}>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">

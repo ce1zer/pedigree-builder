@@ -144,7 +144,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   const textSizeClasses = {
     large: {
       kennel: 'text-[8.25pt]', // Reduced by 50%: 16.5pt -> 8.25pt
-      name: 'text-[11.75pt]' // Reduced by 50%: 23.5pt -> 11.75pt
+      name: 'text-[13.75pt]' // Increased by 2pt: 11.75pt -> 13.75pt for 1st generation
     },
     medium: {
       kennel: 'text-[6.5pt]', // Reduced by 50%: 13pt -> 6.5pt

@@ -168,10 +168,10 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
   const gapClass = size === 'large' ? 'gap-[5px]' : size === 'medium' ? 'gap-[2px]' : 'gap-3';
   
   return (
-    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass}`}>
+    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass} ${size === 'small' ? 'h-full' : ''}`}>
       {/* For small size on father's side (3rd generation), text comes first (left side) */}
       {isSmallWithTextLeft && (
-        <div className="flex-1 min-w-0 flex flex-col justify-center text-right">
+        <div className="flex-1 min-w-0 flex flex-col justify-center items-end text-right" style={{ height: '100%' }}>
           <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>
             {isUnknown ? 'UNKNOWN' : (() => {
               const championPrefix = dog?.champion === 'ch' ? 'Ch. ' 
@@ -203,7 +203,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {dog ? (
         <Link 
           href={`/dogs/${dog.id}`} 
-          className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2 hover:underline block`}
+          className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2 hover:underline block`}
         >
           {dog?.image_url ? (
             <img
@@ -218,7 +218,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           )}
         </Link>
       ) : (
-        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} ${imageBorderColor} border-2`}>
+        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2`}>
           <div className={`w-full h-full bg-gray-800 flex items-center justify-center ${size === 'large' ? 'aspect-[4/3.45]' : 'aspect-[4/3]'}`}>
             <PlaceholderSVG />
           </div>
@@ -227,7 +227,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       
       {/* Dog Info - For large and medium sizes (vertical layout) and small size on mother's side (text right) */}
       {(size === 'large' || size === 'medium' || (size === 'small' && side === 'mother')) && (
-        <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
+        <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'} ${size === 'small' ? 'h-full' : ''}`}>
           <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>
             {isUnknown ? 'UNKNOWN' : (() => {
               const championPrefix = dog?.champion === 'ch' ? 'Ch. ' 

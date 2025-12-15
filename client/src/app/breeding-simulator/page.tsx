@@ -738,7 +738,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
   }, []);
 
   return (
-    <div className="bg-arbor p-8 w-full">
+    <div className="card w-full">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-xl font-semibold text-white">Breeding Simulator - 6 Generation Pedigree</h2>
         <button
@@ -1176,7 +1176,7 @@ const BreedingSimulator: React.FC = () => {
   }, [loadPedigrees]);
 
   return (
-    <div className="mx-auto space-y-8" style={{ maxWidth: '768px' }}>
+    <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">

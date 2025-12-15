@@ -3,6 +3,7 @@ import { Inter, Bebas_Neue } from "next/font/google";
 import "./globals.css";
 import Layout from "@/components/Layout";
 import { Toaster } from "react-hot-toast";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 const bebasNeue = Bebas_Neue({ 
@@ -27,6 +28,7 @@ export default function RootLayout({
         <Layout>
           {children}
         </Layout>
+        <SpeedInsights />
         <Toaster 
           position="top-right"
           toastOptions={{

@@ -103,3 +103,6 @@ Desktop.ini
 .local-chromium/
 node_modules
 .vercel
+
+# Cursor / IDE metadata
+.cursor/

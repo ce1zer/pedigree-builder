@@ -202,7 +202,7 @@ const KennelsView: React.FC<KennelsViewProps> = ({ kennels, loading, onRefresh }
           {kennels.map((kennel) => (
             <div
               key={kennel.id}
-              className="card-spotify group relative"
+              className="card-spotify card-spotify-interactive group relative"
             >
               {editingId === kennel.id ? (
                 <div className="space-y-3">
@@ -325,7 +325,7 @@ const DogsView: React.FC<DogsViewProps> = ({ dogs, filteredDogs, loading, search
             <Link 
               key={dog.id} 
               href={`/dogs/${dog.id}`}
-              className="card-spotify group cursor-pointer relative"
+              className="card-spotify card-spotify-interactive group cursor-pointer relative"
             >
               {/* Edit Icon - Top Right Corner */}
               <button

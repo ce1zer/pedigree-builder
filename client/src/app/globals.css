@@ -339,7 +339,8 @@ select.input-spotify {
   transition: all 0.2s ease;
 }
 
-.card-spotify:hover {
+/* Only apply hover styling when the card is actually interactive */
+.card-spotify-interactive:hover {
   background-color: var(--card-hover);
 }
 
@@ -353,7 +354,7 @@ select.input-spotify {
   transition: all 0.2s ease;
 }
 
-.card-spotify-elevated:hover {
+.card-spotify-elevated-interactive:hover {
   box-shadow: var(--shadow-elevated-hover);
 }
 

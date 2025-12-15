@@ -775,6 +775,96 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
   );
 };
 
+// Screen Pedigree Node Component - neutral theme styling (export must remain unchanged)
+interface PedigreeNodeScreenProps {
+  dog: Dog | null;
+  size?: 'large' | 'medium' | 'small';
+  imageCacheBuster?: number;
+}
+
+const PedigreeNodeScreen: React.FC<PedigreeNodeScreenProps> = ({ dog, size = 'medium', imageCacheBuster = 0 }) => {
+  // Keep the exact layout structure/sizing consistent with export node
+  const sizeClasses = {
+    large: 'w-full h-full',
+    medium: 'w-full h-full',
+    small: 'w-full h-full'
+  };
+
+  const imageSizeClasses = {
+    large: 'w-2/3 aspect-[4/3]',
+    medium: 'w-[35%] aspect-[4/3]',
+    small: 'w-1/4 aspect-[4/3]'
+  };
+
+  const isUnknown = !dog;
+  const isVerticalLayout = size === 'large';
+  const gapClass = size === 'large' ? 'gap-[11.25px]' : 'gap-3';
+
+  const kennelLine = isUnknown ? 'Unknown' : (() => {
+    const championPrefix = dog?.champion === 'ch' ? 'Ch. '
+      : dog?.champion === 'dual_ch' ? 'Dual Ch. '
+      : dog?.champion === 'gr_ch' ? 'Gr. Ch. '
+      : dog?.champion === 'dual_gr_ch' ? 'Dual Gr. Ch. '
+      : dog?.champion === 'nw_gr_ch' ? 'NW. Gr. Ch. '
+      : dog?.champion === 'inw_gr_ch' ? 'INW. Gr. Ch. '
+      : '';
+    const kennelName = typeof dog?.primary_kennel === 'object' && dog?.primary_kennel?.name
+      ? dog.primary_kennel.name
+      : (typeof dog?.primary_kennel === 'string' ? dog.primary_kennel : dog?.primary_kennel_name || '');
+    return (championPrefix + kennelName).trim() || '—';
+  })();
+
+  return (
+    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass}`}>
+      {/* Image */}
+      {dog ? (
+        <Link
+          href={`/dogs/${dog.id}`}
+          className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} border border-[color:var(--border)] rounded-lg bg-[var(--card)] block`}
+        >
+          {getImageUrl(dog?.image_url) ? (
+            <img
+              src={`${getImageUrl(dog.image_url)!}?t=${imageCacheBuster}`}
+              alt={dog.dog_name || 'Unknown'}
+              className="w-full h-full object-cover aspect-[4/3]"
+              key={`${dog.image_url}-${imageCacheBuster}`}
+            />
+          ) : (
+            <div className="w-full h-full bg-[var(--muted)] flex items-center justify-center aspect-[4/3]">
+              <PlaceholderSVG className="w-3/4 h-3/4 object-contain opacity-40" />
+            </div>
+          )}
+        </Link>
+      ) : (
+        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0'} border border-[color:var(--border)] rounded-lg bg-[var(--card)]`}>
+          <div className="w-full h-full bg-[var(--muted)] flex items-center justify-center aspect-[4/3]">
+            <PlaceholderSVG className="w-3/4 h-3/4 object-contain opacity-40" />
+          </div>
+        </div>
+      )}
+
+      {/* Text */}
+      <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
+        <p className="text-xs text-[color:var(--muted-foreground)] uppercase tracking-wider leading-tight">
+          {kennelLine}
+        </p>
+        {dog ? (
+          <Link
+            href={`/dogs/${dog.id}`}
+            className="text-sm text-[color:var(--foreground)] font-medium leading-tight block truncate mt-[2px]"
+          >
+            {dog.dog_name}
+          </Link>
+        ) : (
+          <p className="text-sm text-[color:var(--foreground)] font-medium leading-tight mt-[2px]">
+            Unknown
+          </p>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // Main Dog Display Component (Top Center)
 interface MainDogDisplayProps {
   dog: Dog;
@@ -833,8 +923,10 @@ interface PedigreeTreeProps {
 }
 
 const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBuster }) => {
-  const pedigreeRef = useRef<HTMLDivElement>(null);
+  const screenPedigreeRef = useRef<HTMLDivElement>(null);
+  const exportPedigreeRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
+  const [exportWidthPx, setExportWidthPx] = useState<number | null>(null);
 
   // Extract dogs from each generation - both father's and mother's side
   const parents = generations[1]?.dogs || [null, null];
@@ -861,9 +953,22 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
   const mmFather = greatGrandparents[6]; // Mother's Mother's Father
   const mmMother = greatGrandparents[7]; // Mother's Mother's Mother
 
+  // Keep export subtree width in sync with the visible on-page tree so PNG dimensions remain unchanged.
+  useEffect(() => {
+    const el = screenPedigreeRef.current;
+    if (!el) return;
+
+    const update = () => setExportWidthPx(el.offsetWidth || null);
+    update();
+
+    const ro = new ResizeObserver(() => update());
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   // Export pedigree to PNG
   const handleExportToPNG = useCallback(async () => {
-    if (!pedigreeRef.current) {
+    if (!exportPedigreeRef.current) {
       toast.error('Unable to export pedigree');
       return;
     }
@@ -1244,7 +1349,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       };
       
       // Create isolated clone
-      const isolatedClone = createIsolatedClone(pedigreeRef.current);
+      const isolatedClone = createIsolatedClone(exportPedigreeRef.current);
       
       // Remove generation labels from export
       // The generation labels are always the first direct child div of the pedigree container
@@ -1284,9 +1389,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       await Promise.all(imagePromises);
       
       // Apply computed styles to the root clone to ensure exact layout match
-      const rootComputed = window.getComputedStyle(pedigreeRef.current);
-      const originalWidth = pedigreeRef.current.offsetWidth;
-      const originalHeight = pedigreeRef.current.offsetHeight;
+      const rootComputed = window.getComputedStyle(exportPedigreeRef.current);
+      const originalWidth = exportPedigreeRef.current.offsetWidth;
+      const originalHeight = exportPedigreeRef.current.offsetHeight;
       
       // Apply all computed styles to root clone for exact match
       isolatedClone.style.width = rootComputed.width;
@@ -1395,8 +1500,117 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
         </button>
       </div>
       
-      {/* Pedigree Tree Content - This is what gets exported */}
-      <div ref={pedigreeRef} data-pedigree-export className="theme-legacy">
+      {/* Visible (screen) pedigree - neutral theme styling */}
+      <div ref={screenPedigreeRef}>
+        {/* Generation Labels */}
+        <div className="grid grid-cols-3 gap-x-8 mb-8">
+          <div className="text-center">
+            <p className="text-xs text-[color:var(--muted-foreground)] uppercase tracking-wider">1st generation</p>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-[color:var(--muted-foreground)] uppercase tracking-wider">2nd generation</p>
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-[color:var(--muted-foreground)] uppercase tracking-wider">3rd generation</p>
+          </div>
+        </div>
+
+        {/* Pedigree Tree Layout - keep structure/dimensions identical */}
+        <div className="grid grid-cols-3 gap-x-[0.2rem] w-full items-start">
+          {/* Column 1: Parents */}
+          <div className="flex flex-col relative" style={{ height: '100%' }}>
+            <div className="relative" style={{ height: '50%' }}>
+              <div className="h-full w-full flex items-center justify-center">
+                <PedigreeNodeScreen dog={father} size="large" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '50%' }}>
+              <div className="h-full w-full flex items-center justify-center">
+                <PedigreeNodeScreen dog={mother} size="large" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+          </div>
+
+          {/* Column 2: Grandparents */}
+          <div className="flex flex-col relative" style={{ height: '100%' }}>
+            <div className="relative" style={{ height: '25%' }}>
+              <div className="h-full flex items-center justify-center">
+                <PedigreeNodeScreen dog={fatherFather} size="medium" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '25%' }}>
+              <div className="h-full flex items-center justify-center">
+                <PedigreeNodeScreen dog={fatherMother} size="medium" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '25%' }}>
+              <div className="h-full flex items-center justify-center">
+                <PedigreeNodeScreen dog={motherFather} size="medium" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '25%' }}>
+              <div className="h-full flex items-center justify-center">
+                <PedigreeNodeScreen dog={motherMother} size="medium" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+          </div>
+
+          {/* Column 3: Great-grandparents */}
+          <div className="flex flex-col" style={{ height: '100%' }}>
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNodeScreen dog={ffFather} size="small" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNodeScreen dog={ffMother} size="small" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNodeScreen dog={fmFather} size="small" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNodeScreen dog={fmMother} size="small" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNodeScreen dog={mfFather} size="small" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNodeScreen dog={mfMother} size="small" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNodeScreen dog={mmFather} size="small" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+            <div className="relative" style={{ height: '12.5%' }}>
+              <div className="h-full flex items-center justify-center py-1">
+                <PedigreeNodeScreen dog={mmMother} size="small" imageCacheBuster={imageCacheBuster} />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Offscreen export pedigree - legacy styling must remain pixel-identical */}
+      <div
+        style={{
+          position: 'fixed',
+          left: '-10000px',
+          top: 0,
+          width: exportWidthPx ? `${exportWidthPx}px` : undefined,
+        }}
+      >
+        <div ref={exportPedigreeRef} data-pedigree-export className="theme-legacy">
         {/* Generation Labels */}
         <div className="grid grid-cols-3 gap-x-8 mb-8">
           <div className="text-center">
@@ -1520,6 +1734,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
             </div>
           </div>
         </div>
+      </div>
       </div>
       </div>
     </div>

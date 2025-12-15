@@ -42,6 +42,136 @@
   /* Shadows */
   --shadow-elevated: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   --shadow-elevated-hover: 0 25px 50px -12px rgba(62, 207, 142, 0.1); /* Green tint */
+
+  /* Layout / UI tokens used by the neutral theme scope (keeps exports unchanged) */
+  --header-bg: #121212;
+  --header-border: #4b5563; /* tailwind gray-600 */
+  --nav-active-bg: #171717;
+  --nav-hover-bg: #303036;
+  --nav-hover-fg: var(--primary);
+  --popover-bg: #1e1e1e;
+  --popover-border: #374151; /* tailwind gray-700 */
+  --cta-border: #ffffff;
+  --cta-fg: #ffffff;
+  --cta-hover-bg: #ffffff;
+  --cta-hover-fg: #121212;
+  --ring-color: var(--primary);
+
+  /* Shape / motion tokens */
+  --radius-button: 9999px;
+  --button-padding-y: 0.75rem;
+  --button-padding-x: 1.5rem;
+  --button-ghost-padding-y: 0.5rem;
+  --button-ghost-padding-x: 1rem;
+  --button-hover-scale: 1.05;
+}
+
+/* Explicit legacy theme scope (export-sensitive routes) */
+.theme-legacy {
+  --background: #121212;
+  --foreground: hsl(0, 0%, 100%);
+  --primary: hsl(142.1, 76.2%, 36.3%);
+  --primary-foreground: hsl(240, 10%, 3.9%);
+  --primary-hover: hsl(142.1, 76.2%, 42%);
+
+  --card-bg: #171717;
+  --card-hover: #1f1f1f;
+  --card-foreground: hsl(0, 0%, 100%);
+
+  --border-color: hsl(240, 5.9%, 20%);
+  --border-light: hsl(240, 5.9%, 30%);
+
+  --text-primary: hsl(0, 0%, 100%);
+  --text-secondary: hsl(240, 4.8%, 95.9%);
+  --text-muted: hsl(240, 3.8%, 46.1%);
+
+  --button-secondary-bg: hsl(240, 5.9%, 20%);
+  --button-secondary-border: hsl(240, 5.9%, 30%);
+  --button-secondary-hover-bg: hsl(240, 5.9%, 25%);
+  --button-secondary-hover-border: hsl(240, 5.9%, 35%);
+
+  --input-bg: hsl(240, 5.9%, 15%);
+  --input-border: hsl(240, 5.9%, 25%);
+  --input-focus-border: hsl(142.1, 76.2%, 36.3%);
+  --input-focus-shadow: rgba(62, 207, 142, 0.2);
+
+  --shadow-elevated: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  --shadow-elevated-hover: 0 25px 50px -12px rgba(62, 207, 142, 0.1);
+
+  --header-bg: #121212;
+  --header-border: #4b5563;
+  --nav-active-bg: #171717;
+  --nav-hover-bg: #303036;
+  --nav-hover-fg: var(--primary);
+  --popover-bg: #1e1e1e;
+  --popover-border: #374151;
+  --cta-border: #ffffff;
+  --cta-fg: #ffffff;
+  --cta-hover-bg: #ffffff;
+  --cta-hover-fg: #121212;
+  --ring-color: var(--primary);
+
+  --radius-button: 9999px;
+  --button-padding-y: 0.75rem;
+  --button-padding-x: 1.5rem;
+  --button-ghost-padding-y: 0.5rem;
+  --button-ghost-padding-x: 1rem;
+  --button-hover-scale: 1.05;
+}
+
+/* Neutral (Vercel-like) dark theme scope for non-export pages */
+.theme-neutral {
+  --background: #000000;
+  --foreground: #fafafa;
+
+  /* Neutral primary (no green) */
+  --primary: #fafafa;
+  --primary-foreground: #0a0a0a;
+  --primary-hover: #e5e5e5;
+
+  --card-bg: #0a0a0a;
+  --card-hover: #111111;
+  --card-foreground: #fafafa;
+
+  --border-color: #262626;
+  --border-light: #333333;
+
+  --text-primary: #fafafa;
+  --text-secondary: #e4e4e7;
+  --text-muted: #a1a1aa;
+
+  --button-secondary-bg: #0a0a0a;
+  --button-secondary-border: #262626;
+  --button-secondary-hover-bg: #111111;
+  --button-secondary-hover-border: #333333;
+
+  --input-bg: #0a0a0a;
+  --input-border: #262626;
+  --input-focus-border: #525252;
+  --input-focus-shadow: rgba(250, 250, 250, 0.08);
+
+  --shadow-elevated: 0 20px 40px -24px rgba(0, 0, 0, 0.8);
+  --shadow-elevated-hover: 0 20px 40px -24px rgba(0, 0, 0, 0.8);
+
+  --header-bg: #000000;
+  --header-border: #262626;
+  --nav-active-bg: #0a0a0a;
+  --nav-hover-bg: #111111;
+  --nav-hover-fg: #fafafa;
+  --popover-bg: #0a0a0a;
+  --popover-border: #262626;
+  --cta-border: #262626;
+  --cta-fg: #fafafa;
+  --cta-hover-bg: #fafafa;
+  --cta-hover-fg: #0a0a0a;
+  --ring-color: #fafafa;
+
+  --radius-button: 10px;
+  --button-padding-y: 0.55rem;
+  --button-padding-x: 0.95rem;
+  --button-ghost-padding-y: 0.55rem;
+  --button-ghost-padding-x: 0.95rem;
+  --button-hover-scale: 1;
 }
 
 /* Tailwind Theme Configuration */
@@ -75,8 +205,8 @@ body {
   background-color: var(--primary);
   color: var(--primary-foreground);
   font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  border-radius: 9999px;
+  padding: var(--button-padding-y) var(--button-padding-x);
+  border-radius: var(--radius-button);
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -89,7 +219,7 @@ body {
 
 .btn-spotify-primary:hover:not(:disabled) {
   background-color: var(--primary-hover);
-  transform: scale(1.05);
+  transform: scale(var(--button-hover-scale));
 }
 
 .btn-spotify-primary:disabled {
@@ -103,8 +233,8 @@ body {
   background-color: var(--button-secondary-bg);
   color: #ffffff;
   font-weight: 500;
-  padding: 0.75rem 1.5rem;
-  border-radius: 9999px;
+  padding: var(--button-padding-y) var(--button-padding-x);
+  border-radius: var(--radius-button);
   border: 1px solid var(--button-secondary-border);
   cursor: pointer;
   transition: all 0.2s ease;
@@ -129,8 +259,8 @@ body {
   background-color: transparent;
   color: var(--text-secondary);
   font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 9999px;
+  padding: var(--button-ghost-padding-y) var(--button-ghost-padding-x);
+  border-radius: var(--radius-button);
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;

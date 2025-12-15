@@ -509,7 +509,7 @@ const DashboardContent: React.FC = () => {
             onClick={() => setView('dogs')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
               view === 'dogs'
-                ? 'bg-[#3ecf8e] text-[#121212]'
+                ? 'bg-[var(--primary)] text-[color:var(--primary-foreground)]'
                 : 'text-gray-300 hover:text-white'
             }`}
           >
@@ -522,7 +522,7 @@ const DashboardContent: React.FC = () => {
             onClick={() => setView('kennels')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
               view === 'kennels'
-                ? 'bg-[#3ecf8e] text-[#121212]'
+                ? 'bg-[var(--primary)] text-[color:var(--primary-foreground)]'
                 : 'text-gray-300 hover:text-white'
             }`}
           >

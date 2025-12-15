@@ -54,8 +54,8 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive }) => (
     href={item.href}
     className={`flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
       isActive 
-        ? 'bg-[#171717] text-white' 
-        : 'text-gray-300 hover:text-[#3ecf8e] hover:bg-[#303036]'
+        ? 'bg-[var(--nav-active-bg)] text-[color:var(--text-primary)]'
+        : 'text-[color:var(--text-secondary)] hover:text-[color:var(--nav-hover-fg)] hover:bg-[var(--nav-hover-bg)]'
     }`}
   >
     {item.icon}
@@ -276,7 +276,7 @@ const SearchBar: React.FC<{ pathname: string }> = ({ pathname }) => {
 
       {/* Suggestions Dropdown */}
       {showSuggestions && filteredDogs.length > 0 && (
-        <div className="absolute z-50 w-full mt-1 bg-[#1e1e1e] border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <div className="absolute z-50 w-full mt-1 bg-[var(--popover-bg)] border border-[color:var(--popover-border)] rounded-lg shadow-lg max-h-60 overflow-auto">
           {filteredDogs.map((dog, index) => {
             const kennelName = getKennelName(dog);
             return (
@@ -286,7 +286,7 @@ const SearchBar: React.FC<{ pathname: string }> = ({ pathname }) => {
                 onClick={() => handleDogSelect(dog)}
                 className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors ${
                   index === selectedIndex
-                    ? 'bg-gray-700 ring-2 ring-[#3ecf8e] ring-inset'
+                    ? 'bg-gray-700 ring-2 ring-[color:var(--ring-color)] ring-inset'
                     : ''
                 }`}
               >
@@ -328,7 +328,7 @@ const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
   };
 
   return (
-    <header className="bg-[#121212] border-b border-gray-600 backdrop-blur-sm sticky top-0 z-50">
+    <header className="bg-[var(--header-bg)] border-b border-[color:var(--header-border)] backdrop-blur-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-3 items-center h-16 gap-4">
           {/* Left: Navigation */}
@@ -353,7 +353,7 @@ const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
           <div className="flex justify-end">
             <Link
               href="/dogs/new"
-              className="border-2 border-white text-white hover:bg-white hover:text-[#121212] px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 inline-flex items-center space-x-2"
+              className="border-2 border-[color:var(--cta-border)] text-[color:var(--cta-fg)] hover:bg-[var(--cta-hover-bg)] hover:text-[color:var(--cta-hover-fg)] px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 inline-flex items-center space-x-2"
             >
               <Plus className={SMALL_ICON_SIZE} />
               <span>Add Dog</span>
@@ -373,8 +373,16 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const pathname = usePathname();
 
+  // Keep export-sensitive routes on the legacy theme to preserve PNG export pixel output.
+  const isExportSensitiveRoute =
+    pathname === '/breeding-simulator' ||
+    pathname.startsWith('/breeding-simulator/') ||
+    (pathname.startsWith('/dogs/') && pathname !== '/dogs/new');
+
+  const themeClass = isExportSensitiveRoute ? 'theme-legacy' : 'theme-neutral';
+
   return (
-    <div className="min-h-screen bg-[#121212]">
+    <div className={`min-h-screen ${themeClass} bg-[var(--background)]`}>
       <Header pathname={pathname} />
       
       <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">

@@ -547,7 +547,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                     setSearchTerm('');
                   }
                 }}
-                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3ecf8e]"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--ring-color)]"
                 autoFocus
               />
             </div>
@@ -562,7 +562,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                     onClick={() => handleSelect(dog)}
                     className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors ${
                       index === selectedIndex
-                        ? 'bg-gray-700 ring-2 ring-[#3ecf8e] ring-inset'
+                        ? 'bg-gray-700 ring-2 ring-[color:var(--ring-color)] ring-inset'
                         : ''
                     } ${
                       value?.id === dog.id ? 'bg-gray-600 hover:bg-gray-700' : ''

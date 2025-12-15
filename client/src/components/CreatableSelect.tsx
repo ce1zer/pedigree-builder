@@ -249,7 +249,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
         </div>
 
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-[#1e1e1e] border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-auto">
+          <div className="absolute z-50 w-full mt-1 bg-[var(--popover-bg)] border border-[color:var(--popover-border)] rounded-lg shadow-lg max-h-60 overflow-auto">
             {loading ? (
               <div className="px-4 py-2 text-gray-400 text-sm">Loading...</div>
             ) : filteredKennels.length > 0 ? (
@@ -261,7 +261,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
                     onClick={() => handleSelect(kennel)}
                     className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors ${
                       index === selectedIndex
-                        ? 'bg-gray-700 ring-2 ring-[#3ecf8e] ring-inset'
+                        ? 'bg-gray-700 ring-2 ring-[color:var(--ring-color)] ring-inset'
                         : ''
                     } ${
                       value?.id === kennel.id ? 'bg-gray-600 hover:bg-gray-700' : ''
@@ -277,7 +277,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
                 onClick={() => handleCreateKennel(searchTerm.trim())}
                 className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors ${
                   selectedIndex === filteredKennels.length
-                    ? 'bg-gray-700 ring-2 ring-[#3ecf8e] ring-inset'
+                    ? 'bg-gray-700 ring-2 ring-[color:var(--ring-color)] ring-inset'
                     : ''
                 }`}
               >

@@ -7,6 +7,27 @@
 **Status:** ● Ready  
 **Last Deployed:** Just now
 
+## 🔐 Restrict access (basic protection)
+
+If you want the app **not publicly accessible** at the production URL, the simplest options are:
+
+### Option A (recommended): Vercel Deployment/Password Protection (no code changes)
+
+In Vercel, open your project → **Settings** → **Deployment Protection / Password Protection** (label varies) and enable it for **Production**.
+
+- This blocks access **before** your app loads.
+- If you don’t see this option, your Vercel plan may not include it. Use Option B.
+
+### Option B (fallback): Basic Auth via Next.js Middleware (prod only)
+
+This adds **HTTP Basic Auth** at the edge for production requests.
+
+- Set these env vars in **Vercel → Settings → Environment Variables** (Production):
+  - `BASIC_AUTH_USER`
+  - `BASIC_AUTH_PASS`
+
+Then redeploy. When you visit the site, the browser will prompt for a username/password.
+
 ## 🔧 Required Environment Variables
 
 The application requires the following environment variables to be set in Vercel:

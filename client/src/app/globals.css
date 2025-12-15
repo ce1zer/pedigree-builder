@@ -374,6 +374,34 @@ select.input {
 }
 
 /* ==========================================================================
+   Pedigree (screen vs export)
+   ========================================================================== */
+
+/* Keep export DOM in the layout context but off-screen (do NOT use display:none) */
+.pedigree-export-only {
+  position: absolute;
+  left: -99999px;
+  top: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* Screen-only pedigree styling to match app theme without changing export output */
+.pedigree-screen .font-bebas-neue {
+  font-family: var(--font-sans) !important;
+}
+
+/* Replace the pedigree's custom gray with the app's muted text */
+.pedigree-screen .text-\[\#717179\] {
+  color: var(--text-muted) !important;
+}
+
+/* Use app borders instead of pure white borders on screen */
+.pedigree-screen .border-white {
+  border-color: var(--border-color) !important;
+}
+
+/* ==========================================================================
    BullyDEX Pedigree Tree Styles
    ========================================================================== */
 

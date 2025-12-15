@@ -265,7 +265,7 @@ interface BreedingSimulatorTreeProps {
 }
 
 const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGenerations, motherGenerations }) => {
-  const pedigreeRef = useRef<HTMLDivElement>(null);
+  const exportPedigreeRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   // Extract father's side - we need the father's parents, grandparents, and great-grandparents
@@ -330,7 +330,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
 
   // Export pedigree to PNG
   const handleExportToPNG = useCallback(async () => {
-    if (!pedigreeRef.current) {
+    if (!exportPedigreeRef.current) {
       toast.error('Unable to export pedigree');
       return;
     }
@@ -662,7 +662,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         return clone;
       };
       
-      const isolatedClone = createIsolatedClone(pedigreeRef.current);
+      const isolatedClone = createIsolatedClone(exportPedigreeRef.current);
       
       // Remove generation labels from export
       // The generation labels are always the first direct child div of the pedigree container
@@ -680,7 +680,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       }
       
       // Apply computed styles to the root clone to ensure exact layout match
-      const rootComputed = window.getComputedStyle(pedigreeRef.current);
+      const rootComputed = window.getComputedStyle(exportPedigreeRef.current);
       isolatedClone.style.width = rootComputed.width;
       isolatedClone.style.height = rootComputed.height;
       isolatedClone.style.maxWidth = rootComputed.maxWidth;
@@ -692,8 +692,8 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       tempContainer.style.position = 'absolute';
       tempContainer.style.left = '-9999px';
       tempContainer.style.top = '0';
-      tempContainer.style.width = pedigreeRef.current.offsetWidth + 'px';
-      tempContainer.style.height = pedigreeRef.current.offsetHeight + 'px';
+      tempContainer.style.width = exportPedigreeRef.current.offsetWidth + 'px';
+      tempContainer.style.height = exportPedigreeRef.current.offsetHeight + 'px';
       tempContainer.style.backgroundColor = 'transparent';
       tempContainer.appendChild(isolatedClone);
       document.body.appendChild(tempContainer);
@@ -737,24 +737,11 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
     }
   }, []);
 
-  return (
-    <div className="card w-full">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-xl font-semibold text-white">Breeding Simulator - 6 Generation Pedigree</h2>
-        <button
-          onClick={handleExportToPNG}
-          disabled={isExporting}
-          className="btn-secondary inline-flex items-center space-x-2"
-        >
-          <Download className="h-4 w-4" />
-          <span>{isExporting ? 'Exporting...' : 'Export to PNG'}</span>
-        </button>
-      </div>
-      
-      <div ref={pedigreeRef} data-pedigree-export className="theme-legacy">
-        {/* 6 Column Mirrored Layout - Matching exact layout from original pedigree */}
-        {/* Gap reduced by 70%: from 0.2rem to 0.06rem (~1px) */}
-        <div className="pedigree-grid grid grid-cols-6 gap-x-[0.06rem] w-full items-start mx-auto" style={{ maxWidth: '1600px' }}>
+  const PedigreeTreeContent = () => (
+    <>
+      {/* 6 Column Mirrored Layout - Matching exact layout from original pedigree */}
+      {/* Gap reduced by 70%: from 0.2rem to 0.06rem (~1px) */}
+      <div className="pedigree-grid grid grid-cols-6 gap-x-[0.06rem] w-full items-start mx-auto" style={{ maxWidth: '1600px' }}>
           {/* Column 1: Father's 3rd Generation (Great-grandparents) - 8 tiles: top 50% */}
           <div className="flex flex-col" style={{ height: '100%' }}>
             {/* Father's Father's Father's Father - 12.5% of total height */}
@@ -994,6 +981,33 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
               </div>
             </div>
           </div>
+        </div>
+    </>
+  );
+
+  return (
+    <div className="card w-full relative">
+      <div className="flex justify-between items-center mb-8">
+        <h2 className="text-xl font-semibold text-white">Breeding Simulator - 6 Generation Pedigree</h2>
+        <button
+          onClick={handleExportToPNG}
+          disabled={isExporting}
+          className="btn-secondary inline-flex items-center space-x-2"
+        >
+          <Download className="h-4 w-4" />
+          <span>{isExporting ? 'Exporting...' : 'Export to PNG'}</span>
+        </button>
+      </div>
+
+      {/* On-page tree (restyled via CSS wrapper) */}
+      <div className="pedigree-screen">
+        <PedigreeTreeContent />
+      </div>
+
+      {/* Export-only tree (must remain unchanged; used by html2canvas) */}
+      <div className="pedigree-export-only" aria-hidden="true">
+        <div ref={exportPedigreeRef} data-pedigree-export className="theme-legacy">
+          <PedigreeTreeContent />
         </div>
       </div>
     </div>

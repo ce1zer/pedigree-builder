@@ -187,7 +187,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-[1px] font-bebas-neue`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[color:var(--ring-color)] hover:underline block truncate mt-[1px] font-bebas-neue`}
             >
               {dog.dog_name}
             </Link>
@@ -243,7 +243,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
-              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-[1px] font-bebas-neue`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[color:var(--ring-color)] hover:underline block truncate mt-[1px] font-bebas-neue`}
             >
               {dog.dog_name}
             </Link>
@@ -744,7 +744,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         <button
           onClick={handleExportToPNG}
           disabled={isExporting}
-          className="btn-spotify-secondary inline-flex items-center space-x-2"
+          className="btn-secondary inline-flex items-center space-x-2"
         >
           <Download className="h-4 w-4" />
           <span>{isExporting ? 'Exporting...' : 'Export to PNG'}</span>
@@ -1061,7 +1061,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="input-spotify w-full text-left flex items-center justify-between pr-8"
+          className="input w-full text-left flex items-center justify-between pr-8"
         >
           <span className={value ? 'text-white' : 'text-gray-400'}>
             {value ? `${value.dog_name} (${getKennelName(value)})` : placeholder}
@@ -1088,7 +1088,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                 placeholder="Search by name or kennel..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3ecf8e]"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--ring-color)]"
                 autoFocus
               />
             </div>
@@ -1182,7 +1182,7 @@ const BreedingSimulator: React.FC = () => {
         <div className="flex items-center space-x-4">
           <button
             onClick={() => router.back()}
-            className="btn-spotify-ghost p-2"
+            className="btn-ghost p-2"
           >
             <ArrowLeft className={ICON_SIZE} />
           </button>
@@ -1193,7 +1193,7 @@ const BreedingSimulator: React.FC = () => {
       </div>
 
       {/* Dog Selection */}
-      <div className="card-spotify">
+      <div className="card">
         <h2 className="text-xl font-semibold text-white mb-6">Select Dogs</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Father Selection */}
@@ -1218,7 +1218,7 @@ const BreedingSimulator: React.FC = () => {
 
       {/* Breeding Simulator Pedigree Tree */}
       {loading || pedigreeLoading ? (
-        <div className="card-spotify">
+        <div className="card">
           <div className="flex justify-center items-center h-32">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
             <span className="ml-3 text-gray-400">Loading...</span>
@@ -1230,7 +1230,7 @@ const BreedingSimulator: React.FC = () => {
           motherGenerations={motherGenerations} 
         />
       ) : (
-        <div className="card-spotify">
+        <div className="card">
           <div className="text-center py-12">
             <p className="text-gray-400 text-lg">Please select both a father and mother to view the breeding simulator pedigree</p>
           </div>

@@ -131,7 +131,7 @@ const KennelsView: React.FC<KennelsViewProps> = ({ kennels, loading, onRefresh }
     <div className="space-y-6">
       {/* Add Kennel Form */}
       {showAddForm ? (
-        <div className="card-spotify">
+        <div className="card">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-white">Add New Kennel</h3>
             <button
@@ -158,13 +158,13 @@ const KennelsView: React.FC<KennelsViewProps> = ({ kennels, loading, onRefresh }
                 }
               }}
               placeholder="Enter kennel name..."
-              className="input-spotify flex-1"
+              className="input flex-1"
               autoFocus
             />
             <button
               onClick={handleAdd}
               disabled={isSaving}
-              className="btn-spotify-primary inline-flex items-center space-x-2"
+              className="btn-primary inline-flex items-center space-x-2"
             >
               <Save className="h-4 w-4" />
               <span>{isSaving ? 'Adding...' : 'Add'}</span>
@@ -174,7 +174,7 @@ const KennelsView: React.FC<KennelsViewProps> = ({ kennels, loading, onRefresh }
                 setShowAddForm(false);
                 setNewKennelName('');
               }}
-              className="btn-spotify-secondary"
+              className="btn-secondary"
             >
               Cancel
             </button>
@@ -183,7 +183,7 @@ const KennelsView: React.FC<KennelsViewProps> = ({ kennels, loading, onRefresh }
       ) : (
         <button
           onClick={() => setShowAddForm(true)}
-          className="btn-spotify-primary inline-flex items-center space-x-2"
+          className="btn-primary inline-flex items-center space-x-2"
         >
           <Plus className="h-4 w-4" />
           <span>Add Kennel</span>
@@ -192,7 +192,7 @@ const KennelsView: React.FC<KennelsViewProps> = ({ kennels, loading, onRefresh }
 
       {/* Kennels List */}
       {kennels.length === 0 ? (
-        <div className="card-spotify-elevated p-12 text-center">
+        <div className="card-elevated card-elevated-interactive p-12 text-center">
           <Building2 className="h-16 w-16 text-gray-500 mx-auto mb-6" />
           <h3 className="text-xl font-semibold text-white mb-3">No kennels added yet</h3>
           <p className="text-gray-400 mb-8 text-lg">Start by adding your first kennel</p>
@@ -202,7 +202,7 @@ const KennelsView: React.FC<KennelsViewProps> = ({ kennels, loading, onRefresh }
           {kennels.map((kennel) => (
             <div
               key={kennel.id}
-              className="card-spotify card-spotify-interactive group relative"
+              className="card card-interactive group relative"
             >
               {editingId === kennel.id ? (
                 <div className="space-y-3">
@@ -217,14 +217,14 @@ const KennelsView: React.FC<KennelsViewProps> = ({ kennels, loading, onRefresh }
                         handleCancelEdit();
                       }
                     }}
-                    className="input-spotify w-full"
+                    className="input w-full"
                     autoFocus
                   />
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleSave(kennel.id)}
                       disabled={isSaving}
-                      className="btn-spotify-primary inline-flex items-center space-x-1 flex-1 justify-center"
+                      className="btn-primary inline-flex items-center space-x-1 flex-1 justify-center"
                     >
                       <Save className="h-4 w-4" />
                       <span>{isSaving ? 'Saving...' : 'Save'}</span>
@@ -232,7 +232,7 @@ const KennelsView: React.FC<KennelsViewProps> = ({ kennels, loading, onRefresh }
                     <button
                       onClick={handleCancelEdit}
                       disabled={isSaving}
-                      className="btn-spotify-secondary"
+                      className="btn-secondary"
                     >
                       <X className="h-4 w-4" />
                     </button>
@@ -301,7 +301,7 @@ const DogsView: React.FC<DogsViewProps> = ({ dogs, filteredDogs, loading, search
   return (
     <>
       {filteredDogs.length === 0 ? (
-        <div className="card-spotify-elevated p-12 text-center">
+        <div className="card-elevated card-elevated-interactive p-12 text-center">
           <Users className="h-16 w-16 text-gray-500 mx-auto mb-6" />
           <h3 className="text-xl font-semibold text-white mb-3">
             {searchQuery ? 'No dogs found' : 'No dogs added yet'}
@@ -313,7 +313,7 @@ const DogsView: React.FC<DogsViewProps> = ({ dogs, filteredDogs, loading, search
             }
           </p>
           {!searchQuery && (
-            <Link href="/dogs/new" className="btn-spotify-primary inline-flex items-center space-x-2">
+            <Link href="/dogs/new" className="btn-primary inline-flex items-center space-x-2">
               <Plus className="h-5 w-5" />
               <span>Add First Dog</span>
             </Link>
@@ -325,7 +325,7 @@ const DogsView: React.FC<DogsViewProps> = ({ dogs, filteredDogs, loading, search
             <Link 
               key={dog.id} 
               href={`/dogs/${dog.id}`}
-              className="card-spotify card-spotify-interactive group cursor-pointer relative"
+              className="card card-interactive group cursor-pointer relative"
             >
               {/* Edit Icon - Top Right Corner */}
               <button

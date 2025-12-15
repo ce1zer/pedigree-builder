@@ -258,7 +258,7 @@ const SearchBar: React.FC<{ pathname: string }> = ({ pathname }) => {
               setShowSuggestions(true);
             }
           }}
-          className="input-spotify w-full pl-4 pr-10"
+          className="input w-full pl-4 pr-10"
         />
         <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center space-x-1 z-10">
           {searchQuery && (

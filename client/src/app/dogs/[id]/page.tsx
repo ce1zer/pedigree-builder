@@ -233,7 +233,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
 
   return (
     <>
-      <div className="card-spotify">
+      <div className="card">
         <h2 className="text-xl font-semibold text-white mb-6">Photo</h2>
         
         <div className="flex items-center space-x-6">
@@ -255,7 +255,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
           {/* Upload and Crop Buttons */}
           <div className="flex-1 space-y-3">
             <div className="flex space-x-3">
-              <label className="btn-spotify-secondary inline-flex items-center space-x-2 cursor-pointer">
+              <label className="btn-secondary inline-flex items-center space-x-2 cursor-pointer">
                 <Upload className={SMALL_ICON_SIZE} />
                 <span>Upload New Photo</span>
                 <input
@@ -270,7 +270,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
                 <button
                   type="button"
                   onClick={handleCropExisting}
-                  className="btn-spotify-secondary inline-flex items-center space-x-2"
+                  className="btn-secondary inline-flex items-center space-x-2"
                 >
                   <Edit className={SMALL_ICON_SIZE} />
                   <span>Crop Photo</span>
@@ -328,14 +328,14 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
               <button
                 type="button"
                 onClick={handleCancelCrop}
-                className="btn-spotify-secondary"
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleCrop}
-                className="btn-spotify-primary"
+                className="btn-primary"
               >
                 Crop & Save
               </button>
@@ -438,7 +438,7 @@ interface BasicInfoCardProps {
 }
 
 const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog, imageCacheBuster }) => (
-  <div className="card-spotify">
+  <div className="card">
     <h2 className="text-xl font-semibold text-white mb-6">Basic Information</h2>
     
     <div className="flex items-start space-x-6">
@@ -570,7 +570,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="input-spotify w-full text-left flex items-center justify-between pr-8"
+          className="input w-full text-left flex items-center justify-between pr-8"
         >
           <span className={value ? 'text-white' : 'text-gray-400'}>
             {value ? `${value.dog_name}${(() => {
@@ -623,7 +623,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                     setSearchTerm('');
                   }
                 }}
-                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#3ecf8e]"
+                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--ring-color)]"
                 autoFocus
               />
             </div>
@@ -638,7 +638,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                     onClick={() => handleSelect(dog)}
                     className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors ${
                       index === selectedIndex
-                        ? 'bg-gray-700 ring-2 ring-[#3ecf8e] ring-inset'
+                        ? 'bg-gray-700 ring-2 ring-[color:var(--ring-color)] ring-inset'
                         : ''
                     } ${
                       value?.id === dog.id ? 'bg-gray-600 hover:bg-gray-700' : ''
@@ -761,7 +761,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
         {dog ? (
           <Link 
             href={`/dogs/${dog.id}`}
-            className={`${textSizeClasses[size].name} text-white uppercase tracking-wide leading-tight hover:text-[#3ecf8e] hover:underline block truncate mt-[2px] font-bebas-neue`}
+            className={`${textSizeClasses[size].name} text-white uppercase tracking-wide leading-tight hover:text-[color:var(--ring-color)] hover:underline block truncate mt-[2px] font-bebas-neue`}
           >
             {dog.dog_name}
           </Link>
@@ -1382,13 +1382,13 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
   }, []);
 
   return (
-    <div className="card-spotify w-full">
+    <div className="card w-full">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-xl font-semibold text-white">3-Generation Pedigree</h2>
         <button
           onClick={handleExportToPNG}
           disabled={isExporting}
-          className="btn-spotify-secondary inline-flex items-center space-x-2"
+          className="btn-secondary inline-flex items-center space-x-2"
         >
           <Download className="h-4 w-4" />
           <span>{isExporting ? 'Exporting...' : 'Export to PNG'}</span>
@@ -1788,7 +1788,7 @@ const DogProfile: React.FC = () => {
     return (
       <div className="text-center py-12">
         <h2 className="text-2xl font-bold text-white mb-4">Dog Not Found</h2>
-        <Link href="/" className="btn-spotify-primary inline-flex items-center space-x-2">
+        <Link href="/" className="btn-primary inline-flex items-center space-x-2">
           <ArrowLeft className={ICON_SIZE} />
           <span>Back to Dashboard</span>
         </Link>
@@ -1803,7 +1803,7 @@ const DogProfile: React.FC = () => {
         <div className="flex items-center space-x-4">
           <button
             onClick={() => router.back()}
-            className="btn-spotify-ghost p-2"
+            className="btn-ghost p-2"
           >
             <ArrowLeft className={ICON_SIZE} />
           </button>
@@ -1816,7 +1816,7 @@ const DogProfile: React.FC = () => {
           {!isEditing && (
             <button
               onClick={() => setIsEditing(!isEditing)}
-              className="btn-spotify-secondary inline-flex items-center space-x-2"
+              className="btn-secondary inline-flex items-center space-x-2"
               disabled={isDeleting}
             >
               <Edit className={SMALL_ICON_SIZE} />
@@ -1827,7 +1827,7 @@ const DogProfile: React.FC = () => {
             <>
               <button
                 onClick={() => setIsEditing(false)}
-                className="btn-spotify-secondary inline-flex items-center space-x-2"
+                className="btn-secondary inline-flex items-center space-x-2"
                 disabled={isSubmitting}
               >
                 <span>Cancel</span>
@@ -1835,7 +1835,7 @@ const DogProfile: React.FC = () => {
               <button
                 type="submit"
                 form="edit-dog-form"
-                className="btn-spotify-primary inline-flex items-center space-x-2"
+                className="btn-primary inline-flex items-center space-x-2"
                 disabled={isSubmitting}
               >
                 <Save className={SMALL_ICON_SIZE} />
@@ -1845,7 +1845,7 @@ const DogProfile: React.FC = () => {
           )}
           <button
             onClick={handleDelete}
-            className="btn-spotify-secondary inline-flex items-center space-x-2 text-red-400 hover:text-red-300"
+            className="btn-secondary inline-flex items-center space-x-2 text-red-400 hover:text-red-300"
             disabled={isDeleting || isEditing}
           >
             <Trash2 className={SMALL_ICON_SIZE} />
@@ -1863,7 +1863,7 @@ const DogProfile: React.FC = () => {
             onPhotoChange={handlePhotoChange} 
           />
 
-          <div className="card-spotify">
+          <div className="card">
             <h2 className="text-xl font-semibold text-white mb-6">Edit Dog Information</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1878,7 +1878,7 @@ const DogProfile: React.FC = () => {
                     required: 'Dog name is required',
                     minLength: { value: 2, message: 'Dog name must be at least 2 characters' }
                   })}
-                  className="input-spotify w-full"
+                  className="input w-full"
                 />
                 {errors.dog_name && (
                   <p className="mt-2 text-sm text-red-400">{errors.dog_name.message}</p>
@@ -1917,7 +1917,7 @@ const DogProfile: React.FC = () => {
                 </label>
                 <select
                   {...register('champion')}
-                  className="input-spotify w-full"
+                  className="input w-full"
                 >
                   <option value="none">None</option>
                   <option value="ch">Ch.</option>
@@ -1996,7 +1996,7 @@ const DogProfile: React.FC = () => {
 
           {/* Pedigree Tree */}
           {pedigreeLoading ? (
-            <div className="card-spotify">
+            <div className="card">
               <div className="flex justify-center items-center h-32">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
                 <span className="ml-3 text-gray-400">Loading pedigree...</span>

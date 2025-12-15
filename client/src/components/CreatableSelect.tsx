@@ -225,7 +225,7 @@ export const CreatableSelect: React.FC<CreatableSelectProps> = ({
             onKeyDown={handleKeyDown}
             onFocus={() => setIsOpen(true)}
             placeholder={placeholder}
-            className={`input-spotify w-full pr-10 ${
+            className={`input w-full pr-10 ${
               error ? 'border-red-500' : ''
             }`}
           />

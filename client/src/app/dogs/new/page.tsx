@@ -155,7 +155,7 @@ const PhotoUploadInline: React.FC<PhotoUploadInlineProps> = ({ photoPreview, onP
             )}
           </div>
           <div className="flex-1">
-            <label className="btn-spotify-secondary inline-flex items-center space-x-2 cursor-pointer">
+            <label className="btn-secondary inline-flex items-center space-x-2 cursor-pointer">
               <Upload className={SMALL_ICON_SIZE} />
               <span>Upload Photo</span>
               <input
@@ -217,14 +217,14 @@ const PhotoUploadInline: React.FC<PhotoUploadInlineProps> = ({ photoPreview, onP
               <button
                 type="button"
                 onClick={handleCancelCrop}
-                className="btn-spotify-secondary"
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleCrop}
-                className="btn-spotify-primary"
+                className="btn-primary"
               >
                 Crop & Save
               </button>
@@ -300,7 +300,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
 
   return (
     <>
-      <div className="card-spotify">
+      <div className="card">
         <h2 className="text-lg font-semibold text-white mb-3">Photo</h2>
         
         <div className="flex items-center space-x-4">
@@ -321,7 +321,7 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
           
           {/* Upload Button */}
           <div className="flex-1">
-            <label className="btn-spotify-secondary inline-flex items-center space-x-2 cursor-pointer">
+            <label className="btn-secondary inline-flex items-center space-x-2 cursor-pointer">
               <Upload className={SMALL_ICON_SIZE} />
               <span>Upload Photo</span>
               <input
@@ -383,14 +383,14 @@ const PhotoUpload: React.FC<PhotoUploadProps> = ({ photoPreview, onPhotoChange }
               <button
                 type="button"
                 onClick={handleCancelCrop}
-                className="btn-spotify-secondary"
+                className="btn-secondary"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleCrop}
-                className="btn-spotify-primary"
+                className="btn-primary"
               >
                 Crop & Save
               </button>
@@ -494,7 +494,7 @@ const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="input-spotify w-full text-left flex items-center justify-between pr-8"
+          className="input w-full text-left flex items-center justify-between pr-8"
         >
           <span className={value ? 'text-white' : 'text-gray-400'}>
             {value ? `${value.dog_name}${(() => {
@@ -608,7 +608,7 @@ const ParentSelection: React.FC<ParentSelectionProps> = ({
   const femaleDogs = availableDogs.filter(dog => dog.gender === 'female');
 
   return (
-    <div className="card-spotify">
+    <div className="card">
       <h2 className="text-lg font-semibold text-white mb-3">Parents</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -766,7 +766,7 @@ const AddDog: React.FC = () => {
       <div className="flex items-center space-x-3">
         <button
           onClick={() => router.back()}
-          className="btn-spotify-ghost p-2"
+          className="btn-ghost p-2"
         >
           <ArrowLeft className={ICON_SIZE} />
         </button>
@@ -776,7 +776,7 @@ const AddDog: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)}>
-        <div className="card-spotify space-y-6">
+        <div className="card space-y-6">
           {/* Dog Name */}
           <FormField 
             label="Dog Name" 
@@ -786,7 +786,7 @@ const AddDog: React.FC = () => {
             <input
               type="text"
               {...register('dog_name', VALIDATION_RULES.dog_name)}
-              className="input-spotify w-full"
+              className="input w-full"
               placeholder="e.g. Max, Luna, Buddy"
             />
           </FormField>
@@ -823,7 +823,7 @@ const AddDog: React.FC = () => {
           >
             <select
               {...register('champion')}
-              className="input-spotify w-full"
+              className="input w-full"
               defaultValue="none"
             >
               <option value="none">None</option>
@@ -913,14 +913,14 @@ const AddDog: React.FC = () => {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="btn-spotify-secondary"
+                className="btn-secondary"
                 disabled={isSubmitting}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="btn-spotify-primary inline-flex items-center space-x-2"
+                className="btn-primary inline-flex items-center space-x-2"
                 disabled={isSubmitting}
               >
                 <Save className={SMALL_ICON_SIZE} />

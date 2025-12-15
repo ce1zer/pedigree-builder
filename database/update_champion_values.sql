@@ -24,3 +24,4 @@ ALTER TABLE dogs
 -- FROM pg_constraint 
 -- WHERE conname = 'dogs_champion_check';
 
+

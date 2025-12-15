@@ -21,3 +21,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_kennels_name_lower_unique ON kennels(name_
 CREATE INDEX IF NOT EXISTS idx_kennels_name_lower ON kennels(name_lower);
 
 
+

@@ -16,3 +16,4 @@ CREATE INDEX IF NOT EXISTS idx_dogs_unique_check ON dogs(champion, primary_kenne
 CREATE INDEX IF NOT EXISTS idx_dogs_created_at ON dogs(created_at DESC);
 
 
+

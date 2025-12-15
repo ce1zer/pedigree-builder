@@ -1396,7 +1396,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       </div>
       
       {/* Pedigree Tree Content - This is what gets exported */}
-      <div ref={pedigreeRef} data-pedigree-export>
+      <div ref={pedigreeRef} data-pedigree-export className="theme-legacy">
         {/* Generation Labels */}
         <div className="grid grid-cols-3 gap-x-8 mb-8">
           <div className="text-center">

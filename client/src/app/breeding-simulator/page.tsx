@@ -751,7 +751,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         </button>
       </div>
       
-      <div ref={pedigreeRef} data-pedigree-export>
+      <div ref={pedigreeRef} data-pedigree-export className="theme-legacy">
         {/* 6 Column Mirrored Layout - Matching exact layout from original pedigree */}
         {/* Gap reduced by 70%: from 0.2rem to 0.06rem (~1px) */}
         <div className="pedigree-grid grid grid-cols-6 gap-x-[0.06rem] w-full items-start mx-auto" style={{ maxWidth: '1600px' }}>

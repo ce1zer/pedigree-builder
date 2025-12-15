@@ -371,15 +371,10 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  // Apply the neutral theme globally. Export-sensitive DOM subtrees explicitly opt into
+  // `.theme-legacy` at the component level to keep PNG exports unchanged.
+  const themeClass = 'theme-neutral';
   const pathname = usePathname();
-
-  // Keep export-sensitive routes on the legacy theme to preserve PNG export pixel output.
-  const isExportSensitiveRoute =
-    pathname === '/breeding-simulator' ||
-    pathname.startsWith('/breeding-simulator/') ||
-    (pathname.startsWith('/dogs/') && pathname !== '/dogs/new');
-
-  const themeClass = isExportSensitiveRoute ? 'theme-legacy' : 'theme-neutral';
 
   return (
     <div className={`min-h-screen ${themeClass} bg-[var(--background)]`}>

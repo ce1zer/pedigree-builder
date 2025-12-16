@@ -1201,7 +1201,7 @@ const BreedingSimulator: React.FC = () => {
             <ArrowLeft className={ICON_SIZE} />
           </button>
           <div>
-            <h1 className="text-4xl font-bold text-white">Breeding Simulator</h1>
+            <h1 className="text-2xl font-bold text-white">Breeding Simulator</h1>
           </div>
         </div>
       </div>

@@ -424,6 +424,22 @@ select.input {
   gap: 2.5px !important;
 }
 
+/* Breeding Simulator PNG export-only: render all text 2x larger */
+.pedigree-export-only [data-export-gap="tight"] p,
+.pedigree-export-only [data-export-gap="tight"] a,
+.pedigree-export-only [data-export-gap="tight"] span,
+.pedigree-export-only [data-export-gap="tight"] h1,
+.pedigree-export-only [data-export-gap="tight"] h2,
+.pedigree-export-only [data-export-gap="tight"] h3 {
+  transform: scale(2);
+  transform-origin: center;
+}
+
+.pedigree-export-only [data-export-gap="tight"] a,
+.pedigree-export-only [data-export-gap="tight"] span {
+  display: inline-block;
+}
+
 /* Screen-only pedigree styling to match app theme without changing export output */
 .pedigree-screen .font-bebas-neue {
   font-family: var(--font-sans) !important;

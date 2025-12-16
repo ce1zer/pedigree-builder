@@ -432,6 +432,12 @@ select.input {
   display: inline !important;
 }
 
+/* Export-only: kennel → dog name spacing (leading-tight + mt-[5px]) */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .mt-\[1px\] {
+  /* Export pipeline halves margin-top when cloning for html2canvas, so set 10px here to land at ~5px in the PNG */
+  margin-top: 10px !important;
+}
+
 /* 1st generation */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[8\.25pt\].text-\[\#717179\] {
   font-size: 15pt !important; /* kennel */
@@ -450,10 +456,10 @@ select.input {
 
 /* 3rd generation */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6pt\].text-\[\#717179\] {
-  font-size: 8pt !important; /* kennel */
+  font-size: 10pt !important; /* kennel */
 }
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6\.5pt\].text-white {
-  font-size: 8pt !important; /* dog name */
+  font-size: 15pt !important; /* dog name */
 }
 
 /* Screen-only pedigree styling to match app theme without changing export output */

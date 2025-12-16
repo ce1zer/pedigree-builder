@@ -424,20 +424,36 @@ select.input {
   gap: 2.5px !important;
 }
 
-/* Breeding Simulator PNG export-only: render all text 2x larger */
-.pedigree-export-only [data-export-gap="tight"] p,
-.pedigree-export-only [data-export-gap="tight"] a,
-.pedigree-export-only [data-export-gap="tight"] span,
-.pedigree-export-only [data-export-gap="tight"] h1,
-.pedigree-export-only [data-export-gap="tight"] h2,
-.pedigree-export-only [data-export-gap="tight"] h3 {
-  transform: scale(2);
-  transform-origin: center;
+/* Breeding Simulator PNG export-only: exact pedigree font sizes (pt) */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid p,
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid a,
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid span {
+  transform: none !important;
+  display: inline !important;
 }
 
-.pedigree-export-only [data-export-gap="tight"] a,
-.pedigree-export-only [data-export-gap="tight"] span {
-  display: inline-block;
+/* 1st generation */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[8\.25pt\].text-\[\#717179\] {
+  font-size: 25pt !important; /* kennel */
+}
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[13\.75pt\].text-white {
+  font-size: 40pt !important; /* dog name */
+}
+
+/* 2nd generation */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6\.5pt\].text-\[\#717179\] {
+  font-size: 20pt !important; /* kennel */
+}
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[7\.5pt\].text-white {
+  font-size: 30pt !important; /* dog name */
+}
+
+/* 3rd generation */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6pt\].text-\[\#717179\] {
+  font-size: 20pt !important; /* kennel */
+}
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6\.5pt\].text-white {
+  font-size: 20pt !important; /* dog name */
 }
 
 /* Screen-only pedigree styling to match app theme without changing export output */

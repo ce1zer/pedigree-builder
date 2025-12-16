@@ -438,6 +438,14 @@ select.input {
   margin-top: 10px !important;
 }
 
+/* Export-only: align Mother 3rd generation column to the top (remove the 50% spacer) */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(6) > div:first-child {
+  display: none !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
 /* 1st generation */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[8\.25pt\].text-\[\#717179\] {
   font-size: 15pt !important; /* kennel */

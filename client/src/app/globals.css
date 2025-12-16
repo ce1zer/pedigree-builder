@@ -398,6 +398,21 @@ select.input {
   margin-right: 0.25rem !important;
 }
 
+/* Breeding Simulator export-only tweak: make pedigree images visually wider so column whitespace shrinks */
+.pedigree-export-only [data-export-gap="tight"] .w-\[52\.5\%\] {
+  width: 65% !important; /* was 52.5% (2nd gen tiles) */
+}
+
+.pedigree-export-only [data-export-gap="tight"] .w-\[37\.5\%\] {
+  width: 55% !important; /* was 37.5% (3rd gen tiles) */
+}
+
+.pedigree-export-only [data-export-gap="tight"] img {
+  width: 100% !important;
+  height: auto !important;
+  object-fit: cover;
+}
+
 /* Screen-only pedigree styling to match app theme without changing export output */
 .pedigree-screen .font-bebas-neue {
   font-family: var(--font-sans) !important;

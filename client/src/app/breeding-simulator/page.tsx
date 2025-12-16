@@ -1006,7 +1006,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
 
       {/* Export-only tree (must remain unchanged; used by html2canvas) */}
       <div className="pedigree-export-only" aria-hidden="true">
-        <div ref={exportPedigreeRef} data-pedigree-export className="theme-legacy">
+        <div ref={exportPedigreeRef} data-pedigree-export data-export-gap="tight" className="theme-legacy">
           <PedigreeTreeContent />
         </div>
       </div>

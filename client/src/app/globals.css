@@ -386,6 +386,11 @@ select.input {
   pointer-events: none;
 }
 
+/* Breeding Simulator export-only tweak: tighten pedigree column spacing in the PNG export */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid {
+  column-gap: 0.04rem !important;
+}
+
 /* Screen-only pedigree styling to match app theme without changing export output */
 .pedigree-screen .font-bebas-neue {
   font-family: var(--font-sans) !important;

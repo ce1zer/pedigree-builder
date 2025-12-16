@@ -386,26 +386,6 @@ select.input {
   pointer-events: none;
 }
 
-/* Breeding Simulator export-only tweak: square-crop pedigree images without affecting on-page UI */
-.pedigree-export-only [data-export-image-shape="square"] a.overflow-hidden.border-white,
-.pedigree-export-only [data-export-image-shape="square"] div.overflow-hidden.border-white {
-  aspect-ratio: 1 / 1 !important;
-}
-
-.pedigree-export-only [data-export-image-shape="square"] a.overflow-hidden.border-white img {
-  width: 100% !important;
-  height: 100% !important;
-  object-fit: cover !important;
-  aspect-ratio: 1 / 1 !important;
-}
-
-.pedigree-export-only [data-export-image-shape="square"] a.overflow-hidden.border-white > div,
-.pedigree-export-only [data-export-image-shape="square"] div.overflow-hidden.border-white > div {
-  width: 100% !important;
-  height: 100% !important;
-  aspect-ratio: 1 / 1 !important;
-}
-
 /* Screen-only pedigree styling to match app theme without changing export output */
 .pedigree-screen .font-bebas-neue {
   font-family: var(--font-sans) !important;

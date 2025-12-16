@@ -388,7 +388,14 @@ select.input {
 
 /* Breeding Simulator export-only tweak: tighten pedigree column spacing in the PNG export */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid {
+  gap: 0px 0.04rem !important;
   column-gap: 0.04rem !important;
+}
+
+/* Breeding Simulator export-only tweak: reduce the explicit middle seam margins (inline 0.5rem) */
+.pedigree-export-only [data-export-gap="tight"] .parent-pair {
+  margin-left: 0.25rem !important;
+  margin-right: 0.25rem !important;
 }
 
 /* Screen-only pedigree styling to match app theme without changing export output */

@@ -434,26 +434,26 @@ select.input {
 
 /* 1st generation */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[8\.25pt\].text-\[\#717179\] {
-  font-size: 25pt !important; /* kennel */
+  font-size: 15pt !important; /* kennel */
 }
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[13\.75pt\].text-white {
-  font-size: 40pt !important; /* dog name */
+  font-size: 25pt !important; /* dog name */
 }
 
 /* 2nd generation */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6\.5pt\].text-\[\#717179\] {
-  font-size: 20pt !important; /* kennel */
+  font-size: 10pt !important; /* kennel */
 }
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[7\.5pt\].text-white {
-  font-size: 30pt !important; /* dog name */
+  font-size: 15pt !important; /* dog name */
 }
 
 /* 3rd generation */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6pt\].text-\[\#717179\] {
-  font-size: 20pt !important; /* kennel */
+  font-size: 8pt !important; /* kennel */
 }
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6\.5pt\].text-white {
-  font-size: 20pt !important; /* dog name */
+  font-size: 8pt !important; /* dog name */
 }
 
 /* Screen-only pedigree styling to match app theme without changing export output */

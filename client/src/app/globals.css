@@ -390,7 +390,6 @@ select.input {
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid {
   gap: 0px 0.04rem !important;
   column-gap: 0.04rem !important;
-  height: 100% !important;
 }
 
 /* Breeding Simulator export-only tweak: reduce the explicit middle seam margins (inline 0.5rem) */

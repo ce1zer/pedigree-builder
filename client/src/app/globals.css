@@ -390,8 +390,6 @@ select.input {
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid {
   gap: 0px 0.04rem !important;
   column-gap: 0.04rem !important;
-  /* Make the export taller so percentage-based row heights have more room for larger text */
-  height: 1400px !important;
 }
 
 /* Breeding Simulator export-only tweak: reduce the explicit middle seam margins (inline 0.5rem) */
@@ -434,17 +432,6 @@ select.input {
   display: inline !important;
 }
 
-/* Export-only: allow dog names to wrap (2 lines max) so they don't get cut off */
-.pedigree-export-only [data-export-gap="tight"] .pedigree-grid a.truncate {
-  white-space: normal !important;
-  text-overflow: clip !important;
-  overflow: hidden !important;
-  display: -webkit-box !important;
-  -webkit-line-clamp: 2 !important;
-  -webkit-box-orient: vertical !important;
-  word-break: break-word;
-}
-
 /* Export-only: kennel → dog name spacing (near-zero in the final PNG) */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .mt-\[1px\] {
   margin-top: 0 !important;
@@ -479,9 +466,6 @@ select.input {
 }
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[7\.5pt\].text-white {
   font-size: 15pt !important; /* dog name */
-  /* Add breathing room below 2nd-gen names so they don't overlap the next tile */
-  padding-bottom: 14px !important;
-  display: block !important;
 }
 
 /* 3rd generation */

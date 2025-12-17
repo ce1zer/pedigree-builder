@@ -365,6 +365,10 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         const grid = exportRoot.querySelector('.pedigree-grid') as HTMLElement | null;
         if (!grid) return false;
 
+        // If the grid/root is overflowing vertically, we need more room to avoid bottom cut-off.
+        if (exportRoot.scrollHeight > exportRoot.clientHeight + 1) return true;
+        if (grid.scrollHeight > grid.clientHeight + 1) return true;
+
         const nameEls = Array.from(grid.querySelectorAll('a.truncate')) as HTMLElement[];
         for (const nameEl of nameEls) {
           // Detect truncation/overflow (scroll > client indicates clipping, including line-clamp overflow)

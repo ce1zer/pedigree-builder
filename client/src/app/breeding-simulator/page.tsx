@@ -337,75 +337,6 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
 
     try {
       setIsExporting(true);
-
-      // Auto-grow the export subtree (offscreen only) until names fit and don't overlap,
-      // capped at a maximum PNG size (composition preserved via uniform scaling).
-      const CANVAS_SCALE = 2;
-      const MAX_PNG_WIDTH = 4000;
-      const MAX_PNG_HEIGHT = 2000;
-      const MAX_DOM_WIDTH = Math.floor(MAX_PNG_WIDTH / CANVAS_SCALE);
-      const MAX_DOM_HEIGHT = Math.floor(MAX_PNG_HEIGHT / CANVAS_SCALE);
-
-      const exportRoot = exportPedigreeRef.current;
-      const prevInlineWidth = exportRoot.style.width;
-      const prevInlineHeight = exportRoot.style.height;
-
-      const findTileContainer = (el: HTMLElement): HTMLElement | null => {
-        let current: HTMLElement | null = el;
-        while (current && current !== exportRoot) {
-          // The layout tiles in the pedigree grid use `className="relative"` and `style={{ height: '12.5%' }}` etc.
-          const h = current.style?.height || '';
-          if (current.classList.contains('relative') && h.endsWith('%')) return current;
-          current = current.parentElement;
-        }
-        return null;
-      };
-
-      const needsMoreRoom = (): boolean => {
-        const grid = exportRoot.querySelector('.pedigree-grid') as HTMLElement | null;
-        if (!grid) return false;
-
-        const nameEls = Array.from(grid.querySelectorAll('a.truncate')) as HTMLElement[];
-        for (const nameEl of nameEls) {
-          // Detect truncation/overflow (scroll > client indicates clipping, including line-clamp overflow)
-          if (nameEl.scrollWidth > nameEl.clientWidth + 1) return true;
-          if (nameEl.scrollHeight > nameEl.clientHeight + 1) return true;
-
-          // Detect overlap: name extends outside its tile box
-          const tile = findTileContainer(nameEl);
-          if (tile) {
-            const nameRect = nameEl.getBoundingClientRect();
-            const tileRect = tile.getBoundingClientRect();
-            if (nameRect.bottom > tileRect.bottom + 0.5) return true;
-          }
-        }
-
-        return false;
-      };
-
-      let targetW = exportRoot.offsetWidth;
-      let targetH = exportRoot.offsetHeight;
-      // Ensure we start from a measurable baseline
-      if (targetW <= 0) targetW = 1200;
-      if (targetH <= 0) targetH = 600;
-
-      for (let i = 0; i < 8; i++) {
-        exportRoot.style.width = `${Math.min(targetW, MAX_DOM_WIDTH)}px`;
-        exportRoot.style.height = `${Math.min(targetH, MAX_DOM_HEIGHT)}px`;
-        // Let layout settle
-        // eslint-disable-next-line no-await-in-loop
-        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-
-        if (!needsMoreRoom()) break;
-
-        const maxWFactor = MAX_DOM_WIDTH / Math.max(1, targetW);
-        const maxHFactor = MAX_DOM_HEIGHT / Math.max(1, targetH);
-        const growFactor = Math.min(1.1, maxWFactor, maxHFactor);
-        if (growFactor <= 1.0001) break;
-
-        targetW = Math.ceil(targetW * growFactor);
-        targetH = Math.ceil(targetH * growFactor);
-      }
       
       const createIsolatedClone = (original: HTMLElement): HTMLElement => {
         const clone = original.cloneNode(true) as HTMLElement;
@@ -797,9 +728,6 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         }, 'image/png');
       } finally {
         document.body.removeChild(tempContainer);
-        // Restore export subtree sizing so on-page (and future exports) aren't affected.
-        exportRoot.style.width = prevInlineWidth;
-        exportRoot.style.height = prevInlineHeight;
       }
     } catch (error) {
       console.error('Export error:', error);

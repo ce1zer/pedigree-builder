@@ -692,11 +692,8 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       tempContainer.style.position = 'absolute';
       tempContainer.style.left = '-9999px';
       tempContainer.style.top = '0';
-      // Force a consistent export canvas size (crop overflow if content doesn't fit)
-      const EXPORT_WIDTH = 2500;
-      const EXPORT_HEIGHT = 1200;
-      tempContainer.style.width = Math.max(exportPedigreeRef.current.offsetWidth, EXPORT_WIDTH) + 'px';
-      tempContainer.style.height = Math.max(exportPedigreeRef.current.offsetHeight, EXPORT_HEIGHT) + 'px';
+      tempContainer.style.width = exportPedigreeRef.current.offsetWidth + 'px';
+      tempContainer.style.height = exportPedigreeRef.current.offsetHeight + 'px';
       tempContainer.style.backgroundColor = 'transparent';
       tempContainer.appendChild(isolatedClone);
       document.body.appendChild(tempContainer);
@@ -704,14 +701,7 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       try {
         const canvas = await html2canvas(isolatedClone, {
           backgroundColor: null,
-          // Force the output PNG to be exactly 2500×1200 px
-          scale: 1,
-          width: EXPORT_WIDTH,
-          height: EXPORT_HEIGHT,
-          windowWidth: EXPORT_WIDTH,
-          windowHeight: EXPORT_HEIGHT,
-          x: 0,
-          y: 0,
+          scale: 2,
           logging: false,
           useCORS: true,
           allowTaint: true,

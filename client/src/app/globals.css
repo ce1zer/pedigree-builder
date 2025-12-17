@@ -432,10 +432,10 @@ select.input {
   display: inline !important;
 }
 
-/* Export-only: kennel → dog name spacing (base = leading-tight + mt-[5px]) */
+/* Export-only: kennel → dog name spacing (target ~2px in the final PNG) */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .mt-\[1px\] {
-  /* Export pipeline halves margin-top when cloning for html2canvas, so set 10px here to land at ~5px in the PNG */
-  margin-top: 10px !important;
+  /* Export pipeline halves margin-top when cloning for html2canvas, so set 4px here to land at ~2px in the PNG */
+  margin-top: 4px !important;
 }
 
 /* Export-only: align Mother 3rd generation column to the top (remove the 50% spacer) */
@@ -471,12 +471,7 @@ select.input {
   font-size: 15pt !important; /* dog name */
 }
 
-/* Export-only: reduce kennel → name vertical gap for 1st + 2nd gen (smaller than the base 5px) */
-.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[13\.75pt\].text-white.mt-\[1px\],
-.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[7\.5pt\].text-white.mt-\[1px\] {
-  /* Set to 4px here so it lands at ~2px in the PNG (export clone halves margin-top) */
-  margin-top: 4px !important;
-}
+/* (intentionally no per-generation override; keep spacing uniform across 1st/2nd/3rd) */
 
 /* Screen-only pedigree styling to match app theme without changing export output */
 .pedigree-screen .font-bebas-neue {

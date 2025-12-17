@@ -426,10 +426,21 @@ select.input {
 
 /* Breeding Simulator PNG export-only: exact pedigree font sizes (pt) */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid p,
-.pedigree-export-only [data-export-gap="tight"] .pedigree-grid a,
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid span {
   transform: none !important;
   display: inline !important;
+}
+
+/* Export-only: allow dog names (links) to wrap to 2 lines max (no ellipsis) */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid a.truncate {
+  white-space: normal !important;
+  text-overflow: clip !important;
+  overflow: hidden !important;
+  display: -webkit-box !important;
+  line-clamp: 2 !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+  word-break: break-word;
 }
 
 /* Export-only: kennel → dog name spacing (near-zero in the final PNG) */

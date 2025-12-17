@@ -432,10 +432,15 @@ select.input {
   display: inline !important;
 }
 
-/* Export-only: kennel → dog name spacing (target ~2px in the final PNG) */
+/* Export-only: kennel → dog name spacing (near-zero in the final PNG) */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .mt-\[1px\] {
-  /* Export pipeline halves margin-top when cloning for html2canvas, so set 4px here to land at ~2px in the PNG */
-  margin-top: 4px !important;
+  margin-top: 0 !important;
+}
+
+/* Export-only: reduce line-height for pedigree text to remove leading-tight whitespace */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid p,
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid a {
+  line-height: 1 !important;
 }
 
 /* Export-only: align Mother 3rd generation column to the top (remove the 50% spacer) */

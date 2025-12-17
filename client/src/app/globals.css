@@ -400,7 +400,7 @@ select.input {
 
 /* Breeding Simulator export-only tweak: make pedigree images visually wider so column whitespace shrinks */
 .pedigree-export-only [data-export-gap="tight"] .w-\[52\.5\%\] {
-  width: 65% !important; /* was 52.5% (2nd gen tiles) */
+  width: 52% !important; /* ~20% smaller than our previous 65% (2nd gen tiles) */
 }
 
 .pedigree-export-only [data-export-gap="tight"] .w-\[37\.5\%\] {

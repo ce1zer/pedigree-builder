@@ -507,10 +507,10 @@ const DashboardContent: React.FC = () => {
         <div className="flex items-center space-x-2 bg-gray-800 p-1 rounded-lg">
           <button
             onClick={() => setView('dogs')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all border border-transparent ${
               view === 'dogs'
                 ? 'bg-[var(--primary)] text-[color:var(--primary-foreground)]'
-                : 'text-gray-300 hover:text-white'
+                : 'text-gray-300 hover:text-white hover:bg-[var(--button-secondary-hover-bg)] hover:border-[var(--button-secondary-hover-border)]'
             }`}
           >
             <div className="flex items-center space-x-2">
@@ -520,10 +520,10 @@ const DashboardContent: React.FC = () => {
           </button>
           <button
             onClick={() => setView('kennels')}
-            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+            className={`px-4 py-2 rounded-md text-sm font-medium transition-all border border-transparent ${
               view === 'kennels'
                 ? 'bg-[var(--primary)] text-[color:var(--primary-foreground)]'
-                : 'text-gray-300 hover:text-white'
+                : 'text-gray-300 hover:text-white hover:bg-[var(--button-secondary-hover-bg)] hover:border-[var(--button-secondary-hover-border)]'
             }`}
           >
             <div className="flex items-center space-x-2">

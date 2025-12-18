@@ -3,11 +3,12 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Download, ChevronDown, X } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import { Dog } from '@/types';
 import { dogsApi } from '@/services/api';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
+import { DogSearchableDropdown } from '@/components/DogSearchableDropdown';
 
 // Constants
 const ICON_SIZE = 'h-5 w-5';
@@ -1014,127 +1015,6 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
   );
 };
 
-// Searchable Dropdown Component
-interface SearchableDropdownProps {
-  options: Dog[];
-  value: Dog | null;
-  onChange: (dog: Dog | null) => void;
-  placeholder: string;
-  label: string;
-}
-
-const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
-  options,
-  value,
-  onChange,
-  placeholder,
-  label
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Filter options based on search term
-  const filteredOptions = options.filter(dog => {
-    const kennelName = getKennelName(dog);
-    return dog.dog_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      kennelName.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setSearchTerm('');
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleSelect = (dog: Dog) => {
-    onChange(dog);
-    setIsOpen(false);
-    setSearchTerm('');
-  };
-
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange(null);
-    setSearchTerm('');
-  };
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <label className="block text-sm font-semibold text-gray-300 mb-3">
-        {label}
-      </label>
-      <div className="relative">
-        <button
-          type="button"
-          onClick={() => setIsOpen(!isOpen)}
-          className="input w-full text-left flex items-center justify-between pr-8"
-        >
-          <span className={value ? 'text-white' : 'text-gray-400'}>
-            {value ? `${value.dog_name} (${getKennelName(value)})` : placeholder}
-          </span>
-          <div className="flex items-center space-x-2">
-            {value && (
-              <span
-                role="button"
-                tabIndex={-1}
-                aria-label="Clear selection"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={handleClear}
-                className="p-1 hover:bg-gray-700 rounded"
-              >
-                <X className="h-4 w-4 text-gray-400 hover:text-white" />
-              </span>
-            )}
-            <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-          </div>
-        </button>
-
-        {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-hidden">
-            <div className="p-2 border-b border-gray-700">
-              <input
-                type="text"
-                placeholder="Search by name or kennel..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 bg-gray-900 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[color:var(--ring-color)]"
-                autoFocus
-              />
-            </div>
-            <div className="overflow-y-auto max-h-48">
-              {filteredOptions.length === 0 ? (
-                <div className="px-4 py-3 text-gray-400 text-sm">No dogs found</div>
-              ) : (
-                filteredOptions.map((dog) => (
-                  <button
-                    key={dog.id}
-                    type="button"
-                    onClick={() => handleSelect(dog)}
-                    className={`w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors ${
-                      value?.id === dog.id ? 'bg-gray-600 hover:bg-gray-700' : ''
-                    }`}
-                  >
-                    <div className="text-white font-medium">{dog.dog_name}</div>
-                    <div className="text-sm text-gray-400">{getKennelName(dog)}</div>
-                  </button>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
 // Main Breeding Simulator Component
 const BreedingSimulator: React.FC = () => {
   const router = useRouter();
@@ -1214,7 +1094,7 @@ const BreedingSimulator: React.FC = () => {
         <h2 className="text-xl font-semibold text-white mb-6">Select Dogs</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Father Selection */}
-          <SearchableDropdown
+          <DogSearchableDropdown
             options={availableDogs.filter(d => d.gender === 'male')}
             value={father}
             onChange={setFather}
@@ -1223,7 +1103,7 @@ const BreedingSimulator: React.FC = () => {
           />
 
           {/* Mother Selection */}
-          <SearchableDropdown
+          <DogSearchableDropdown
             options={availableDogs.filter(d => d.gender === 'female')}
             value={mother}
             onChange={setMother}

@@ -388,14 +388,14 @@ select.input {
 
 /* Breeding Simulator export-only tweak: tighten pedigree column spacing in the PNG export */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid {
-  gap: 0px 0.04rem !important;
-  column-gap: 0.04rem !important;
+  gap: 0px 0 !important;
+  column-gap: 0 !important;
 }
 
 /* Breeding Simulator export-only tweak: reduce the explicit middle seam margins (inline 0.5rem) */
 .pedigree-export-only [data-export-gap="tight"] .parent-pair {
-  margin-left: 0.25rem !important;
-  margin-right: 0.25rem !important;
+  margin-left: 0.755rem !important;
+  margin-right: 0.755rem !important;
 }
 
 /* Breeding Simulator export-only tweak: make pedigree images visually wider so column whitespace shrinks */
@@ -415,7 +415,7 @@ select.input {
 
 /* Breeding Simulator export-only tweak: 1st generation images 25% bigger (crop within overflow-hidden wrapper) */
 .pedigree-export-only [data-export-gap="tight"] img[class*="aspect-[4/3.45]"] {
-  transform: scale(1.25);
+  transform: scale(1.50);
   transform-origin: center;
 }
 
@@ -473,7 +473,25 @@ select.input {
   font-size: 10pt !important; /* kennel */
 }
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6\.5pt\].text-white {
-  font-size: 15pt !important; /* dog name */
+  font-size: 12pt !important; /* dog name */
+}
+
+/* Export-only: allow 3rd-gen kennel + dog names to wrap (prevent tail-only clipping like "ent Washington") */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid a.truncate.text-\[6\.5pt\].text-white,
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid p.text-\[6pt\].text-\[\#717179\] {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+}
+
+/* Export-only: reserve kennel line height so nodes don't shift when kennel is empty */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[8\.25pt\].text-\[\#717179\],
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6\.5pt\].text-\[\#717179\] {
+  display: block !important;
+  min-height: 1em !important;
 }
 
 /* (intentionally no per-generation override; keep spacing uniform across 1st/2nd/3rd) */
@@ -486,6 +504,13 @@ select.input {
 /* Replace the pedigree's custom gray with the app's muted text */
 .pedigree-screen .text-\[\#717179\] {
   color: var(--text-muted) !important;
+}
+
+/* Screen-only: reserve kennel line height so nodes don't shift when kennel is empty */
+.pedigree-screen .text-\[8\.25pt\].text-\[\#717179\],
+.pedigree-screen .text-\[6\.5pt\].text-\[\#717179\] {
+  display: block;
+  min-height: 1em;
 }
 
 /* Use app borders instead of pure white borders on screen */

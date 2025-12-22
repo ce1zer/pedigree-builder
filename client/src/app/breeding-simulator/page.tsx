@@ -159,6 +159,20 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
 
   const isUnknown = !dog;
   const imageBorderColor = 'border-white';
+  const kennelName = dog ? getKennelName(dog) : '';
+  const championPrefix = dog?.champion === 'ch' ? 'Ch. '
+    : dog?.champion === 'dual_ch' ? 'Dual Ch. '
+    : dog?.champion === 'gr_ch' ? 'Gr. Ch. '
+    : dog?.champion === 'dual_gr_ch' ? 'Dual Gr. Ch. '
+    : dog?.champion === 'nw_gr_ch' ? 'NW. Gr. Ch. '
+    : dog?.champion === 'inw_gr_ch' ? 'INW. Gr. Ch. '
+    : '';
+  // If kennel is missing, still show the champion title (if any).
+  const kennelDisplay = isUnknown
+    ? 'UNKNOWN'
+    : (kennelName
+      ? championPrefix + kennelName
+      : (championPrefix ? championPrefix.trimEnd() : ''));
 
   // For large and medium sizes (1st and 2nd generation), use vertical layout (image on top, text below)
   // For small (3rd generation): father's side = text left, mother's side = text right
@@ -173,18 +187,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {/* For small size on father's side (3rd generation), text comes first (left side) */}
       {isSmallWithTextLeft && (
         <div className="flex-1 min-w-0 flex flex-col justify-center items-end text-right" style={{ height: '100%' }}>
-          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>
-            {isUnknown ? 'UNKNOWN' : (() => {
-              const championPrefix = dog?.champion === 'ch' ? 'Ch. ' 
-                : dog?.champion === 'dual_ch' ? 'Dual Ch. '
-                : dog?.champion === 'gr_ch' ? 'Gr. Ch. '
-                : dog?.champion === 'dual_gr_ch' ? 'Dual Gr. Ch. '
-                : dog?.champion === 'nw_gr_ch' ? 'NW. Gr. Ch. '
-                : dog?.champion === 'inw_gr_ch' ? 'INW. Gr. Ch. '
-                : '';
-              return championPrefix + getKennelName(dog);
-            })()}
-          </p>
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>{kennelDisplay}</p>
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
@@ -229,18 +232,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side 
       {/* Dog Info - For large and medium sizes (vertical layout) and small size on mother's side (text right) */}
       {(size === 'large' || size === 'medium' || (size === 'small' && side === 'mother')) && (
         <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'} ${size === 'small' ? 'h-full' : ''}`}>
-          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>
-            {isUnknown ? 'UNKNOWN' : (() => {
-              const championPrefix = dog?.champion === 'ch' ? 'Ch. ' 
-                : dog?.champion === 'dual_ch' ? 'Dual Ch. '
-                : dog?.champion === 'gr_ch' ? 'Gr. Ch. '
-                : dog?.champion === 'dual_gr_ch' ? 'Dual Gr. Ch. '
-                : dog?.champion === 'nw_gr_ch' ? 'NW. Gr. Ch. '
-                : dog?.champion === 'inw_gr_ch' ? 'INW. Gr. Ch. '
-                : '';
-              return championPrefix + getKennelName(dog);
-            })()}
-          </p>
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>{kennelDisplay}</p>
           {dog ? (
             <Link 
               href={`/dogs/${dog.id}`}
@@ -336,8 +328,65 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       return;
     }
 
+    let prevInlineHeight = '';
+    let prevInlineMaxHeight = '';
+    let prevInlineWidth = '';
+    let prevInlineMaxWidth = '';
+    const movedTextEls: Array<{ el: HTMLElement; prevTransform: string; prevDisplay: string; prevWillChange: string }> = [];
+
     try {
       setIsExporting(true);
+
+      // Export-only: increase export DOM height to avoid bottom text clipping and overlaps.
+      // We restore the original inline styles in the finally block.
+      const exportEl = exportPedigreeRef.current;
+      prevInlineHeight = exportEl.style.height;
+      prevInlineMaxHeight = exportEl.style.maxHeight;
+      prevInlineWidth = exportEl.style.width;
+      prevInlineMaxWidth = exportEl.style.maxWidth;
+
+      const currentWidth = exportEl.offsetWidth;
+      const currentHeight = exportEl.offsetHeight;
+
+      // Make the export slightly wider so 3rd-gen kennel names wrap less often.
+      exportEl.style.width = `${Math.round(currentWidth * 1.1)}px`;
+      exportEl.style.maxWidth = 'none';
+
+      exportEl.style.height = `${Math.round(currentHeight * 1.2)}px`;
+      exportEl.style.maxHeight = 'none';
+
+      // Export-only: if kennel line is empty, visually move the dog-name line up into that slot
+      // while preserving layout height (keeps image alignment consistent).
+      const kennelCandidates = Array.from(exportEl.querySelectorAll('p')) as HTMLParagraphElement[];
+      for (const kennelP of kennelCandidates) {
+        if (kennelP.textContent?.trim()) continue;
+        // Only target pedigree kennel lines (gray text in the export DOM)
+        if (!kennelP.closest('.pedigree-grid')) continue;
+        const kennelColor = window.getComputedStyle(kennelP).color;
+        if (kennelColor !== 'rgb(113, 113, 121)') continue;
+
+        const kennelHeight = kennelP.offsetHeight;
+        if (!kennelHeight) continue;
+
+        const dogNameEl = kennelP.nextElementSibling as HTMLElement | null;
+        if (!dogNameEl) continue;
+
+        // Track and apply a translateY shift without affecting layout.
+        movedTextEls.push({
+          el: dogNameEl,
+          prevTransform: dogNameEl.style.transform,
+          prevDisplay: dogNameEl.style.display,
+          prevWillChange: dogNameEl.style.willChange,
+        });
+
+        const existingTransform = dogNameEl.style.transform?.trim();
+        const shift = `translateY(-${kennelHeight}px)`;
+        dogNameEl.style.transform = existingTransform && existingTransform !== 'none'
+          ? `${existingTransform} ${shift}`
+          : shift;
+        dogNameEl.style.display = 'block';
+        dogNameEl.style.willChange = 'transform';
+      }
       
       const createIsolatedClone = (original: HTMLElement): HTMLElement => {
         const clone = original.cloneNode(true) as HTMLElement;
@@ -734,6 +783,18 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
       console.error('Export error:', error);
       toast.error('Failed to export pedigree');
     } finally {
+      // Restore export DOM sizing
+      if (exportPedigreeRef.current) {
+        exportPedigreeRef.current.style.height = prevInlineHeight;
+        exportPedigreeRef.current.style.maxHeight = prevInlineMaxHeight;
+        exportPedigreeRef.current.style.width = prevInlineWidth;
+        exportPedigreeRef.current.style.maxWidth = prevInlineMaxWidth;
+      }
+      for (const { el, prevTransform, prevDisplay, prevWillChange } of movedTextEls) {
+        el.style.transform = prevTransform;
+        el.style.display = prevDisplay;
+        el.style.willChange = prevWillChange;
+      }
       setIsExporting(false);
     }
   }, []);

@@ -386,21 +386,93 @@ select.input {
   pointer-events: none;
 }
 
+/* Export-only: shared row spacing between stacked dogs */
+.pedigree-export-only [data-export-gap="tight"][data-pedigree-export] {
+  --export-row-gap: 10px;
+  /* Vertically center the pedigree within the export box height */
+  display: flex;
+  align-items: center;
+}
+
 /* Breeding Simulator export-only tweak: tighten pedigree column spacing in the PNG export */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid {
   gap: 0px 0 !important;
   column-gap: 0 !important;
+  grid-template-columns: 0.90fr 0.90fr 1.25fr 1.25fr 0.90fr 0.90fr !important;
+  /* Center the whole pedigree vertically within the (taller) export box */
+  margin-top: auto !important;
+  margin-bottom: auto !important;
 }
 
 /* Breeding Simulator export-only tweak: reduce the explicit middle seam margins (inline 0.5rem) */
 .pedigree-export-only [data-export-gap="tight"] .parent-pair {
   margin-left: 0.755rem !important;
   margin-right: 0.755rem !important;
+  /* Export-only: even vertical spacing between the two 1st-gen tiles */
+  gap: var(--export-row-gap) !important;
+}
+
+/* Export-only: compensate for added 1st-gen gap so the two tiles still fit in 100% height */
+.pedigree-export-only [data-export-gap="tight"] .parent-pair .pedigree-tile {
+  height: calc(50% - (var(--export-row-gap) / 2)) !important;
+}
+
+/* Export-only: add vertical spacing in 2nd-gen columns (cols 2 and 5) and compensate heights */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(2),
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(5) {
+  gap: var(--export-row-gap) !important;
+}
+
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(2) > div.relative,
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(5) > div.relative {
+  height: calc(50% - (var(--export-row-gap) / 2)) !important;
+}
+
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(2) > div.relative > div.flex.flex-col,
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(5) > div.relative > div.flex.flex-col {
+  gap: var(--export-row-gap) !important;
+}
+
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(2) > div.relative > div.flex.flex-col > div.relative,
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(5) > div.relative > div.flex.flex-col > div.relative {
+  height: calc(50% - (var(--export-row-gap) / 2)) !important;
+}
+
+/* Export-only: even row spacing in 3rd-gen columns (cols 1 and 6) */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(1),
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(6) {
+  gap: var(--export-row-gap) !important;
+}
+
+/* Export-only: remove the alignment spacer blocks so both 3rd-gen columns can be centered */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(1) > div:last-child {
+  display: none !important;
+  height: 0 !important;
+  flex: 0 0 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(6) > div:first-of-type {
+  display: none !important;
+  height: 0 !important;
+  flex: 0 0 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Export-only: set 3rd-gen tile heights to account for the 7 gaps across 8 rows */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(1) > div.relative:not(:last-child) {
+  height: calc((100% - (7 * var(--export-row-gap))) / 8) !important;
+}
+
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(6) > div.relative:not(:first-child) {
+  height: calc((100% - (7 * var(--export-row-gap))) / 8) !important;
 }
 
 /* Breeding Simulator export-only tweak: make pedigree images visually wider so column whitespace shrinks */
 .pedigree-export-only [data-export-gap="tight"] .w-\[52\.5\%\] {
-  width: 52% !important; /* ~20% smaller than our previous 65% (2nd gen tiles) */
+  width: 60% !important; /* 25% smaller than 80% */
 }
 
 .pedigree-export-only [data-export-gap="tight"] .w-\[37\.5\%\] {
@@ -430,6 +502,11 @@ select.input {
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid span {
   transform: none !important;
   display: inline !important;
+}
+
+/* Dog Detail pedigree PNG export: 1st-gen dog name at 25pt (export only; on-page unchanged) */
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] .text-\[19\.5pt\].text-white {
+  font-size: 25pt !important;
 }
 
 /* Export-only: kennel → dog name spacing (near-zero in the final PNG) */
@@ -489,9 +566,18 @@ select.input {
 
 /* Export-only: reserve kennel line height so nodes don't shift when kennel is empty */
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[8\.25pt\].text-\[\#717179\],
-.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6\.5pt\].text-\[\#717179\] {
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6\.5pt\].text-\[\#717179\],
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6pt\].text-\[\#717179\] {
   display: block !important;
   min-height: 1em !important;
+}
+
+/* Export-only: if kennel line is actually empty, keep its height for alignment but hide the text.
+   We then shift the dog-name line upward during export (JS) to appear in this slot. */
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid p.text-\[8\.25pt\].text-\[\#717179\]:empty,
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid p.text-\[6\.5pt\].text-\[\#717179\]:empty,
+.pedigree-export-only [data-export-gap="tight"] .pedigree-grid p.text-\[6pt\].text-\[\#717179\]:empty {
+  visibility: hidden !important;
 }
 
 /* (intentionally no per-generation override; keep spacing uniform across 1st/2nd/3rd) */

@@ -807,6 +807,18 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
 
     try {
       setIsExporting(true);
+
+      // Export-only: temporarily bump 1st-gen (large) dog-name font size for the PNG export.
+      // This operates only on the hidden export DOM and is restored after export.
+      const exportEl = exportPedigreeRef.current;
+      const bumpedDogNameEls: Array<{ el: HTMLElement; prevFontSize: string }> = [];
+      const dogNameCandidates = Array.from(
+        exportEl.querySelectorAll('.text-\\[19\\.5pt\\].text-white')
+      ) as HTMLElement[];
+      for (const el of dogNameCandidates) {
+        bumpedDogNameEls.push({ el, prevFontSize: el.style.fontSize });
+        el.style.fontSize = '25pt';
+      }
       
       // Create a completely isolated clone with only RGB colors
       const createIsolatedClone = (original: HTMLElement): HTMLElement => {
@@ -1310,6 +1322,11 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
         // Clean up temporary container
         document.body.removeChild(tempContainer);
       }
+
+      // Restore temporary inline font sizes on export DOM
+      for (const { el, prevFontSize } of bumpedDogNameEls) {
+        el.style.fontSize = prevFontSize;
+      }
     } catch (error) {
       console.error('Export error:', error);
       toast.error('Failed to export pedigree');
@@ -1335,13 +1352,18 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       {/* On-page tree (restyled via CSS wrapper to match breeding simulator) */}
       <div className="pedigree-screen">
         <PedigreeTreeContent />
-      </div>
+        </div>
 
       {/* Export-only tree (must remain unchanged; used by html2canvas) */}
       <div className="pedigree-export-only" aria-hidden="true">
-        <div ref={exportPedigreeRef} data-pedigree-export className="theme-legacy">
+        <div
+          ref={exportPedigreeRef}
+          data-pedigree-export
+          data-export-context="dog-detail-pedigree"
+          className="theme-legacy"
+        >
           <PedigreeTreeContent />
-        </div>
+      </div>
       </div>
     </div>
   );

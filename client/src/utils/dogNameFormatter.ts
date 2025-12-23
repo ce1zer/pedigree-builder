@@ -1,7 +1,7 @@
 import { Dog } from '@/types';
 
-// Helper function to get kennel name from dog
-const getKennelName = (dog: Dog | null, type: 'primary' | 'secondary'): string => {
+// Helper function to get kennel name from dog (internal, with type parameter)
+const getKennelNameInternal = (dog: Dog | null, type: 'primary' | 'secondary'): string => {
   if (!dog) return '';
   
   if (type === 'primary') {
@@ -20,6 +20,14 @@ const getKennelName = (dog: Dog | null, type: 'primary' | 'secondary'): string =
     }
   }
   return '';
+};
+
+/**
+ * Get primary kennel name from a dog
+ * Handles all cases: primary_kennel_name, string primary_kennel, and object primary_kennel
+ */
+export const getKennelName = (dog: Dog | null): string => {
+  return getKennelNameInternal(dog, 'primary');
 };
 
 /**
@@ -51,7 +59,7 @@ export const formatDogDisplayName = (dog: Dog | null): string => {
   }
   
   // Add primary kennel
-  const primaryKennel = getKennelName(dog, 'primary');
+  const primaryKennel = getKennelNameInternal(dog, 'primary');
   if (primaryKennel) {
     parts.push(primaryKennel);
   }
@@ -60,7 +68,7 @@ export const formatDogDisplayName = (dog: Dog | null): string => {
   parts.push(dog.dog_name);
   
   // Add secondary kennel with "of" prefix
-  const secondaryKennel = getKennelName(dog, 'secondary');
+  const secondaryKennel = getKennelNameInternal(dog, 'secondary');
   if (secondaryKennel) {
     parts.push('of', secondaryKennel);
   }

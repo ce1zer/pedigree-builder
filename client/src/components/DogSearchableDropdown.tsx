@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { Dog } from '@/types';
+import { getKennelName } from '@/utils/dogNameFormatter';
 
 interface DogSearchableDropdownProps {
   options: Dog[];
@@ -10,16 +11,6 @@ interface DogSearchableDropdownProps {
   onChange: (dog: Dog | null) => void;
   placeholder: string;
   label: string;
-}
-
-function getKennelName(dog: Dog | null): string {
-  if (!dog) return '';
-  if (dog.primary_kennel_name) return dog.primary_kennel_name;
-  if (typeof dog.primary_kennel === 'string') return dog.primary_kennel;
-  if (dog.primary_kennel && typeof dog.primary_kennel === 'object') {
-    return dog.primary_kennel.name || '';
-  }
-  return '';
 }
 
 export const DogSearchableDropdown: React.FC<DogSearchableDropdownProps> = ({

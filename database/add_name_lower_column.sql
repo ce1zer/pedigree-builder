@@ -22,3 +22,4 @@ CREATE INDEX IF NOT EXISTS idx_kennels_name_lower ON kennels(name_lower);
 
 
 
+

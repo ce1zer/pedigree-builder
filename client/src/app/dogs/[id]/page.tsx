@@ -540,12 +540,28 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
 
   const isUnknown = !dog;
   const imageBorderColor = 'border-white';
+  const championPrefix = dog?.champion === 'ch' ? 'Ch. ' 
+    : dog?.champion === 'dual_ch' ? 'Dual Ch. '
+    : dog?.champion === 'gr_ch' ? 'Gr. Ch. '
+    : dog?.champion === 'dual_gr_ch' ? 'Dual Gr. Ch. '
+    : dog?.champion === 'nw_gr_ch' ? 'NW. Gr. Ch. '
+    : dog?.champion === 'inw_gr_ch' ? 'INW. Gr. Ch. '
+    : '';
+  const kennelName = dog ? (typeof dog.primary_kennel === 'object' && dog.primary_kennel?.name 
+    ? dog.primary_kennel.name 
+    : (typeof dog.primary_kennel === 'string' ? dog.primary_kennel : dog.primary_kennel_name || '')) : '';
+  // If kennel is missing, still show the champion title (if any).
+  const kennelDisplay = isUnknown
+    ? 'UNKNOWN'
+    : (kennelName
+      ? championPrefix + kennelName
+      : (championPrefix ? championPrefix.trimEnd() : ''));
 
   // For large size (1st generation), use vertical layout (image on top, text below)
   // For medium and small sizes (2nd and 3rd generation), use horizontal layout (image left, text right)
   const isVerticalLayout = size === 'large';
-  // Increase gap for large size (1st gen) by 50%: gap-[7.5px] (7.5px) -> gap-[11.25px] (11.25px)
-  const gapClass = size === 'large' ? 'gap-[11.25px]' : 'gap-3';
+  // Reduced gap for large size (1st gen) to match breeding simulator: gap-[5px]
+  const gapClass = size === 'large' ? 'gap-[5px]' : 'gap-3';
   
   return (
     <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass}`}>
@@ -579,19 +595,7 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
       {/* Dog Info - Vertical Layout for text content */}
       <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
         <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>
-            {isUnknown ? 'UNKNOWN' : (() => {
-              const championPrefix = dog?.champion === 'ch' ? 'Ch. ' 
-                : dog?.champion === 'dual_ch' ? 'Dual Ch. '
-                : dog?.champion === 'gr_ch' ? 'Gr. Ch. '
-                : dog?.champion === 'dual_gr_ch' ? 'Dual Gr. Ch. '
-                : dog?.champion === 'nw_gr_ch' ? 'NW. Gr. Ch. '
-                : dog?.champion === 'inw_gr_ch' ? 'INW. Gr. Ch. '
-                : '';
-              const kennelName = typeof dog.primary_kennel === 'object' && dog.primary_kennel?.name 
-                ? dog.primary_kennel.name 
-                : (typeof dog.primary_kennel === 'string' ? dog.primary_kennel : dog.primary_kennel_name || '');
-              return championPrefix + kennelName;
-            })()}
+          {kennelDisplay}
         </p>
         {dog ? (
           <Link 
@@ -820,6 +824,110 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
         el.style.fontSize = '25pt';
       }
       
+      // Export-only: if kennel line is empty, visually move the dog-name line up into that slot
+      // while preserving layout height (keeps image alignment consistent).
+      const movedTextEls: Array<{ el: HTMLElement; prevTransform: string; prevDisplay: string; prevWillChange: string }> = [];
+      const collapsedTextContainers: Array<{ el: HTMLElement; prevValue: string; prevPriority: string }> = [];
+      const tightenedDogNameMargins: Array<{ el: HTMLElement; prevValue: string; prevPriority: string }> = [];
+      const hiddenKennelLines: Array<{ el: HTMLElement; prevValue: string; prevPriority: string }> = [];
+      const adjustedKennelMinHeights: Array<{ el: HTMLElement; prevValue: string; prevPriority: string }> = [];
+      const kennelCandidates = Array.from(exportEl.querySelectorAll('p')) as HTMLParagraphElement[];
+      for (const kennelP of kennelCandidates) {
+        if (kennelP.textContent?.trim()) continue;
+        // Only target pedigree kennel lines (gray text in the export DOM).
+        // Note: dog-detail pedigree layout does not include a `.pedigree-tree` wrapper,
+        // so avoid filtering by a non-existent selector here.
+        const kennelColor = window.getComputedStyle(kennelP).color;
+        if (kennelColor !== 'rgb(113, 113, 121)') continue;
+        const isFirstGenKennelLine = kennelP.classList.contains('text-[16.5pt]');
+
+        const kennelHeight = kennelP.offsetHeight;
+        if (!kennelHeight) continue;
+
+        const dogNameEl = kennelP.nextElementSibling as HTMLElement | null;
+        if (!dogNameEl) continue;
+
+        // Hide the empty kennel line for export (don't rely on CSS :empty, which may not match due to JSX whitespace).
+        hiddenKennelLines.push({
+          el: kennelP,
+          prevValue: kennelP.style.getPropertyValue('visibility'),
+          prevPriority: kennelP.style.getPropertyPriority('visibility'),
+        });
+        kennelP.style.setProperty('visibility', 'hidden', 'important');
+
+        // Compute a consistent "kennel slot" height so the overall node height (and thus vertical centering)
+        // matches the non-empty kennel case. For 1st gen, this is roughly line-height + the usual dog-name mt.
+        let shiftPx = kennelHeight;
+        if (isFirstGenKennelLine) {
+          const kennelComputed = window.getComputedStyle(kennelP);
+          const dogNameComputed = window.getComputedStyle(dogNameEl);
+          const lineHeightStr = kennelComputed.lineHeight;
+          const mtStr = dogNameComputed.marginTop;
+          const lineHeightPx = lineHeightStr?.endsWith('px') ? parseFloat(lineHeightStr) : NaN;
+          const mtPx = mtStr?.endsWith('px') ? parseFloat(mtStr) : NaN;
+
+          if (Number.isFinite(lineHeightPx)) {
+            const reservedPx = lineHeightPx + (Number.isFinite(mtPx) ? mtPx : 0);
+            adjustedKennelMinHeights.push({
+              el: kennelP,
+              prevValue: kennelP.style.getPropertyValue('min-height'),
+              prevPriority: kennelP.style.getPropertyPriority('min-height'),
+            });
+            kennelP.style.setProperty('min-height', `${reservedPx}px`, 'important');
+            shiftPx = reservedPx;
+          }
+        }
+
+        // 1st gen only: collapse the text container so we don't leave extra vertical space,
+        // and remove the dog-name's top margin so it sits tight to the image (like breeding export).
+        if (isFirstGenKennelLine) {
+          // Find the parent text container (div with flex flex-col items-center text-center)
+          let parent = kennelP.parentElement;
+          while (parent && parent !== exportEl) {
+            if (
+              parent.classList.contains('flex') &&
+              parent.classList.contains('flex-col') &&
+              parent.classList.contains('items-center') &&
+              parent.classList.contains('text-center')
+            ) {
+              const container = parent as HTMLElement;
+              collapsedTextContainers.push({
+                el: container,
+                prevValue: container.style.getPropertyValue('min-height'),
+                prevPriority: container.style.getPropertyPriority('min-height'),
+              });
+              // Override any CSS (even if later reintroduced with !important)
+              container.style.setProperty('min-height', '0px', 'important');
+              break;
+            }
+            parent = parent.parentElement;
+          }
+
+          tightenedDogNameMargins.push({
+            el: dogNameEl,
+            prevValue: dogNameEl.style.getPropertyValue('margin-top'),
+            prevPriority: dogNameEl.style.getPropertyPriority('margin-top'),
+          });
+          dogNameEl.style.setProperty('margin-top', '0px', 'important');
+        }
+
+        // Track and apply a translateY shift without affecting layout.
+        movedTextEls.push({
+          el: dogNameEl,
+          prevTransform: dogNameEl.style.transform,
+          prevDisplay: dogNameEl.style.display,
+          prevWillChange: dogNameEl.style.willChange,
+        });
+
+        const existingTransform = dogNameEl.style.transform?.trim();
+        const shift = `translateY(-${shiftPx}px)`;
+        dogNameEl.style.transform = existingTransform && existingTransform !== 'none'
+          ? `${existingTransform} ${shift}`
+          : shift;
+        dogNameEl.style.display = 'block';
+        dogNameEl.style.willChange = 'transform';
+      }
+      
       // Create a completely isolated clone with only RGB colors
       const createIsolatedClone = (original: HTMLElement): HTMLElement => {
         const clone = original.cloneNode(true) as HTMLElement;
@@ -902,7 +1010,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           const marginRight = computed.marginRight;
           const marginBottom = computed.marginBottom;
           const marginLeft = computed.marginLeft;
-          const gap = computed.gap; // Includes updated spacing: gap-[11.25px] for 1st gen
+          const gap = computed.gap;
           const columnGap = computed.columnGap;
           const rowGap = computed.rowGap;
           const gridTemplateColumns = computed.gridTemplateColumns;
@@ -1108,6 +1216,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           
           // For text elements, preserve exact layout and alignment
           if (tagName === 'p' || tagName === 'span' || tagName === 'a' || tagName === 'div' || tagName === 'h1' || tagName === 'h2' || tagName === 'h3') {
+            // Check if this is an image container - if so, preserve overflow-hidden
+            const isImageContainer = cloneEl.querySelector('img') !== null || originalEl.querySelector('img') !== null;
+            
             // Ensure text is visible
             cloneEl.style.setProperty('visibility', 'visible');
             cloneEl.style.setProperty('opacity', '1');
@@ -1140,22 +1251,44 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
             if (whiteSpace) setStyleIfNotInline('white-space', whiteSpace);
             // Preserve text-overflow to maintain exact text behavior
             if (textOverflow) setStyleIfNotInline('text-overflow', textOverflow);
-            // Only make overflow visible if it's hidden, but preserve other overflow settings
-            if (overflow === 'hidden') {
-              cloneEl.style.setProperty('overflow', 'visible');
-            } else if (overflow) {
-              setStyleIfNotInline('overflow', overflow);
+            
+            // Handle overflow based on whether this is an image container
+            if (!isImageContainer) {
+              // Only make overflow visible for non-image containers (text elements)
+              if (overflow === 'hidden') {
+                cloneEl.style.setProperty('overflow', 'visible');
+              } else if (overflow) {
+                setStyleIfNotInline('overflow', overflow);
+              }
+              if (overflowX === 'hidden') {
+                cloneEl.style.setProperty('overflow-x', 'visible');
+              } else if (overflowX) {
+                setStyleIfNotInline('overflow-x', overflowX);
+              }
+              if (overflowY === 'hidden') {
+                cloneEl.style.setProperty('overflow-y', 'visible');
+              } else if (overflowY) {
+                setStyleIfNotInline('overflow-y', overflowY);
+              }
+            } else {
+              // Image containers: preserve overflow-hidden to keep images within borders
+              if (overflow === 'hidden') {
+                setStyleIfNotInline('overflow', 'hidden');
+              } else if (overflow) {
+                setStyleIfNotInline('overflow', overflow);
+              }
+              if (overflowX === 'hidden') {
+                setStyleIfNotInline('overflow-x', 'hidden');
+              } else if (overflowX) {
+                setStyleIfNotInline('overflow-x', overflowX);
+              }
+              if (overflowY === 'hidden') {
+                setStyleIfNotInline('overflow-y', 'hidden');
+              } else if (overflowY) {
+                setStyleIfNotInline('overflow-y', overflowY);
+              }
             }
-            if (overflowX === 'hidden') {
-              cloneEl.style.setProperty('overflow-x', 'visible');
-            } else if (overflowX) {
-              setStyleIfNotInline('overflow-x', overflowX);
-            }
-            if (overflowY === 'hidden') {
-              cloneEl.style.setProperty('overflow-y', 'visible');
-            } else if (overflowY) {
-              setStyleIfNotInline('overflow-y', overflowY);
-            }
+            
             // Ensure text color is set
             if (computed.color && computed.color !== 'rgba(0, 0, 0, 0)') {
               cloneEl.style.setProperty('color', 'rgb(255, 255, 255)');
@@ -1168,17 +1301,12 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           }
           
           
-          // Border colors - use blue or white
+          // Border colors - use white
           if (computed.borderColor && computed.borderColor !== 'rgba(0, 0, 0, 0)') {
             // Check if it's a white border for pedigree tiles or connection lines
             const borderStyle = computed.borderStyle;
             if (borderStyle && borderStyle !== 'none') {
-              // Use white for pedigree tiles and connection lines
-              if (cloneEl.querySelector('img') || cloneEl.textContent?.trim()) {
-                cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
-              } else {
-                cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
-              }
+              cloneEl.style.setProperty('border-color', 'rgb(255, 255, 255)');
             }
           }
           
@@ -1211,7 +1339,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       // Wait for all images to load before exporting
       const images = isolatedClone.querySelectorAll('img');
       const imagePromises = Array.from(images).map((img) => {
-        return new Promise<void>((resolve, reject) => {
+        return new Promise<void>((resolve) => {
           if (img.complete && img.naturalHeight !== 0) {
             resolve();
           } else {
@@ -1270,7 +1398,6 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           useCORS: true,
           allowTaint: true,
           foreignObjectRendering: false,
-          ignoreElements: () => false,
           onclone: (clonedDoc) => {
             // Ensure all images in the cloned document are loaded
             const clonedImages = clonedDoc.querySelectorAll('img');
@@ -1326,6 +1453,49 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       // Restore temporary inline font sizes on export DOM
       for (const { el, prevFontSize } of bumpedDogNameEls) {
         el.style.fontSize = prevFontSize;
+      }
+      
+      // Restore text container min-heights
+      for (const { el, prevValue, prevPriority } of collapsedTextContainers) {
+        if (!prevValue) {
+          el.style.removeProperty('min-height');
+        } else {
+          el.style.setProperty('min-height', prevValue, prevPriority || undefined);
+        }
+      }
+
+      // Restore tightened dog-name margins
+      for (const { el, prevValue, prevPriority } of tightenedDogNameMargins) {
+        if (!prevValue) {
+          el.style.removeProperty('margin-top');
+        } else {
+          el.style.setProperty('margin-top', prevValue, prevPriority || undefined);
+        }
+      }
+
+      // Restore hidden kennel lines
+      for (const { el, prevValue, prevPriority } of hiddenKennelLines) {
+        if (!prevValue) {
+          el.style.removeProperty('visibility');
+        } else {
+          el.style.setProperty('visibility', prevValue, prevPriority || undefined);
+        }
+      }
+
+      // Restore adjusted kennel min-heights
+      for (const { el, prevValue, prevPriority } of adjustedKennelMinHeights) {
+        if (!prevValue) {
+          el.style.removeProperty('min-height');
+        } else {
+          el.style.setProperty('min-height', prevValue, prevPriority || undefined);
+        }
+      }
+      
+      // Restore translateY shifts
+      for (const { el, prevTransform, prevDisplay, prevWillChange } of movedTextEls) {
+        el.style.transform = prevTransform;
+        el.style.display = prevDisplay;
+        el.style.willChange = prevWillChange;
       }
     } catch (error) {
       console.error('Export error:', error);

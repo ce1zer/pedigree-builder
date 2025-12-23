@@ -2,25 +2,16 @@
 
 import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Database, Plus, GitBranch, Search, X } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Database, Plus, GitBranch, Search, X, LogOut } from 'lucide-react';
 import { Dog } from '@/types';
 import { dogsApi } from '@/services/api';
+import { createClient } from '@/utils/supabase/client';
+import toast from 'react-hot-toast';
+import { getKennelName } from '@/utils/dogNameFormatter';
 
 // Constants
 const SMALL_ICON_SIZE = 'h-4 w-4';
-
-// Helper function to get kennel name from dog
-const getKennelName = (dog: Dog | null): string => {
-  if (!dog) return '';
-  if (dog.primary_kennel_name) return dog.primary_kennel_name;
-  if (typeof dog.primary_kennel === 'string') return dog.primary_kennel;
-  if (dog.primary_kennel && typeof dog.primary_kennel === 'object') {
-    const kennel = dog.primary_kennel as { name?: string };
-    return kennel.name || '';
-  }
-  return '';
-};
 
 // Navigation item interface
 interface NavItem {
@@ -66,7 +57,6 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive }) => (
 // Search Bar Component (separated to use useSearchParams)
 const SearchBar: React.FC<{ pathname: string }> = ({ pathname }) => {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [filteredDogs, setFilteredDogs] = useState<Dog[]>([]);
@@ -75,13 +65,6 @@ const SearchBar: React.FC<{ pathname: string }> = ({ pathname }) => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-
-  const isActive = (path: string) => {
-    if (path === '/') {
-      return pathname === '/';
-    }
-    return pathname.startsWith(path);
-  };
 
   // Function to load dogs (can be called manually or automatically)
   const loadDogs = useCallback(async () => {
@@ -320,11 +303,41 @@ const SearchBar: React.FC<{ pathname: string }> = ({ pathname }) => {
 
 // Header component
 const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const supabase = createClient();
+
   const isActive = (path: string) => {
     if (path === '/') {
       return pathname === '/';
     }
     return pathname.startsWith(path);
+  };
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      // Also sign out from Supabase client-side
+      await supabase.auth.signOut();
+      
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Signed out successfully');
+        router.push('/login');
+        router.refresh();
+      } else {
+        toast.error(data.error || 'Failed to sign out');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'An unexpected error occurred');
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -349,8 +362,8 @@ const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
             </Suspense>
           </div>
 
-          {/* Right: Add Dog Button */}
-          <div className="flex justify-end">
+          {/* Right: Add Dog Button and Logout */}
+          <div className="flex justify-end items-center space-x-2">
             <Link
               href="/dogs/new"
               className="border-2 border-[color:var(--cta-border)] text-[color:var(--cta-fg)] hover:bg-[var(--cta-hover-bg)] hover:text-[color:var(--cta-hover-fg)] px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 inline-flex items-center space-x-2"
@@ -358,6 +371,15 @@ const Header: React.FC<{ pathname: string }> = ({ pathname }) => {
               <Plus className={SMALL_ICON_SIZE} />
               <span>Add Dog</span>
             </Link>
+            <button
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="text-[color:var(--text-secondary)] hover:text-[color:var(--text-primary)] hover:bg-[var(--nav-hover-bg)] px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 inline-flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Sign out"
+            >
+              <LogOut className={SMALL_ICON_SIZE} />
+              <span className="hidden sm:inline">Sign Out</span>
+            </button>
           </div>
         </div>
       </div>
@@ -375,12 +397,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   // `.theme-legacy` at the component level to keep PNG exports unchanged.
   const themeClass = 'theme-neutral';
   const pathname = usePathname();
+  const isLoginPage = pathname === '/login';
 
   return (
     <div className={`min-h-screen ${themeClass} bg-[var(--background)]`}>
-      <Header pathname={pathname} />
+      {!isLoginPage && <Header pathname={pathname} />}
       
-      <main className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+      <main className={`max-w-7xl mx-auto px-6 lg:px-8 ${isLoginPage ? 'py-0' : 'py-8'}`}>
         {children}
       </main>
     </div>

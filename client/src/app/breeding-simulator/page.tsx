@@ -9,6 +9,7 @@ import { dogsApi } from '@/services/api';
 import toast from 'react-hot-toast';
 import html2canvas from 'html2canvas';
 import { DogSearchableDropdown } from '@/components/DogSearchableDropdown';
+import { getKennelName } from '@/utils/dogNameFormatter';
 
 // Constants
 const ICON_SIZE = 'h-5 w-5';
@@ -113,14 +114,6 @@ const buildPedigreeGenerations = async (rootDog: Dog): Promise<PedigreeGeneratio
   return generations;
 };
 
-// Helper function to get kennel name
-const getKennelName = (dog: Dog | null): string => {
-  if (!dog) return '';
-  if (typeof dog.primary_kennel === 'object' && dog.primary_kennel?.name) {
-    return dog.primary_kennel.name;
-  }
-  return typeof dog.primary_kennel === 'string' ? dog.primary_kennel : '';
-};
 
 // Pedigree Node Component
 interface PedigreeNodeProps {

@@ -8,19 +8,7 @@ import { Edit, Users, Plus, Building2, Save, X, Trash2 } from 'lucide-react';
 import { Dog, Kennel } from '@/types';
 import { dogsApi, kennelsApi } from '@/services/api';
 import toast from 'react-hot-toast';
-import { formatDogDisplayName } from '@/utils/dogNameFormatter';
-
-// Helper function to get kennel name from dog (for filtering/search)
-const getKennelName = (dog: Dog | null): string => {
-  if (!dog) return '';
-  if (dog.primary_kennel_name) return dog.primary_kennel_name;
-  if (typeof dog.primary_kennel === 'string') return dog.primary_kennel;
-  if (dog.primary_kennel && typeof dog.primary_kennel === 'object') {
-    const kennel = dog.primary_kennel as { name?: string };
-    return kennel.name || '';
-  }
-  return '';
-};
+import { formatDogDisplayName, getKennelName } from '@/utils/dogNameFormatter';
 
 // Kennels View Component
 interface KennelsViewProps {

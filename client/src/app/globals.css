@@ -604,6 +604,27 @@ select.input {
   border-color: var(--border-color) !important;
 }
 
+/* Export-only: reserve kennel line height for dog detail pedigree so nodes don't shift when kennel is empty */
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] .text-\[16\.5pt\].text-\[\#717179\],
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] .text-\[14pt\].text-\[\#717179\],
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] .text-\[10\.75pt\].text-\[\#717179\] {
+  display: block !important;
+  min-height: 1em !important;
+}
+
+/* Export-only: if kennel line is actually empty, keep its height for alignment but hide the text.
+   We then shift the dog-name line upward during export (JS) to appear in this slot. */
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] p.text-\[16\.5pt\].text-\[\#717179\]:empty,
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] p.text-\[14pt\].text-\[\#717179\]:empty,
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] p.text-\[10\.75pt\].text-\[\#717179\]:empty {
+  visibility: hidden !important;
+}
+
+/* Export-only: ensure text container maintains consistent height for 1st generation alignment */
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] .flex.flex-col.items-center.text-center {
+  min-height: 45pt;
+}
+
 /* ==========================================================================
    BullyDEX Pedigree Tree Styles
    ========================================================================== */

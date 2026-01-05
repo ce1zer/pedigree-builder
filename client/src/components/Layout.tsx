@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { Database, Plus, GitBranch, Search, X, LogOut } from 'lucide-react';
+import { Database, Plus, GitBranch, Search, X, LogOut, Link2 } from 'lucide-react';
 import { Dog } from '@/types';
 import { dogsApi } from '@/services/api';
 import { createClient } from '@/utils/supabase/client';
@@ -31,6 +31,11 @@ const NAV_ITEMS: NavItem[] = [
     href: '/breeding-simulator',
     label: 'Breeding Simulator',
     icon: <GitBranch className={SMALL_ICON_SIZE} />
+  },
+  {
+    href: '/import',
+    label: 'Import URL',
+    icon: <Link2 className={SMALL_ICON_SIZE} />
   }
 ];
 

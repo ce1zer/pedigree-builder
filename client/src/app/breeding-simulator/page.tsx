@@ -794,9 +794,9 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
 
   const PedigreeTreeContent = () => (
     <>
-      {/* 6 Column Mirrored Layout - Matching exact layout from original pedigree */}
-      {/* Gap reduced by 70%: from 0.2rem to 0.06rem (~1px) */}
-      <div className="pedigree-grid grid grid-cols-6 gap-x-[0.06rem] w-full items-start mx-auto" style={{ maxWidth: '1600px' }}>
+        {/* 6 Column Mirrored Layout - Matching exact layout from original pedigree */}
+        {/* Gap reduced by 70%: from 0.2rem to 0.06rem (~1px) */}
+        <div className="pedigree-grid grid grid-cols-6 gap-x-[0.06rem] w-full items-start mx-auto" style={{ maxWidth: '1600px' }}>
           {/* Column 1: Father's 3rd Generation (Great-grandparents) - 8 tiles: top 50% */}
           <div className="flex flex-col" style={{ height: '100%' }}>
             {/* Father's Father's Father's Father - 12.5% of total height */}
@@ -1051,19 +1051,19 @@ const BreedingSimulatorTree: React.FC<BreedingSimulatorTreeProps> = ({ fatherGen
         >
           <Download className="h-4 w-4" />
           <span>{isExporting ? 'Exporting...' : 'Export to PNG'}</span>
-        </button>
-      </div>
+              </button>
+          </div>
 
       {/* On-page tree (restyled via CSS wrapper) */}
       <div className="pedigree-screen">
         <PedigreeTreeContent />
-      </div>
+            </div>
 
       {/* Export-only tree (must remain unchanged; used by html2canvas) */}
       <div className="pedigree-export-only" aria-hidden="true">
         <div ref={exportPedigreeRef} data-pedigree-export data-export-gap="tight" className="theme-legacy">
           <PedigreeTreeContent />
-        </div>
+            </div>
       </div>
     </div>
   );

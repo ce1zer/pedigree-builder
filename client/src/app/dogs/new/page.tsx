@@ -477,22 +477,26 @@ const AddDog: React.FC = () => {
   const [availableDogs, setAvailableDogs] = useState<Dog[]>([]);
   const [addAnother, setAddAnother] = useState(true);
 
+  const DEFAULT_DOG_FORM: DogFormData = {
+    dog_name: '',
+    champion: 'none',
+    primary_kennel_id: undefined,
+    secondary_kennel_id: undefined,
+    gender: 'male',
+    father_id: '',
+    mother_id: '',
+    photo: undefined,
+  };
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    reset,
     watch,
   } = useForm<DogFormData>({
-    defaultValues: {
-      dog_name: '',
-      champion: 'none',
-      primary_kennel_id: undefined,
-      secondary_kennel_id: undefined,
-      gender: 'male',
-      father_id: '',
-      mother_id: '',
-    },
+    defaultValues: DEFAULT_DOG_FORM,
   });
 
   const selectedGender = watch('gender');
@@ -557,13 +561,7 @@ const AddDog: React.FC = () => {
         
         if (addAnother) {
           // Reset form and stay on page
-          setValue('dog_name', '');
-          setValue('primary_kennel_id', undefined);
-          setValue('secondary_kennel_id', undefined);
-          setValue('gender', 'male');
-          setValue('father_id', '');
-          setValue('mother_id', '');
-          setValue('photo', undefined);
+          reset(DEFAULT_DOG_FORM);
           setPhotoPreview(null);
           setSelectedFather(null);
           setSelectedMother(null);
@@ -588,7 +586,7 @@ const AddDog: React.FC = () => {
     } finally {
       setIsSubmitting(false);
     }
-  }, [router, addAnother, setValue, loadAvailableDogs]);
+  }, [router, addAnother, reset, DEFAULT_DOG_FORM, loadAvailableDogs]);
 
   // Load available dogs on component mount
   useEffect(() => {

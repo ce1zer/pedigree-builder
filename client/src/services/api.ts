@@ -22,12 +22,15 @@ const createDogFormData = (dogData: DogFormData): FormData => {
   const formData = new FormData();
   formData.append('dogData', JSON.stringify({
     dog_name: dogData.dog_name,
-    champion: dogData.champion || 'none',
-    primary_kennel_id: dogData.primary_kennel_id || null,
-    secondary_kennel_id: dogData.secondary_kennel_id || null,
     gender: dogData.gender,
+    champion: dogData.champion,
     father_id: dogData.father_id,
     mother_id: dogData.mother_id,
+    primary_kennel_id: dogData.primary_kennel_id,
+    secondary_kennel_id: dogData.secondary_kennel_id,
+    // Legacy fields (safe to include; API will ignore if unused)
+    primary_kennel: dogData.primary_kennel,
+    secondary_kennel: dogData.secondary_kennel,
   }));
   
   if (dogData.photo) {
@@ -43,11 +46,7 @@ export const dogsApi = {
    * Retrieve all dogs with their parent information
    */
   getAll: async (): Promise<ApiResponse<Dog[]>> => {
-    const response = await api.get('/dogs', {
-      headers: {
-        'Cache-Control': 'no-cache',
-      },
-    });
+    const response = await api.get('/dogs');
     return handleApiResponse(response);
   },
 
@@ -103,9 +102,6 @@ export const dogsApi = {
   search: async (query: string): Promise<ApiResponse<Dog[]>> => {
     const response = await api.get('/dogs/search', {
       params: { q: query },
-      headers: {
-        'Cache-Control': 'no-cache',
-      },
     });
     
     return handleApiResponse(response);
@@ -149,7 +145,7 @@ export const kennelsApi = {
   /**
    * Delete a kennel
    */
-  delete: async (id: string): Promise<ApiResponse<void>> => {
+  delete: async (id: string): Promise<ApiResponse<{ message: string }>> => {
     const response = await api.delete(`/kennels/${id}`);
     return handleApiResponse(response);
   },

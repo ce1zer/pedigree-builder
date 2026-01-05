@@ -444,8 +444,69 @@ select.input {
   gap: var(--export-row-gap) !important;
 }
 
+/* ==========================================================================
+   Split export (dog detail): column vertical centering + per-generation sizing
+   ========================================================================== */
+
+/* Split export canvas: center the full grid within the padded export height */
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* The split grid should fill the export box height so columns can center within it */
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .pedigree-grid {
+  height: 100% !important;
+  align-items: stretch !important;
+}
+
+/* Prevent breeding-export gap rules from adding extra space on split columns */
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .pedigree-grid > div:nth-child(1),
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .pedigree-grid > div:nth-child(6) {
+  gap: 0 !important;
+}
+
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .split-col {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Center each column's content stack vertically; size is shared across all columns */
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .split-col-content {
+  height: var(--split-stack-height, 74%);
+  margin-block: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--export-row-gap);
+}
+
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .split-col--third .split-tile {
+  height: calc((100% - (3 * var(--export-row-gap))) / 4);
+}
+
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .split-col--second .split-tile {
+  height: calc((100% - (1 * var(--export-row-gap))) / 2);
+}
+
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .split-col--first .split-tile {
+  height: 100%;
+}
+
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .split-tile-inner {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
 /* Export-only: remove the alignment spacer blocks so both 3rd-gen columns can be centered */
-.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(1) > div:last-child {
+/* Exclude split export which has actual dog tiles, not spacer blocks */
+.pedigree-export-only [data-export-gap="tight"]:not([data-export-context="dog-detail-pedigree-split"]) .pedigree-grid > div:nth-child(1) > div:last-child {
   display: none !important;
   height: 0 !important;
   flex: 0 0 0 !important;
@@ -453,7 +514,7 @@ select.input {
   padding: 0 !important;
 }
 
-.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(6) > div:first-of-type {
+.pedigree-export-only [data-export-gap="tight"]:not([data-export-context="dog-detail-pedigree-split"]) .pedigree-grid > div:nth-child(6) > div:first-of-type {
   display: none !important;
   height: 0 !important;
   flex: 0 0 0 !important;
@@ -469,6 +530,9 @@ select.input {
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(6) > div.relative:not(:first-child) {
   height: calc((100% - (7 * var(--export-row-gap))) / 8) !important;
 }
+
+/* Split export: 3rd-gen columns have 4 tiles, not 8 */
+/* NOTE: split export tile sizing is handled via `.split-col-content` + `.split-tile` rules above */
 
 /* Breeding Simulator export-only tweak: make pedigree images visually wider so column whitespace shrinks */
 .pedigree-export-only [data-export-gap="tight"] .w-\[52\.5\%\] {
@@ -491,6 +555,11 @@ select.input {
   transform-origin: center;
 }
 
+/* Split export: do not apply the breeding 1st-gen image scale */
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] img[class*="aspect-[4/3.45]"] {
+  transform: none !important;
+}
+
 /* Breeding Simulator export-only tweak: reduce 1st-gen image↔text vertical gap by 50% (gap-[5px] -> 2.5px) */
 .pedigree-export-only [data-export-gap="tight"] .gap-\[5px\] {
   gap: 2.5px !important;
@@ -505,7 +574,8 @@ select.input {
 }
 
 /* Dog Detail pedigree PNG export: 1st-gen dog name at 25pt (export only; on-page unchanged) */
-.pedigree-export-only [data-export-context="dog-detail-pedigree"] .text-\[19\.5pt\].text-white {
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] .text-\[19\.5pt\].text-white,
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .text-\[19\.5pt\].text-white {
   font-size: 25pt !important;
 }
 
@@ -521,7 +591,8 @@ select.input {
 }
 
 /* Export-only: align Mother 3rd generation column to the top (remove the 50% spacer) */
-.pedigree-export-only [data-export-gap="tight"] .pedigree-grid > div:nth-child(6) > div:first-of-type {
+/* Exclude split export which has actual dog tiles, not spacer blocks */
+.pedigree-export-only [data-export-gap="tight"]:not([data-export-context="dog-detail-pedigree-split"]) .pedigree-grid > div:nth-child(6) > div:first-of-type {
   display: none !important;
   height: 0 !important;
   flex: 0 0 0 !important;
@@ -551,6 +622,27 @@ select.input {
 }
 .pedigree-export-only [data-export-gap="tight"] .pedigree-grid .text-\[6\.5pt\].text-white {
   font-size: 12pt !important; /* dog name */
+}
+
+/* Split export (dog detail): custom font sizes */
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .pedigree-grid .text-\[8\.25pt\].text-\[\#717179\] {
+  font-size: 20pt !important; /* 1st gen kennel */
+}
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .pedigree-grid .text-\[13\.75pt\].text-white {
+  font-size: 40pt !important; /* 1st gen dog name */
+}
+
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .pedigree-grid .text-\[6\.5pt\].text-\[\#717179\],
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .pedigree-grid .text-\[6pt\].text-\[\#717179\] {
+  font-size: 20pt !important; /* 2nd + 3rd gen kennel */
+}
+
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .pedigree-grid .text-\[7\.5pt\].text-white {
+  font-size: 25pt !important; /* 2nd gen dog name */
+}
+
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .pedigree-grid .text-\[6\.5pt\].text-white {
+  font-size: 20pt !important; /* 3rd gen dog name */
 }
 
 /* Export-only: allow 3rd-gen kennel + dog names to wrap (prevent tail-only clipping like "ent Washington") */
@@ -607,7 +699,10 @@ select.input {
 /* Export-only: reserve kennel line height for dog detail pedigree so nodes don't shift when kennel is empty */
 .pedigree-export-only [data-export-context="dog-detail-pedigree"] .text-\[16\.5pt\].text-\[\#717179\],
 .pedigree-export-only [data-export-context="dog-detail-pedigree"] .text-\[14pt\].text-\[\#717179\],
-.pedigree-export-only [data-export-context="dog-detail-pedigree"] .text-\[10\.75pt\].text-\[\#717179\] {
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] .text-\[10\.75pt\].text-\[\#717179\],
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .text-\[16\.5pt\].text-\[\#717179\],
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .text-\[14pt\].text-\[\#717179\],
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .text-\[10\.75pt\].text-\[\#717179\] {
   display: block !important;
   min-height: 1em !important;
 }
@@ -616,12 +711,16 @@ select.input {
    We then shift the dog-name line upward during export (JS) to appear in this slot. */
 .pedigree-export-only [data-export-context="dog-detail-pedigree"] p.text-\[16\.5pt\].text-\[\#717179\]:empty,
 .pedigree-export-only [data-export-context="dog-detail-pedigree"] p.text-\[14pt\].text-\[\#717179\]:empty,
-.pedigree-export-only [data-export-context="dog-detail-pedigree"] p.text-\[10\.75pt\].text-\[\#717179\]:empty {
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] p.text-\[10\.75pt\].text-\[\#717179\]:empty,
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] p.text-\[16\.5pt\].text-\[\#717179\]:empty,
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] p.text-\[14pt\].text-\[\#717179\]:empty,
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] p.text-\[10\.75pt\].text-\[\#717179\]:empty {
   visibility: hidden !important;
 }
 
 /* Export-only: ensure text container maintains consistent height for 1st generation alignment */
-.pedigree-export-only [data-export-context="dog-detail-pedigree"] .flex.flex-col.items-center.text-center {
+.pedigree-export-only [data-export-context="dog-detail-pedigree"] .flex.flex-col.items-center.text-center,
+.pedigree-export-only [data-export-context="dog-detail-pedigree-split"] .flex.flex-col.items-center.text-center {
   min-height: 45pt;
 }
 

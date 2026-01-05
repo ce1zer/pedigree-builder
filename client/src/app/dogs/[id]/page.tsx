@@ -503,10 +503,11 @@ const BasicInfoCard: React.FC<BasicInfoCardProps> = ({ dog, imageCacheBuster }) 
 interface PedigreeNodeProps {
   dog: Dog | null;
   size?: 'large' | 'medium' | 'small';
+  side?: 'father' | 'mother';
   imageCacheBuster?: number;
 }
 
-const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', imageCacheBuster = 0 }) => {
+const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', side, imageCacheBuster = 0 }) => {
   // Size classes - proportional to container size
   // 1st gen: 100%, 2nd gen: 50%, 3rd gen: 25%
   const sizeClasses = {
@@ -560,11 +561,13 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
   // For large size (1st generation), use vertical layout (image on top, text below)
   // For medium and small sizes (2nd and 3rd generation), use horizontal layout (image left, text right)
   const isVerticalLayout = size === 'large';
+  const isMirroredFatherSide = !isVerticalLayout && side === 'father';
   // Reduced gap for large size (1st gen) to match breeding simulator: gap-[5px]
   const gapClass = size === 'large' ? 'gap-[5px]' : 'gap-3';
+  const rowDirectionClass = !isVerticalLayout && isMirroredFatherSide ? 'flex-row-reverse' : '';
   
   return (
-    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass}`}>
+    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : `items-center ${rowDirectionClass}`} ${gapClass}`}>
       {/* Square Image with Border - Clickable if dog exists */}
       {dog ? (
         <Link 
@@ -593,7 +596,15 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
       )}
       
       {/* Dog Info - Vertical Layout for text content */}
-      <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'}`}>
+      <div
+        className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${
+          isVerticalLayout
+            ? 'items-center text-center'
+            : isMirroredFatherSide
+              ? 'justify-center items-end text-right'
+              : 'justify-center'
+        }`}
+      >
         <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>
           {kennelDisplay}
         </p>
@@ -610,6 +621,142 @@ const PedigreeNode: React.FC<PedigreeNodeProps> = ({ dog, size = 'medium', image
           </p>
         )}
       </div>
+    </div>
+  );
+};
+
+// Split export-only node: matches breeding simulator export sizing/behavior.
+interface SplitExportPedigreeNodeProps {
+  dog: Dog | null;
+  size?: 'large' | 'medium' | 'small';
+  side?: 'father' | 'mother'; // For 3rd generation: father = text left, mother = text right
+  imageCacheBuster?: number;
+}
+
+const SplitExportPedigreeNode: React.FC<SplitExportPedigreeNodeProps> = ({ dog, size = 'medium', side, imageCacheBuster = 0 }) => {
+  const sizeClasses = {
+    large: 'w-full h-full',
+    medium: 'w-full h-full',
+    small: 'w-full h-full'
+  };
+
+  const imageSizeClasses = {
+    // Split export-specific sizing:
+    // - 1st gen: ~20% smaller so other generations can be a bit bigger
+    // - 2nd/3rd gen: slightly larger image presence
+    // Split export fill: +20% (capped below 100%)
+    large: 'w-[96%]',
+    medium: 'w-[78%] aspect-[4/3]',
+    small: 'w-[54%] aspect-[4/3]'
+  };
+
+  const textSizeClasses = {
+    large: {
+      kennel: 'text-[8.25pt]',
+      name: 'text-[13.75pt]'
+    },
+    medium: {
+      kennel: 'text-[6.5pt]',
+      name: 'text-[7.5pt]'
+    },
+    small: {
+      kennel: 'text-[6pt]',
+      name: 'text-[6.5pt]'
+    }
+  };
+
+  const isUnknown = !dog;
+  const imageBorderColor = 'border-white';
+  const championPrefix = dog?.champion === 'ch' ? 'Ch. '
+    : dog?.champion === 'dual_ch' ? 'Dual Ch. '
+    : dog?.champion === 'gr_ch' ? 'Gr. Ch. '
+    : dog?.champion === 'dual_gr_ch' ? 'Dual Gr. Ch. '
+    : dog?.champion === 'nw_gr_ch' ? 'NW. Gr. Ch. '
+    : dog?.champion === 'inw_gr_ch' ? 'INW. Gr. Ch. '
+    : '';
+
+  const kennelName = dog ? (typeof dog.primary_kennel === 'object' && dog.primary_kennel?.name
+    ? dog.primary_kennel.name
+    : (typeof dog.primary_kennel === 'string' ? dog.primary_kennel : dog.primary_kennel_name || '')) : '';
+
+  const kennelDisplay = isUnknown
+    ? 'UNKNOWN'
+    : (kennelName
+      ? championPrefix + kennelName
+      : (championPrefix ? championPrefix.trimEnd() : ''));
+
+  // Matches breeding simulator: large+medium are vertical, small is horizontal.
+  const isVerticalLayout = size === 'large' || size === 'medium';
+  const isSmallWithTextLeft = size === 'small' && side === 'father';
+
+  const gapClass = size === 'large' ? 'gap-[5px]' : size === 'medium' ? 'gap-[2px]' : 'gap-3';
+
+  return (
+    <div className={`${sizeClasses[size]} flex ${isVerticalLayout ? 'flex-col items-center justify-center' : 'items-center'} ${gapClass} ${size === 'small' ? 'h-full' : ''}`}>
+      {/* For small size on father's side (3rd generation), text comes first (left side) */}
+      {isSmallWithTextLeft && (
+        <div className="flex-1 min-w-0 flex flex-col justify-center items-end text-right" style={{ height: '100%' }}>
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>{kennelDisplay}</p>
+          {dog ? (
+            <Link
+              href={`/dogs/${dog.id}`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[color:var(--ring-color)] hover:underline block truncate mt-[1px] font-bebas-neue`}
+            >
+              {dog.dog_name}
+            </Link>
+          ) : (
+            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-[1px] font-bebas-neue`}>
+              UNKNOWN
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Square Image with Border - Clickable if dog exists */}
+      {dog ? (
+        <Link
+          href={`/dogs/${dog.id}`}
+          className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2 hover:underline block`}
+        >
+          {getImageUrl(dog?.image_url) ? (
+            <img
+              src={`${getImageUrl(dog.image_url)!}?t=${imageCacheBuster}`}
+              alt={dog.dog_name || 'Unknown'}
+              className={`w-full h-full object-cover ${size === 'large' ? 'aspect-[4/3.45]' : 'aspect-[4/3]'}`}
+              key={`${dog.image_url}-${imageCacheBuster}`}
+            />
+          ) : (
+            <div className={`w-full h-full bg-gray-800 flex items-center justify-center ${size === 'large' ? 'aspect-[4/3.45]' : 'aspect-[4/3]'}`}>
+              <PlaceholderSVG />
+            </div>
+          )}
+        </Link>
+      ) : (
+        <div className={`${imageSizeClasses[size]} overflow-hidden ${isVerticalLayout ? 'flex-shrink-0' : 'flex-shrink-0 self-center'} ${imageBorderColor} border-2`}>
+          <div className={`w-full h-full bg-gray-800 flex items-center justify-center ${size === 'large' ? 'aspect-[4/3.45]' : 'aspect-[4/3]'}`}>
+            <PlaceholderSVG />
+          </div>
+        </div>
+      )}
+
+      {/* Dog Info - For large and medium sizes (vertical layout) and small size on mother's side (text right) */}
+      {(size === 'large' || size === 'medium' || (size === 'small' && side === 'mother')) && (
+        <div className={`${isVerticalLayout ? 'w-full' : 'flex-1'} min-w-0 flex flex-col ${isVerticalLayout ? 'items-center text-center' : 'justify-center'} ${size === 'small' ? 'h-full' : ''}`}>
+          <p className={`${textSizeClasses[size].kennel} text-[#717179] uppercase tracking-wider leading-tight font-bebas-neue`}>{kennelDisplay}</p>
+          {dog ? (
+            <Link
+              href={`/dogs/${dog.id}`}
+              className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight hover:text-[color:var(--ring-color)] hover:underline block truncate mt-[1px] font-bebas-neue`}
+            >
+              {dog.dog_name}
+            </Link>
+          ) : (
+            <p className={`${textSizeClasses[size].name} text-white uppercase font-bold tracking-wide leading-tight mt-[1px] font-bebas-neue`}>
+              UNKNOWN
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -673,6 +820,7 @@ interface PedigreeTreeProps {
 
 const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBuster }) => {
   const exportPedigreeRef = useRef<HTMLDivElement>(null);
+  const exportSplitPedigreeRef = useRef<HTMLDivElement>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   // Extract dogs from each generation - both father's and mother's side
@@ -802,19 +950,191 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
     </>
   );
 
-  // Export pedigree to PNG
-  const handleExportToPNG = useCallback(async () => {
-    if (!exportPedigreeRef.current) {
-      toast.error('Unable to export pedigree');
-      return;
-    }
+  // Split layout (breeding-style column order):
+  // 3rd gen (4 dogs) → 2nd gen (2 dogs) → 1st gen (father) → 1st gen (mother) → 2nd gen (2 dogs) → 3rd gen (4 dogs)
+  // Uses breeding PNG export spacing/sizing via `data-export-gap="tight"` + `.pedigree-grid` CSS.
+  const SplitPedigreeTreeContent = () => (
+    <div className="pedigree-grid grid grid-cols-6 gap-x-0 w-full items-stretch mx-auto" style={{ maxWidth: '2000px' }}>
+      {/* Column 1: Father's 3rd Generation (4 tiles) */}
+      <div className="split-col split-col--third h-full flex flex-col" data-split-col="third-father">
+        <div className="split-col-content">
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={ffFather} size="small" side="father" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={ffMother} size="small" side="father" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={fmFather} size="small" side="father" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={fmMother} size="small" side="father" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Column 2: Father's 2nd Generation (2 tiles) */}
+      <div className="split-col split-col--second generation-col h-full flex flex-col relative">
+        <div className="split-col-content">
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={fatherFather} size="medium" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={fatherMother} size="medium" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Column 3: Father (1 tile) */}
+      <div className="split-col split-col--first generation-col parent-pair h-full flex flex-col relative" style={{ marginRight: '0.5rem' }}>
+        <div className="split-col-content">
+          <div className="split-tile relative">
+            <div className="split-tile-inner" data-split-role="father">
+              <SplitExportPedigreeNode dog={father} size="large" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Column 4: Mother (1 tile) */}
+      <div className="split-col split-col--first generation-col parent-pair h-full flex flex-col relative" style={{ marginLeft: '0.5rem' }}>
+        <div className="split-col-content">
+          <div className="split-tile relative">
+            <div className="split-tile-inner" data-split-role="mother">
+              <SplitExportPedigreeNode dog={mother} size="large" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Column 5: Mother's 2nd Generation (2 tiles) */}
+      <div className="split-col split-col--second generation-col h-full flex flex-col relative">
+        <div className="split-col-content">
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={motherFather} size="medium" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={motherMother} size="medium" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Column 6: Mother's 3rd Generation (4 tiles) */}
+      <div className="split-col split-col--third h-full flex flex-col" data-split-col="third-mother">
+        <div className="split-col-content">
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={mfFather} size="small" side="mother" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={mfMother} size="small" side="mother" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={mmFather} size="small" side="mother" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+          <div className="split-tile relative">
+            <div className="split-tile-inner">
+              <SplitExportPedigreeNode dog={mmMother} size="small" side="mother" imageCacheBuster={imageCacheBuster} />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const exportPedigreeElementToPNG = useCallback(async (exportEl: HTMLDivElement, filePrefix: string) => {
+    // Export-only: for the split layout, temporarily enlarge the export box so the
+    // 6-column grid can be vertically centered without top/bottom clipping (same as breeding export).
+    let prevInlineHeight = '';
+    let prevInlineMaxHeight = '';
+    let prevInlineWidth = '';
+    let prevInlineMaxWidth = '';
+    const translatedSplitCols: Array<{ el: HTMLElement; prevValue: string; prevPriority: string }> = [];
 
     try {
       setIsExporting(true);
 
+      const isSplitExport = exportEl.dataset.exportContext === 'dog-detail-pedigree-split';
+      if (isSplitExport) {
+        prevInlineHeight = exportEl.style.height;
+        prevInlineMaxHeight = exportEl.style.maxHeight;
+        prevInlineWidth = exportEl.style.width;
+        prevInlineMaxWidth = exportEl.style.maxWidth;
+
+        const currentWidth = exportEl.offsetWidth;
+        const currentHeight = exportEl.offsetHeight;
+
+        exportEl.style.width = `${Math.round(currentWidth * 1.1)}px`;
+        exportEl.style.maxWidth = 'none';
+        exportEl.style.height = `${Math.round(currentHeight * 1.4)}px`;
+        exportEl.style.maxHeight = 'none';
+
+        // Wait for browser reflow so vertical centering CSS applies before cloning
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        // Split export-only: align 3rd-gen column midpoints with the corresponding 1st-gen image centers.
+        // Left 3rd-gen column → Father image center, right 3rd-gen column → Mother image center.
+        const findRoleRect = (role: 'father' | 'mother'): DOMRect | null => {
+          const roleRoot = exportEl.querySelector(`[data-split-role="${role}"]`) as HTMLElement | null;
+          if (!roleRoot) return null;
+
+          // Prefer the actual <img> (most accurate). If missing, fall back to the image wrapper.
+          const img = roleRoot.querySelector('img') as HTMLImageElement | null;
+          if (img) return img.getBoundingClientRect();
+
+          const wrapper = roleRoot.querySelector('.overflow-hidden') as HTMLElement | null;
+          if (wrapper) return wrapper.getBoundingClientRect();
+
+          return roleRoot.getBoundingClientRect();
+        };
+
+        const alignThirdGenToRole = (colKey: 'third-father' | 'third-mother', role: 'father' | 'mother') => {
+          const targetRect = findRoleRect(role);
+          if (!targetRect) return;
+
+          const colContent = exportEl.querySelector(`[data-split-col="${colKey}"] .split-col-content`) as HTMLElement | null;
+          if (!colContent) return;
+
+          const colRect = colContent.getBoundingClientRect();
+          const targetCenterY = targetRect.top + targetRect.height / 2;
+          const colCenterY = colRect.top + colRect.height / 2;
+          const delta = Math.round(targetCenterY - colCenterY);
+
+          translatedSplitCols.push({
+            el: colContent,
+            prevValue: colContent.style.getPropertyValue('transform'),
+            prevPriority: colContent.style.getPropertyPriority('transform'),
+          });
+          colContent.style.setProperty('transform', `translateY(${delta}px)`, 'important');
+        };
+
+        alignThirdGenToRole('third-father', 'father');
+        alignThirdGenToRole('third-mother', 'mother');
+      }
+
       // Export-only: temporarily bump 1st-gen (large) dog-name font size for the PNG export.
       // This operates only on the hidden export DOM and is restored after export.
-      const exportEl = exportPedigreeRef.current;
       const bumpedDogNameEls: Array<{ el: HTMLElement; prevFontSize: string }> = [];
       const dogNameCandidates = Array.from(
         exportEl.querySelectorAll('.text-\\[19\\.5pt\\].text-white')
@@ -1321,7 +1641,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       };
       
       // Create isolated clone
-      const isolatedClone = createIsolatedClone(exportPedigreeRef.current);
+      const isolatedClone = createIsolatedClone(exportEl);
       
       // Remove generation labels from export
       // The generation labels are always the first direct child div of the pedigree container
@@ -1361,9 +1681,9 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       await Promise.all(imagePromises);
       
       // Apply computed styles to the root clone to ensure exact layout match
-      const rootComputed = window.getComputedStyle(exportPedigreeRef.current);
-      const originalWidth = exportPedigreeRef.current.offsetWidth;
-      const originalHeight = exportPedigreeRef.current.offsetHeight;
+      const rootComputed = window.getComputedStyle(exportEl);
+      const originalWidth = exportEl.offsetWidth;
+      const originalHeight = exportEl.offsetHeight;
       
       // Apply all computed styles to root clone for exact match
       isolatedClone.style.width = rootComputed.width;
@@ -1437,7 +1757,7 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           const url = URL.createObjectURL(blob);
           const link = document.createElement('a');
           link.href = url;
-          link.download = `pedigree-${Date.now()}.png`;
+          link.download = `${filePrefix}-${Date.now()}.png`;
           document.body.appendChild(link);
           link.click();
           document.body.removeChild(link);
@@ -1501,22 +1821,67 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
       console.error('Export error:', error);
       toast.error('Failed to export pedigree');
     } finally {
+      // Restore temporary export box sizing (split export only)
+      if (exportEl.dataset.exportContext === 'dog-detail-pedigree-split') {
+        exportEl.style.height = prevInlineHeight;
+        exportEl.style.maxHeight = prevInlineMaxHeight;
+        exportEl.style.width = prevInlineWidth;
+        exportEl.style.maxWidth = prevInlineMaxWidth;
+      }
+
+      // Restore split export 3rd-gen translateY adjustments
+      for (const { el, prevValue, prevPriority } of translatedSplitCols) {
+        if (!prevValue) {
+          el.style.removeProperty('transform');
+        } else {
+          el.style.setProperty('transform', prevValue, prevPriority || undefined);
+        }
+      }
+
       setIsExporting(false);
     }
   }, []);
+
+  // Export (current layout) to PNG
+  const handleExportToPNG = useCallback(async () => {
+    if (!exportPedigreeRef.current) {
+      toast.error('Unable to export pedigree');
+      return;
+    }
+    await exportPedigreeElementToPNG(exportPedigreeRef.current, 'pedigree');
+  }, [exportPedigreeElementToPNG]);
+
+  // Export (split father/mother layout) to PNG
+  const handleExportSplitToPNG = useCallback(async () => {
+    if (!exportSplitPedigreeRef.current) {
+      toast.error('Unable to export pedigree');
+      return;
+    }
+    await exportPedigreeElementToPNG(exportSplitPedigreeRef.current, 'pedigree-split');
+  }, [exportPedigreeElementToPNG]);
 
   return (
     <div className="card w-full relative">
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-xl font-semibold text-white">3-Generation Pedigree</h2>
-        <button
-          onClick={handleExportToPNG}
-          disabled={isExporting}
-          className="btn-secondary inline-flex items-center space-x-2"
-        >
-          <Download className="h-4 w-4" />
-          <span>{isExporting ? 'Exporting...' : 'Export to PNG'}</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportToPNG}
+            disabled={isExporting}
+            className="btn-secondary inline-flex items-center space-x-2"
+          >
+            <Download className="h-4 w-4" />
+            <span>{isExporting ? 'Exporting...' : 'Export to PNG'}</span>
+          </button>
+          <button
+            onClick={handleExportSplitToPNG}
+            disabled={isExporting}
+            className="btn-secondary inline-flex items-center space-x-2"
+          >
+            <Download className="h-4 w-4" />
+            <span>{isExporting ? 'Exporting...' : 'Export Split Layout'}</span>
+          </button>
+        </div>
       </div>
       
       {/* On-page tree (restyled via CSS wrapper to match breeding simulator) */}
@@ -1533,7 +1898,17 @@ const PedigreeTree: React.FC<PedigreeTreeProps> = ({ generations, imageCacheBust
           className="theme-legacy"
         >
           <PedigreeTreeContent />
-      </div>
+        </div>
+        <div
+          ref={exportSplitPedigreeRef}
+          data-pedigree-export
+          data-export-gap="tight"
+          data-export-context="dog-detail-pedigree-split"
+          className="theme-legacy"
+          style={{ width: '2000px' }}
+        >
+          <SplitPedigreeTreeContent />
+        </div>
       </div>
     </div>
   );

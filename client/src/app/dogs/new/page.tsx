@@ -423,6 +423,198 @@ const FormField: React.FC<FormFieldProps> = ({ label, required, children, error 
   </div>
 );
 
+type ParentRole = 'father' | 'mother';
+
+interface QuickCreateParentModalProps {
+  open: boolean;
+  role: ParentRole;
+  initialName: string;
+  onClose: () => void;
+  onCreated: (dog: Dog) => void;
+}
+
+const QuickCreateParentModal: React.FC<QuickCreateParentModalProps> = ({
+  open,
+  role,
+  initialName,
+  onClose,
+  onCreated,
+}) => {
+  const gender: DogFormData['gender'] = role === 'father' ? 'male' : 'female';
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [selectedPrimaryKennel, setSelectedPrimaryKennel] = useState<Kennel | null>(null);
+  const [selectedSecondaryKennel, setSelectedSecondaryKennel] = useState<Kennel | null>(null);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    reset,
+  } = useForm<DogFormData>({
+    defaultValues: {
+      dog_name: initialName,
+      champion: 'none',
+      primary_kennel_id: undefined,
+      secondary_kennel_id: undefined,
+      gender,
+      father_id: '',
+      mother_id: '',
+      photo: undefined,
+    },
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    reset({
+      dog_name: initialName,
+      champion: 'none',
+      primary_kennel_id: undefined,
+      secondary_kennel_id: undefined,
+      gender,
+      father_id: '',
+      mother_id: '',
+      photo: undefined,
+    });
+    setPhotoPreview(null);
+    setSelectedPrimaryKennel(null);
+    setSelectedSecondaryKennel(null);
+  }, [open, initialName, gender, reset]);
+
+  const handlePhotoChange = useCallback((file: File) => {
+    setValue('photo', file);
+    const reader = new FileReader();
+    reader.onload = (e) => setPhotoPreview(e.target?.result as string);
+    reader.readAsDataURL(file);
+  }, [setValue]);
+
+  const submit = useCallback(async (data: DogFormData) => {
+    try {
+      setIsSubmitting(true);
+      // Ensure gender is locked to the expected parent role.
+      data.gender = gender;
+      data.father_id = '';
+      data.mother_id = '';
+
+      const response = await dogsApi.create(data);
+      if (response.success && response.data) {
+        toast.success(`${data.dog_name} has been successfully added!`);
+        onCreated(response.data);
+        onClose();
+      } else {
+        toast.error(response.error || 'Error creating dog');
+      }
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || error.message || 'Error creating dog');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [gender, onClose, onCreated]);
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+      <div className="bg-gray-900 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-auto">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-semibold text-white">
+            Add {role === 'father' ? 'Father' : 'Mother'}
+          </h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-gray-400 hover:text-white transition-colors"
+            aria-label="Close"
+          >
+            ✕
+          </button>
+        </div>
+
+        <p className="text-sm text-gray-400 mb-6">
+          This is a quick-create form (no parents here). After saving, it will be selected automatically.
+        </p>
+
+        <form onSubmit={handleSubmit(submit)} className="space-y-6">
+          <FormField label="Dog Name" required error={errors.dog_name?.message}>
+            <input
+              type="text"
+              {...register('dog_name', VALIDATION_RULES.dog_name)}
+              className="input w-full"
+              placeholder="e.g. Dexter"
+              disabled={isSubmitting}
+            />
+          </FormField>
+
+          {/* Kennels */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <CreatableSelect
+              value={selectedPrimaryKennel}
+              onChange={(kennel) => {
+                setSelectedPrimaryKennel(kennel);
+                setValue('primary_kennel_id', kennel?.id || undefined);
+              }}
+              placeholder="Select or type to create primary kennel..."
+              label="Primary Kennel"
+            />
+
+            <CreatableSelect
+              value={selectedSecondaryKennel}
+              onChange={(kennel) => {
+                setSelectedSecondaryKennel(kennel);
+                setValue('secondary_kennel_id', kennel?.id || undefined);
+              }}
+              placeholder="Select or type to create secondary kennel..."
+              label="Secondary Kennel"
+            />
+          </div>
+
+          {/* Champion */}
+          <FormField label="Champion" error={errors.champion?.message}>
+            <select
+              {...register('champion')}
+              className="input w-full"
+              defaultValue="none"
+              disabled={isSubmitting}
+            >
+              <option value="none">None</option>
+              <option value="ch">Ch.</option>
+              <option value="dual_ch">Dual Ch.</option>
+              <option value="gr_ch">Gr. Ch.</option>
+              <option value="dual_gr_ch">Dual Gr. Ch.</option>
+              <option value="nw_gr_ch">NW. Gr. Ch.</option>
+              <option value="inw_gr_ch">INW. Gr. Ch.</option>
+            </select>
+          </FormField>
+
+          {/* Gender (locked) */}
+          <FormField label="Gender (locked)">
+            <input
+              type="text"
+              value={gender === 'male' ? 'Male' : 'Female'}
+              readOnly
+              className="input w-full opacity-80"
+            />
+          </FormField>
+
+          {/* Photo */}
+          <PhotoUploadInline photoPreview={photoPreview} onPhotoChange={handlePhotoChange} />
+
+          <div className="flex justify-end space-x-3">
+            <button type="button" onClick={onClose} className="btn-secondary" disabled={isSubmitting}>
+              Cancel
+            </button>
+            <button type="submit" className="btn-primary" disabled={isSubmitting}>
+              {isSubmitting ? 'Adding...' : 'Add dog'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 // Parent selection component
 interface ParentSelectionProps {
   availableDogs: Dog[];
@@ -430,6 +622,8 @@ interface ParentSelectionProps {
   motherValue: Dog | null;
   onFatherChange: (dog: Dog | null) => void;
   onMotherChange: (dog: Dog | null) => void;
+  onCreateFather: (name: string) => void;
+  onCreateMother: (name: string) => void;
 }
 
 const ParentSelection: React.FC<ParentSelectionProps> = ({ 
@@ -437,7 +631,9 @@ const ParentSelection: React.FC<ParentSelectionProps> = ({
   fatherValue, 
   motherValue,
   onFatherChange,
-  onMotherChange
+  onMotherChange,
+  onCreateFather,
+  onCreateMother
 }) => {
   const maleDogs = availableDogs.filter(dog => dog.gender === 'male');
   const femaleDogs = availableDogs.filter(dog => dog.gender === 'female');
@@ -454,6 +650,7 @@ const ParentSelection: React.FC<ParentSelectionProps> = ({
           onChange={onFatherChange}
           placeholder="No father selected"
           label="Father"
+          onCreateRequested={onCreateFather}
         />
 
         {/* Mother Selection */}
@@ -463,6 +660,7 @@ const ParentSelection: React.FC<ParentSelectionProps> = ({
           onChange={onMotherChange}
           placeholder="No mother selected"
           label="Mother"
+          onCreateRequested={onCreateMother}
         />
       </div>
     </div>
@@ -476,6 +674,7 @@ const AddDog: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [availableDogs, setAvailableDogs] = useState<Dog[]>([]);
   const [addAnother, setAddAnother] = useState(true);
+  const [creatingParent, setCreatingParent] = useState<{ role: ParentRole; initialName: string } | null>(null);
 
   const DEFAULT_DOG_FORM: DogFormData = {
     dog_name: '',
@@ -715,6 +914,7 @@ const AddDog: React.FC = () => {
               }}
               placeholder="No father selected"
               label="Father"
+              onCreateRequested={(name) => setCreatingParent({ role: 'father', initialName: name })}
             />
 
             {/* Mother Selection */}
@@ -727,6 +927,7 @@ const AddDog: React.FC = () => {
               }}
               placeholder="No mother selected"
               label="Mother"
+              onCreateRequested={(name) => setCreatingParent({ role: 'mother', initialName: name })}
             />
           </div>
 
@@ -763,6 +964,27 @@ const AddDog: React.FC = () => {
           </div>
         </div>
       </form>
+
+      <QuickCreateParentModal
+        open={!!creatingParent}
+        role={creatingParent?.role || 'father'}
+        initialName={creatingParent?.initialName || ''}
+        onClose={() => setCreatingParent(null)}
+        onCreated={(newDog) => {
+          setAvailableDogs((prev) => {
+            const exists = prev.some((d) => d.id === newDog.id);
+            return exists ? prev : [...prev, newDog];
+          });
+
+          if (creatingParent?.role === 'father') {
+            setSelectedFather(newDog);
+            setValue('father_id', newDog.id || '');
+          } else {
+            setSelectedMother(newDog);
+            setValue('mother_id', newDog.id || '');
+          }
+        }}
+      />
     </div>
   );
 };

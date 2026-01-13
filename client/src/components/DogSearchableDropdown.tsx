@@ -11,6 +11,7 @@ interface DogSearchableDropdownProps {
   onChange: (dog: Dog | null) => void;
   placeholder: string;
   label: string;
+  onCreateRequested?: (name: string) => void;
 }
 
 export const DogSearchableDropdown: React.FC<DogSearchableDropdownProps> = ({
@@ -19,6 +20,7 @@ export const DogSearchableDropdown: React.FC<DogSearchableDropdownProps> = ({
   onChange,
   placeholder,
   label,
+  onCreateRequested,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,6 +40,23 @@ export const DogSearchableDropdown: React.FC<DogSearchableDropdownProps> = ({
       );
     });
   }, [options, searchTerm]);
+
+  const canCreate = useMemo(() => {
+    if (!onCreateRequested) return false;
+    const name = searchTerm.trim();
+    if (!name) return false;
+    const exactExists = options.some(
+      (d) => (d.dog_name || '').trim().toLowerCase() === name.toLowerCase()
+    );
+    return !exactExists;
+  }, [onCreateRequested, options, searchTerm]);
+
+  const handleCreate = () => {
+    const name = searchTerm.trim();
+    if (!name || !onCreateRequested) return;
+    close();
+    onCreateRequested(name);
+  };
 
   const close = () => {
     setIsOpen(false);
@@ -202,6 +221,19 @@ export const DogSearchableDropdown: React.FC<DogSearchableDropdownProps> = ({
                     })()}
                   </button>
                 ))
+              )}
+
+              {canCreate && (
+                <button
+                  type="button"
+                  onClick={handleCreate}
+                  className="w-full text-left px-4 py-2 border-t border-gray-700 hover:bg-gray-700 transition-colors"
+                >
+                  <div className="text-white font-medium">
+                    + Add &quot;{searchTerm.trim()}&quot;
+                  </div>
+                  <div className="text-sm text-gray-400">Add this dog and select it</div>
+                </button>
               )}
             </div>
           </div>

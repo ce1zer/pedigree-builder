@@ -68,7 +68,11 @@ export const dogsApi = {
     while (true) {
       const pageResp = await dogsApi.list({ limit: pageSize, offset });
       if (!pageResp.success || !pageResp.data) {
-        return pageResp as ApiResponse<Dog[]>;
+        return {
+          success: false,
+          error: pageResp.error || 'Error loading dogs',
+          errors: pageResp.errors,
+        };
       }
 
       const { items } = pageResp.data;

@@ -8,7 +8,7 @@ import { Dog } from '@/types';
 import { dogsApi } from '@/services/api';
 import { createClient } from '@/utils/supabase/client';
 import toast from 'react-hot-toast';
-import { getKennelName } from '@/utils/dogNameFormatter';
+import { formatDogDisplayName, getKennelName } from '@/utils/dogNameFormatter';
 
 // Constants
 const SMALL_ICON_SIZE = 'h-4 w-4';
@@ -63,7 +63,6 @@ const NavLink: React.FC<NavLinkProps> = ({ item, isActive }) => (
 const SearchBar: React.FC<{ pathname: string }> = ({ pathname }) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [dogs, setDogs] = useState<Dog[]>([]);
   const [filteredDogs, setFilteredDogs] = useState<Dog[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -71,90 +70,39 @@ const SearchBar: React.FC<{ pathname: string }> = ({ pathname }) => {
   const searchRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
-  // Function to load dogs (can be called manually or automatically)
-  const loadDogs = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await dogsApi.getAll();
-      if (response.success && response.data) {
-        setDogs(response.data);
-      }
-    } catch (error) {
-      console.error('Failed to load dogs for search:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Load all dogs for autocomplete (lazy load - only when user starts typing)
+  // Search server-side for suggestions (avoids 1000-row cap and keeps results fresh)
   useEffect(() => {
-    // Only load dogs when user starts typing (lazy load)
-    if (searchQuery.trim().length === 0) {
-      return;
-    }
-    
-    // Debounce the API call to avoid loading on every keystroke
-    const timeoutId = setTimeout(async () => {
-      if (dogs.length === 0) { // Only load if not already loaded
-        await loadDogs();
-      }
-    }, 300); // Wait 300ms after user stops typing
-    
-    return () => clearTimeout(timeoutId);
-  }, [searchQuery, dogs.length, loadDogs]);
-
-  // Listen for dog creation events to optimistically add new dog
-  useEffect(() => {
-    const handleDogCreated = (event: Event) => {
-      const customEvent = event as CustomEvent<{ newDog: Dog }>;
-      const newDog = customEvent.detail?.newDog;
-      
-      if (newDog) {
-        // Optimistically add new dog immediately if list is already loaded
-        setDogs(prev => {
-          // Check if dog already exists (prevent duplicates)
-          const exists = prev.some(d => d.id === newDog.id);
-          if (exists) return prev;
-          return [...prev, newDog];
-        });
-        
-        // Also refresh in background to ensure we have latest data
-        loadDogs().catch(err => {
-          console.warn('Background refresh failed, but dog is already added:', err);
-        });
-      } else {
-        // Fallback: if no dog data, refresh the list
-        if (dogs.length > 0) {
-          loadDogs();
-        }
-      }
-    };
-
-    window.addEventListener('dog-created', handleDogCreated);
-    return () => {
-      window.removeEventListener('dog-created', handleDogCreated);
-    };
-  }, [dogs.length, loadDogs]);
-
-  // Filter dogs based on search query
-  useEffect(() => {
-    if (searchQuery.trim()) {
-      const filtered = dogs.filter(dog => {
-        const primaryKennelName = getKennelName(dog);
-        const query = searchQuery.toLowerCase();
-        return (
-          dog.dog_name?.toLowerCase().includes(query) ||
-          primaryKennelName.toLowerCase().includes(query)
-        );
-      });
-      setFilteredDogs(filtered);
-      setShowSuggestions(true);
-      setSelectedIndex(-1);
-    } else {
+    const q = searchQuery.trim();
+    if (q.length < 2) {
       setFilteredDogs([]);
       setShowSuggestions(false);
+      setLoading(false);
+      return;
     }
-  }, [searchQuery, dogs]);
+
+    setLoading(true);
+    const timeoutId = setTimeout(async () => {
+      try {
+        const response = await dogsApi.search(q, { limit: 20, offset: 0 });
+        if (response.success && response.data) {
+          setFilteredDogs(response.data.items || []);
+          setShowSuggestions(true);
+          setSelectedIndex(-1);
+        } else {
+          setFilteredDogs([]);
+          setShowSuggestions(false);
+        }
+      } catch (error) {
+        console.error('Failed to search dogs:', error);
+        setFilteredDogs([]);
+        setShowSuggestions(false);
+      } finally {
+        setLoading(false);
+      }
+    }, 250);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   // Close suggestions when clicking outside
   useEffect(() => {

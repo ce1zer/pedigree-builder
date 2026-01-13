@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { Dog, DogFormData, ApiResponse, Kennel } from '../types';
+import { Dog, DogFormData, ApiResponse, Kennel, PagedResult } from '../types';
 
 // API configuration
 const API_BASE_URL = '/api';
@@ -43,10 +43,10 @@ const createDogFormData = (dogData: DogFormData): FormData => {
 // Dogs API service
 export const dogsApi = {
   /**
-   * Retrieve all dogs with their parent information
+   * Retrieve a page of dogs with their parent information
    */
-  getAll: async (): Promise<ApiResponse<Dog[]>> => {
-    const response = await api.get('/dogs');
+  list: async (params?: { limit?: number; offset?: number }): Promise<ApiResponse<PagedResult<Dog>>> => {
+    const response = await api.get('/dogs', { params });
     return handleApiResponse(response);
   },
 
@@ -56,6 +56,32 @@ export const dogsApi = {
   getById: async (id: string): Promise<ApiResponse<Dog>> => {
     const response = await api.get(`/dogs/${id}`);
     return handleApiResponse(response);
+  },
+
+  /**
+   * Retrieve all dogs by paging until exhausted (use sparingly).
+   */
+  getAll: async (pageSize: number = 100): Promise<ApiResponse<Dog[]>> => {
+    const all: Dog[] = [];
+    let offset = 0;
+
+    while (true) {
+      const pageResp = await dogsApi.list({ limit: pageSize, offset });
+      if (!pageResp.success || !pageResp.data) {
+        return pageResp as ApiResponse<Dog[]>;
+      }
+
+      const { items } = pageResp.data;
+      all.push(...items);
+
+      if (items.length < pageSize) break;
+      offset += pageSize;
+
+      // Safety guard against infinite loops if an API misbehaves
+      if (offset > 1_000_000) break;
+    }
+
+    return { success: true, data: all };
   },
 
   /**
@@ -99,9 +125,9 @@ export const dogsApi = {
   /**
    * Search dogs by name or kennel
    */
-  search: async (query: string): Promise<ApiResponse<Dog[]>> => {
+  search: async (query: string, params?: { limit?: number; offset?: number }): Promise<ApiResponse<PagedResult<Dog>>> => {
     const response = await api.get('/dogs/search', {
-      params: { q: query },
+      params: { q: query, ...params },
     });
     
     return handleApiResponse(response);

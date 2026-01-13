@@ -3,7 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown, X } from 'lucide-react';
 import { Dog } from '@/types';
-import { getKennelName } from '@/utils/dogNameFormatter';
+import { formatDogDisplayName, getKennelName } from '@/utils/dogNameFormatter';
 
 interface DogSearchableDropdownProps {
   options: Dog[];
@@ -32,10 +32,9 @@ export const DogSearchableDropdown: React.FC<DogSearchableDropdownProps> = ({
     if (!query) return options;
 
     return options.filter((dog) => {
-      const kennelName = getKennelName(dog).toLowerCase();
+      const searchable = formatDogDisplayName(dog).toLowerCase();
       return (
-        dog.dog_name?.toLowerCase().includes(query) ||
-        kennelName.includes(query)
+        searchable.includes(query)
       );
     });
   }, [options, searchTerm]);
@@ -161,7 +160,7 @@ export const DogSearchableDropdown: React.FC<DogSearchableDropdownProps> = ({
         </button>
 
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-hidden">
+          <div className="absolute z-50 w-full bottom-full mb-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-hidden">
             <div className="p-2 border-b border-gray-700">
               <input
                 ref={searchInputRef}

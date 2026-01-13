@@ -126,9 +126,16 @@ const checkDuplicateDog = async (
 /**
  * GET /api/dogs - Retrieve all dogs with their parent information
  */
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const { data: dogs, error: dogsError } = await supabase
+    const { searchParams } = new URL(request.url);
+    const limitParam = searchParams.get('limit');
+    const offsetParam = searchParams.get('offset');
+
+    const limit = Math.min(Math.max(parseInt(limitParam || '100', 10) || 100, 1), 500);
+    const offset = Math.max(parseInt(offsetParam || '0', 10) || 0, 0);
+
+    const { data: dogs, error: dogsError, count } = await supabase
       .from('dogs')
       .select(`
         *,
@@ -136,14 +143,23 @@ export async function GET() {
         secondary_kennel:secondary_kennel_id(id, name),
         father:father_id(id, dog_name, primary_kennel_id, secondary_kennel_id, gender, image_url),
         mother:mother_id(id, dog_name, primary_kennel_id, secondary_kennel_id, gender, image_url)
-      `)
-      .order('dog_name');
+      `, { count: 'exact' })
+      .order('dog_name')
+      .range(offset, offset + limit - 1);
     
     if (dogsError) throw dogsError;
     
     // No caching - always return fresh data
     return NextResponse.json(
-      { success: true, data: dogs },
+      {
+        success: true,
+        data: {
+          items: dogs || [],
+          total: count ?? 0,
+          limit,
+          offset,
+        },
+      },
       {
         headers: {
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',

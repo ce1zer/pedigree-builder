@@ -52,3 +52,10 @@ export interface ApiResponse<T> {
   error?: string;
   errors?: string[];
 }
+
+export interface PagedResult<T> {
+  items: T[];
+  total: number;
+  limit: number;
+  offset: number;
+}

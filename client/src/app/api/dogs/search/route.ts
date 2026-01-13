@@ -32,6 +32,8 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q');
+    const limitParam = searchParams.get('limit');
+    const offsetParam = searchParams.get('offset');
 
     // Validate search query
     if (!query || query.trim().length < MIN_SEARCH_LENGTH) {
@@ -41,25 +43,61 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const limit = Math.min(Math.max(parseInt(limitParam || '100', 10) || 100, 1), 500);
+    const offset = Math.max(parseInt(offsetParam || '0', 10) || 0, 0);
+
     const searchTerm = `%${query.trim()}%`;
 
-    // Search in dogs table with kennel joins
-    // Note: This searches in both old text fields (for backward compatibility) and new kennel names
-    const { data, error } = await supabase
-      .from('dogs')
-      .select(`
-        *,
-        primary_kennel:primary_kennel_id(id, name),
-        secondary_kennel:secondary_kennel_id(id, name)
-      `)
-      .or(`dog_name.ilike.${searchTerm},primary_kennel.ilike.${searchTerm},secondary_kennel.ilike.${searchTerm}`)
-      .order('dog_name');
+    // Search in dogs table.
+    // We prefer to search across dog_name and (if present) legacy text kennel columns.
+    // Some deployments do not have those legacy columns, so we gracefully fall back to dog_name only.
+    let data: any[] | null = null;
+    let count: number | null = null;
 
-    if (error) throw error;
+    const trySearch = async (orFilter: string) => {
+      return await supabase
+        .from('dogs')
+        .select(
+          `
+            *,
+            primary_kennel:primary_kennel_id(id, name),
+            secondary_kennel:secondary_kennel_id(id, name)
+          `,
+          { count: 'exact' }
+        )
+        .or(orFilter)
+        .order('dog_name')
+        .range(offset, offset + limit - 1);
+    };
+
+    // Attempt: dog name + legacy kennel text columns (if they exist).
+    let result = await trySearch(
+      `dog_name.ilike.${searchTerm},primary_kennel.ilike.${searchTerm},secondary_kennel.ilike.${searchTerm}`
+    );
+
+    // Fallback: dog name only (for schemas without legacy kennel columns).
+    if (result.error) {
+      const msg = result.error.message || '';
+      if (msg.includes('column') && (msg.includes('primary_kennel') || msg.includes('secondary_kennel'))) {
+        result = await trySearch(`dog_name.ilike.${searchTerm}`);
+      }
+    }
+
+    if (result.error) throw result.error;
+    data = result.data;
+    count = result.count ?? 0;
 
     // Return with no-cache headers
     return NextResponse.json(
-      { success: true, data },
+      {
+        success: true,
+        data: {
+          items: data || [],
+          total: count ?? 0,
+          limit,
+          offset,
+        },
+      },
       {
         headers: {
           'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',

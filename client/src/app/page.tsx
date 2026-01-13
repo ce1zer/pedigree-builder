@@ -381,18 +381,25 @@ const MemoizedDogsView = React.memo(DogsView);
 const DashboardContent: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const PAGE_SIZE = 100;
   const [view, setView] = useState<'dogs' | 'kennels'>('dogs');
   const [dogs, setDogs] = useState<Dog[]>([]);
   const [kennels, setKennels] = useState<Kennel[]>([]);
   const [loading, setLoading] = useState(true);
   const [kennelsLoading, setKennelsLoading] = useState(false);
+  const [totalDogs, setTotalDogs] = useState(0);
+  const [totalMatches, setTotalMatches] = useState(0);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   // Get search query from URL
   const searchQuery = searchParams.get('q') || '';
 
   useEffect(() => {
-    loadDogs();
     loadKennels();
+    // Always keep total dog count fresh (used for header count).
+    loadTotalDogs();
   }, []);
 
   // Listen for dog creation events to optimistically add new dog
@@ -402,18 +409,9 @@ const DashboardContent: React.FC = () => {
       const newDog = customEvent.detail?.newDog;
       
       if (newDog) {
-        // Optimistically add new dog immediately
-        setDogs(prev => {
-          // Check if dog already exists (prevent duplicates)
-          const exists = prev.some(d => d.id === newDog.id);
-          if (exists) return prev;
-          return [...prev, newDog];
-        });
-        
-        // Also refresh in background to ensure we have latest data
-        loadDogs().catch(err => {
-          console.warn('Background refresh failed, but dog is already added:', err);
-        });
+        // Refresh lists/counts so new dogs show up even beyond the first page.
+        loadTotalDogs().catch(() => {});
+        refreshDogs().catch(() => {});
       }
     };
 
@@ -423,40 +421,69 @@ const DashboardContent: React.FC = () => {
     };
   }, []);
 
-  // Optimize filtering with useMemo instead of useEffect
-  const filteredDogs = useMemo(() => {
-    if (!searchQuery.trim()) return dogs;
-    
-    const query = searchQuery.toLowerCase();
-    return dogs.filter(dog => {
-      const primaryKennelName = getKennelName(dog);
-      const secondaryKennelName = typeof dog.secondary_kennel === 'object' && dog.secondary_kennel?.name 
-        ? dog.secondary_kennel.name 
-        : (typeof dog.secondary_kennel === 'string' ? dog.secondary_kennel : dog.secondary_kennel_name || '');
-      return (
-        dog.dog_name?.toLowerCase().includes(query) ||
-        primaryKennelName.toLowerCase().includes(query) ||
-        secondaryKennelName.toLowerCase().includes(query)
-      );
-    });
-  }, [searchQuery, dogs]);
-
-  const loadDogs = async () => {
+  const loadTotalDogs = async () => {
     try {
-      setLoading(true);
-      const response = await dogsApi.getAll();
-      
+      const response = await dogsApi.list({ limit: 1, offset: 0 });
       if (response.success && response.data) {
-        setDogs(response.data);
-      } else {
-        toast.error(response.error || 'Error loading dogs');
+        setTotalDogs(response.data.total);
       }
     } catch (error) {
-      toast.error('Error loading dogs');
+      // Non-fatal
+    }
+  };
+
+  const loadDogsPage = async (nextOffset: number, mode: 'list' | 'search') => {
+    const q = searchQuery.trim();
+    const resp =
+      mode === 'search'
+        ? await dogsApi.search(q, { limit: PAGE_SIZE, offset: nextOffset })
+        : await dogsApi.list({ limit: PAGE_SIZE, offset: nextOffset });
+
+    if (!resp.success || !resp.data) {
+      throw new Error(resp.error || 'Error loading dogs');
+    }
+
+    const { items, total } = resp.data;
+
+    setDogs(prev => (nextOffset === 0 ? items : [...prev, ...items]));
+    setOffset(nextOffset + items.length);
+    setHasMore(nextOffset + items.length < total);
+    if (mode === 'search') {
+      setTotalMatches(total);
+    }
+  };
+
+  const refreshDogs = async () => {
+    setLoading(true);
+    try {
+      const mode: 'list' | 'search' = searchQuery.trim() ? 'search' : 'list';
+      await loadDogsPage(0, mode);
+    } catch (error: any) {
+      toast.error(error.message || 'Error loading dogs');
     } finally {
       setLoading(false);
     }
   };
+
+  const loadMoreDogs = async () => {
+    if (!hasMore || loadingMore) return;
+    setLoadingMore(true);
+    try {
+      const mode: 'list' | 'search' = searchQuery.trim() ? 'search' : 'list';
+      await loadDogsPage(offset, mode);
+    } catch (error: any) {
+      toast.error(error.message || 'Error loading more dogs');
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  useEffect(() => {
+    // When the URL query changes, reload from page 0 using server-side search or the paged list.
+    refreshDogs();
+  }, [searchQuery]);
+
+  const filteredDogs = dogs;
 
   const loadKennels = async () => {
     try {
@@ -482,8 +509,8 @@ const DashboardContent: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-white">
             Database{' '}
-            {view === 'dogs' && dogs.length > 0 && (
-              <span className="text-gray-400">({dogs.length})</span>
+            {view === 'dogs' && totalDogs > 0 && (
+              <span className="text-gray-400">({totalDogs})</span>
             )}
             {view === 'kennels' && kennels.length > 0 && (
               <span className="text-gray-400">({kennels.length})</span>
@@ -524,12 +551,30 @@ const DashboardContent: React.FC = () => {
 
       {/* Content based on view */}
       {view === 'dogs' ? (
-        <MemoizedDogsView
-          dogs={dogs}
-          filteredDogs={filteredDogs}
-          loading={loading}
-          searchQuery={searchQuery}
-        />
+        <>
+          <MemoizedDogsView
+            dogs={dogs}
+            filteredDogs={filteredDogs}
+            loading={loading}
+            searchQuery={searchQuery}
+          />
+          {hasMore && (
+            <div className="flex justify-center pt-4">
+              <button
+                onClick={loadMoreDogs}
+                disabled={loadingMore}
+                className="btn-secondary"
+              >
+                {loadingMore ? 'Loading...' : 'Load more'}
+              </button>
+            </div>
+          )}
+          {searchQuery.trim() && totalMatches > 0 && (
+            <div className="text-center text-sm text-gray-400">
+              Showing {dogs.length} of {totalMatches} matches
+            </div>
+          )}
+        </>
       ) : (
         <MemoizedKennelsView
           kennels={kennels}
